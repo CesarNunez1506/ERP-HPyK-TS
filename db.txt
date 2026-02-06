@@ -1,0 +1,300 @@
+Table planta {
+  codigo varchar(7) [pk]
+  descripcion text
+}
+
+Table area {
+  codigo varchar(2) [pk]
+  descripcion text
+}
+
+Table subarea {
+  codigo varchar(3) [pk]
+  descripcion text
+  area_codigo varchar(2) [ref: > area.codigo]
+}
+
+Table categoria {
+  codigo varchar(3) [pk]
+  descripcion text
+  observacion text [null]
+}
+
+Table clasificacion {
+  codigo varchar(4) [pk]
+  descripcion text
+}
+
+Table unidad_medida {
+  codigo varchar(3) [pk]
+  descripcion text
+}
+
+Table moneda {
+  codigo varchar(3) [pk]
+  descripcion text
+}
+
+Table fabricante {
+  codigo varchar(3) [pk]
+  descripcion text
+}
+
+Table criticidad {
+  codigo varchar(2) [pk]
+  descripcion text
+}
+
+Table tipo_componente {
+  codigo varchar(3) [pk]
+  descripcion text
+}
+
+Table posicion {
+  codigo varchar(3) [pk]
+  descripcion text
+}
+
+Table status_equipo {
+  codigo varchar(3) [pk]
+  descripcion text
+}
+
+Table status_estrategia {
+  codigo varchar(2) [pk]
+  descripcion text
+}
+
+Table tipo_estrategia {
+  codigo varchar(2) [pk]
+  descripcion text
+}
+
+Table ot_status {
+  codigo varchar(15) [pk]
+  descripcion text
+}
+
+Table recursos_status {
+  codigo varchar(25) [pk]
+  descripcion text
+}
+
+Table taller_status {
+  codigo varchar(25) [pk]
+  descripcion text
+}
+
+Table prioridad_atencion {
+  codigo varchar(3) [pk]
+  descripcion text
+}
+
+Table atencion_reparacion {
+  codigo varchar(15) [pk]
+  descripcion text
+}
+
+Table tipo_reparacion {
+  codigo varchar(10) [pk]
+  descripcion text
+}
+
+Table garantia {
+  codigo varchar(2) [pk]
+  descripcion text
+}
+
+Table tipo_garantia {
+  codigo varchar(15) [pk]
+  descripcion text
+}
+
+Table base_metalica {
+  codigo varchar(2) [pk]
+  descripcion text
+}
+
+Table material {
+  material_id int [pk, increment]
+  codigo varchar [unique]
+  descripcion text
+  planta_codigo varchar(7) [ref: > planta.codigo]
+  area_codigo varchar(2) [ref: > area.codigo]
+  categoria_codigo varchar(3) [ref: > categoria.codigo]
+  clasificacion_codigo varchar(4) [ref: > clasificacion.codigo]
+  unidad_medida_codigo varchar(3) [ref: > unidad_medida.codigo]
+  punto_reposicion decimal
+  stock_maximo decimal
+  plazo_entrega int
+  precio decimal
+  moneda_codigo varchar(3) [ref: > moneda.codigo]
+  fabricante_codigo varchar(3) [ref: > fabricante.codigo]
+  np varchar [null]
+}
+
+Table tipo_equipo {
+  codigo varchar(3) [pk]
+  descripcion text
+  categoria_codigo varchar(3) [ref: > categoria.codigo, null]
+}
+
+Table equipo {
+  equipo_id int [pk, increment]
+  codigo varchar [unique]
+  descripcion text
+  status_codigo varchar(3) [ref: > status_equipo.codigo]
+  area_codigo varchar(2) [ref: > area.codigo]
+  subarea_codigo varchar(3) [ref: > subarea.codigo]
+  tipo_codigo varchar(3) [ref: > tipo_equipo.codigo]
+  planta_codigo varchar(7) [ref: > planta.codigo]
+  criticidad_codigo varchar(2) [ref: > criticidad.codigo]
+  fecha_inicio date
+  fecha_fabricacion date [null]
+  fabricante text [null]
+  modelo text [null]
+  ns varchar [null]
+  np varchar [null]
+  capacidad decimal [null]
+  unidad_medida_codigo varchar(3) [ref: > unidad_medida.codigo, null]
+  observaciones text [null]
+}
+
+Table flota_equipo {
+  codigo varchar(10) [pk]
+  descripcion text
+  categoria_codigo varchar(3) [ref: > categoria.codigo]
+  fabricante_codigo varchar(3) [ref: > fabricante.codigo]
+}
+
+Table equipo_flota {
+  equipo_id int [ref: > equipo.equipo_id]
+  flota_codigo varchar(10) [ref: > flota_equipo.codigo]
+  indexes {
+    (equipo_id, flota_codigo) [pk]
+  }
+}
+
+Table componente {
+  componente_id int [pk, increment]
+  codigo varchar [unique]
+  descripcion text
+  equipo_id int [ref: > equipo.equipo_id]
+  tipo_componente_codigo varchar(3) [ref: > tipo_componente.codigo, null]
+  criticidad_codigo varchar(2) [ref: > criticidad.codigo, null]
+  tiempo_reposicion decimal
+  unidad_medida_codigo varchar(3) [ref: > unidad_medida.codigo]
+  observaciones text [null]
+}
+
+Table servicio {
+  servicio_id int [pk, increment]
+  codigo varchar [unique]
+  descripcion text
+  tipo_servicio varchar(10)
+  plazo_entrega int
+  costo decimal
+  moneda_codigo varchar(3) [ref: > moneda.codigo]
+}
+
+Table cliente {
+  codigo varchar(10) [pk]
+  descripcion text
+}
+
+Table estrategia_ot {
+  codigo varchar(2) [pk]
+  descripcion text
+}
+
+Table estrategia {
+  estrategia_id int [pk, increment]
+  usuario varchar
+  area_codigo varchar(2) [ref: > area.codigo]
+  equipo_codigo varchar [ref: > equipo.codigo]
+  actividad text
+  frecuencia decimal
+  unidad_medida_codigo varchar(3) [ref: > unidad_medida.codigo]
+  descripcion text
+  tipo_estrategia_codigo varchar(2) [ref: > tipo_estrategia.codigo]
+  status_codigo varchar(2) [ref: > status_estrategia.codigo]
+}
+
+Table registro_reparacion {
+  registro_id int [pk, increment]
+  usuario varchar
+  codigo_reparacion varchar [null]
+  descripcion text
+  tipo_componente_codigo varchar(3) [ref: > tipo_componente.codigo, null]
+  categoria_codigo varchar(3) [ref: > categoria.codigo, null]
+  flota_equipo_codigo varchar(10) [ref: > flota_equipo.codigo, null]
+  fabricante_codigo varchar(3) [ref: > fabricante.codigo, null]
+  np varchar [null]
+  posicion_codigo varchar(3) [ref: > posicion.codigo, null]
+  precio decimal [null]
+  fecha_registro datetime [default: `now()`]
+}
+
+Table orden_trabajo {
+  ot_id int [pk, increment]
+  numero_ot varchar [unique]
+  cliente_codigo varchar(10) [ref: > cliente.codigo]
+  estrategia_codigo varchar(2) [ref: > estrategia_ot.codigo, null]
+  registro_reparacion_id int [ref: > registro_reparacion.registro_id, null]
+  equipo_id int [ref: > equipo.equipo_id, null]
+  componente_id int [ref: > componente.componente_id, null]
+  cod_rep varchar [null]
+  tipo_reparacion_codigo varchar(10) [ref: > tipo_reparacion.codigo, null]
+  np varchar [null]
+  ns varchar [null]
+  fabricante text [null]
+  flota text [null]
+  posicion text [null]
+  plaqueteo varchar [null]
+  wo_cliente varchar [null]
+  po_cliente varchar [null]
+  fecha_requerimiento_cliente datetime [null]
+  contrato_dias decimal [null]
+  id_viajero varchar [null]
+  guia_remision varchar [null]
+  empresa_entrega varchar [null]
+  fecha_recepcion datetime [null]
+  pcr decimal [null]
+  horas decimal [null]
+  porcentaje_pcr decimal [null]
+  base_metalica_codigo varchar(2) [ref: > base_metalica.codigo, null]
+  garantia_codigo varchar(2) [ref: > garantia.codigo, null]
+  tipo_garantia_codigo varchar(15) [ref: > tipo_garantia.codigo, null]
+  atencion_reparacion_codigo varchar(15) [ref: > atencion_reparacion.codigo, null]
+  prioridad_atencion_codigo varchar(3) [ref: > prioridad_atencion.codigo, null]
+  ot_status_codigo varchar(15) [ref: > ot_status.codigo, null]
+  recursos_status_codigo varchar(25) [ref: > recursos_status.codigo, null]
+  taller_status_codigo varchar(25) [ref: > taller_status.codigo, null]
+  descripcion text [null]
+  comentarios text [null]
+  fecha_creacion datetime [default: `now()`]
+}
+
+Table tarea {
+  tarea_id int [pk, increment]
+  ot_id int [ref: > orden_trabajo.ot_id]
+  usuario varchar
+  actividad text
+  item decimal
+  tipo varchar(3)
+  material_id int [ref: > material.material_id, null]
+  servicio_id int [ref: > servicio.servicio_id, null]
+  equipo_id int [ref: > equipo.equipo_id, null]
+  componente_id int [ref: > componente.componente_id, null]
+  requerimiento decimal
+  cantidad decimal
+  precio_unitario decimal
+  subtotal decimal
+  np varchar [null]
+  referencia_descripcion text [null]
+  observaciones text [null]
+  
+  indexes {
+    (ot_id, item) [unique]
+  }
+}

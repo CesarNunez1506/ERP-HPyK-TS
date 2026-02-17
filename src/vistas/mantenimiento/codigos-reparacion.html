@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Códigos de Reparación - HP&K ERP</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="/vistas/shared/navigation.js"></script>
+    <style>
+        .dropdown-menu { display: none; }
+        .dropdown.active .dropdown-menu { display: block; }
+        .modal { display: none; }
+        .modal.active { display: flex; }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <!-- Navigation Menu will be loaded here -->
+    <div id="navigation-container"></div>
+
+    <!-- Header -->
+    <div class="bg-gradient-to-r from-green-600 to-green-800 text-white shadow-lg">
+        <div class="container mx-auto px-6 py-4">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center space-x-4">
+                    <i class="fas fa-code text-3xl"></i>
+                    <div>
+                        <h1 class="text-2xl font-bold">Códigos de Reparación</h1>
+                        <p class="text-green-200 text-sm">Clasificación y Codificación</p>
+                    </div>
+                </div>
+                <div class="flex items-center space-x-3">
+                    <a href="/index.html" class="bg-green-700 hover:bg-green-800 px-4 py-2 rounded-lg transition">
+                        <i class="fas fa-home"></i> Inicio
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Contenido Principal -->
+    <div class="container mx-auto px-4 py-8">
+        <div class="bg-white rounded-lg shadow-lg p-6">
+            <div class="flex justify-between items-center mb-6">
+                <div>
+                    <h1 class="text-3xl font-bold text-gray-800 flex items-center">
+                        <i class="fas fa-code text-cyan-600 mr-3"></i>
+                        Códigos de Reparación
+                    </h1>
+                    <p class="text-gray-500 mt-1">Catálogo de códigos de reparación y fallas</p>
+                </div>
+                <button onclick="showCreateForm()" class="bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white px-6 py-3 rounded-lg font-semibold shadow-md transition">
+                    <i class="fas fa-plus mr-2"></i> Nuevo Código
+                </button>
+            </div>
+
+            <!-- Filtro -->
+            <div class="mb-4">
+                <input type="text" id="searchInput" onkeyup="filterTable()" placeholder="Buscar códigos..." class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-transparent">
+            </div>
+
+            <!-- Tabla -->
+            <div class="overflow-x-auto">
+                <table class="min-w-full bg-white border border-gray-200 rounded-lg">
+                    <thead class="bg-gradient-to-r from-gray-100 to-gray-200">
+                        <tr>
+                            <th class="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Código</th>
+                            <th class="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Descripción</th>
+                            <th class="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Categoría</th>
+                            <th class="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Estado</th>
+                            <th class="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tableBody" class="divide-y divide-gray-200"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Formulario -->
+    <div id="modal" class="modal fixed inset-0 bg-gray-900 bg-opacity-50 overflow-y-auto h-full w-full z-50 items-center justify-center">
+        <div class="relative mx-auto p-8 border w-11/12 max-w-3xl shadow-2xl rounded-xl bg-white my-8">
+            <div class="flex justify-between items-center mb-6 pb-4 border-b border-gray-200">
+                <h3 class="text-3xl font-bold text-gray-800" id="modalTitle">
+                    <i class="fas fa-code text-cyan-600 mr-2"></i>
+                    Nuevo Código
+                </h3>
+                <button onclick="closeModal()" class="text-gray-400 hover:text-gray-600 text-3xl font-bold transition">
+                    &times;
+                </button>
+            </div>
+
+            <form id="codigoForm" onsubmit="saveCodigo(event)" class="space-y-6">
+                <input type="hidden" id="codigoId">
+                
+                <!-- Sección 1: Identificación -->
+                <div class="bg-gray-50 rounded-lg p-4">
+                    <h4 class="text-lg font-semibold text-cyan-700 mb-4 flex items-center">
+                        <i class="fas fa-id-card text-cyan-600 mr-2"></i>
+                        Identificación
+                    </h4>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Código *</label>
+                            <input type="text" id="codigo" required class="w-full px-3 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-cyan-500 focus:border-transparent">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Categoría *</label>
+                            <select id="categoria" required class="w-full px-3 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-cyan-500 focus:border-transparent">
+                                <option value="">Seleccione...</option>
+                                <option value="Mecánico">Mecánico</option>
+                                <option value="Eléctrico">Eléctrico</option>
+                                <option value="Electrónico">Electrónico</option>
+                                <option value="Hidráulico">Hidráulico</option>
+                                <option value="Neumático">Neumático</option>
+                                <option value="Estructural">Estructural</option>
+                                <option value="Otro">Otro</option>
+                            </select>
+                        </div>
+                        <div class="md:col-span-2">
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Descripción *</label>
+                            <input type="text" id="descripcion" required class="w-full px-3 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-cyan-500 focus:border-transparent">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Sección 2: Detalles -->
+                <div class="bg-gray-50 rounded-lg p-4">
+                    <h4 class="text-lg font-semibold text-blue-700 mb-4 flex items-center">
+                        <i class="fas fa-info-circle text-blue-600 mr-2"></i>
+                        Detalles de Reparación
+                    </h4>
+                    <div class="grid grid-cols-1 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Causa Probable</label>
+                            <textarea id="causa_probable" rows="2" class="w-full px-3 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-cyan-500 focus:border-transparent"></textarea>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Acción Correctiva</label>
+                            <textarea id="accion_correctiva" rows="2" class="w-full px-3 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-cyan-500 focus:border-transparent"></textarea>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Sección 3: Estado -->
+                <div class="bg-gray-50 rounded-lg p-4">
+                    <h4 class="text-lg font-semibold text-green-700 mb-4 flex items-center">
+                        <i class="fas fa-toggle-on text-green-600 mr-2"></i>
+                        Estado
+                    </h4>
+                    <div class="flex items-center">
+                        <input type="checkbox" id="activo" checked class="w-4 h-4 text-cyan-600 border-gray-300 rounded focus:ring-cyan-500">
+                        <label for="activo" class="ml-2 text-sm font-medium text-gray-700">Activo</label>
+                    </div>
+                </div>
+
+                <!-- Sección 4: Usuario -->
+                <div class="bg-gray-50 rounded-lg p-4">
+                    <h4 class="text-lg font-semibold text-gray-700 mb-4 flex items-center">
+                        <i class="fas fa-user text-gray-600 mr-2"></i>
+                        Información del Usuario
+                    </h4>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Creado por</label>
+                            <input type="text" id="user_crea" readonly class="w-full px-3 py-2 border border-gray-300 rounded bg-gray-100">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Fecha de creación</label>
+                            <input type="datetime-local" id="fecha_creacion" readonly class="w-full px-3 py-2 border border-gray-300 rounded bg-gray-100">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Botones -->
+                <div class="flex justify-end space-x-3 pt-4 border-t border-gray-200">
+                    <button type="button" onclick="closeModal()" class="bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white px-6 py-3 rounded-lg font-semibold shadow-md transition">
+                        <i class="fas fa-times mr-2"></i> Cancelar
+                    </button>
+                    <button type="submit" class="bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white px-6 py-3 rounded-lg font-semibold shadow-md transition">
+                        <i class="fas fa-save mr-2"></i> Guardar
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="fixed top-4 right-4 px-6 py-3 rounded-lg shadow-lg text-white transform transition-transform duration-300 translate-x-full z-50"></div>
+
+    <script>
+        let codigos = [];
+
+        // Dropdown functions
+        function toggleDropdown(event, button) {
+            event.stopPropagation();
+            const dropdown = button.parentElement;
+            const isActive = dropdown.classList.contains('active');
+            closeAllDropdowns();
+            if (!isActive) dropdown.classList.add('active');
+        }
+
+        function closeAllDropdowns(event) {
+            if (event && event.target.closest('.dropdown')) return;
+            document.querySelectorAll('.dropdown').forEach(d => d.classList.remove('active'));
+        }
+
+        // Modal functions
+        function showCreateForm() {
+            document.getElementById('codigoForm').reset();
+            document.getElementById('modalTitle').innerHTML = '<i class="fas fa-code text-cyan-600 mr-2"></i>Nuevo Código';
+            document.getElementById('codigoId').value = '';
+            document.getElementById('user_crea').value = localStorage.getItem('username') || 'Admin';
+            document.getElementById('fecha_creacion').value = new Date().toISOString().slice(0, 16);
+            document.getElementById('modal').classList.add('active');
+        }
+
+        function closeModal() {
+            document.getElementById('modal').classList.remove('active');
+        }
+
+        // Toast notification
+        function showToast(message, type = 'success') {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.className = `fixed top-4 right-4 px-6 py-3 rounded-lg shadow-lg text-white transform transition-transform duration-300 z-50 ${
+                type === 'success' ? 'bg-gradient-to-r from-green-500 to-green-600' : 'bg-gradient-to-r from-red-500 to-red-600'
+            }`;
+            toast.style.transform = 'translateX(0)';
+            setTimeout(() => { toast.style.transform = 'translateX(150%)'; }, 3000);
+        }
+
+        // Cargar códigos
+        async function loadCodigos() {
+            try {
+                const response = await fetch('/api/mantenimiento/codigos-reparacion');
+                codigos = await response.json();
+                renderTable();
+            } catch (error) {
+                console.error('Error cargando códigos:', error);
+                showToast('Error al cargar códigos', 'error');
+            }
+        }
+
+        // Renderizar tabla
+        function renderTable() {
+            const tbody = document.getElementById('tableBody');
+            tbody.innerHTML = '';
+            
+            codigos.forEach(codigo => {
+                const estadoBadge = codigo.activo ? 
+                    'bg-green-100 text-green-800' : 
+                    'bg-gray-100 text-gray-800';
+
+                tbody.innerHTML += `
+                    <tr class="hover:bg-gray-50">
+                        <td class="px-4 py-3 text-sm font-medium text-gray-900">${codigo.codigo}</td>
+                        <td class="px-4 py-3 text-sm text-gray-700">${codigo.descripcion}</td>
+                        <td class="px-4 py-3 text-sm text-gray-600">${codigo.categoria}</td>
+                        <td class="px-4 py-3">
+                            <span class="px-2 py-1 text-xs font-semibold rounded-full ${estadoBadge}">
+                                ${codigo.activo ? 'Activo' : 'Inactivo'}
+                            </span>
+                        </td>
+                        <td class="px-4 py-3 text-sm">
+                            <button onclick="editCodigo(${codigo.id})" class="text-blue-600 hover:text-blue-800 mr-3" title="Editar">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button onclick="deleteCodigo(${codigo.id})" class="text-red-600 hover:text-red-800" title="Eliminar">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </td>
+                    </tr>
+                `;
+            });
+        }
+
+        // Filtrar tabla
+        function filterTable() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            const rows = document.querySelectorAll('#tableBody tr');
+            
+            rows.forEach(row => {
+                const text = row.textContent.toLowerCase();
+                row.style.display = text.includes(searchTerm) ? '' : 'none';
+            });
+        }
+
+        // Guardar código
+        async function saveCodigo(event) {
+            event.preventDefault();
+            
+            const formData = {
+                codigo: document.getElementById('codigo').value,
+                descripcion: document.getElementById('descripcion').value,
+                categoria: document.getElementById('categoria').value,
+                causa_probable: document.getElementById('causa_probable').value,
+                accion_correctiva: document.getElementById('accion_correctiva').value,
+                activo: document.getElementById('activo').checked,
+                user_crea: document.getElementById('user_crea').value
+            };
+
+            try {
+                const id = document.getElementById('codigoId').value;
+                const url = id ? `/api/mantenimiento/codigos-reparacion/${id}` : '/api/mantenimiento/codigos-reparacion';
+                const method = id ? 'PUT' : 'POST';
+
+                const response = await fetch(url, {
+                    method: method,
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(formData)
+                });
+
+                if (response.ok) {
+                    showToast(id ? 'Código actualizado exitosamente' : 'Código creado exitosamente', 'success');
+                    closeModal();
+                    loadCodigos();
+                } else {
+                    showToast('Error al guardar código', 'error');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                showToast('Error al guardar código', 'error');
+            }
+        }
+
+        // Editar código
+        async function editCodigo(id) {
+            try {
+                const response = await fetch(`/api/mantenimiento/codigos-reparacion/${id}`);
+                const codigo = await response.json();
+
+                document.getElementById('modalTitle').innerHTML = '<i class="fas fa-edit text-cyan-600 mr-2"></i>Editar Código';
+                document.getElementById('codigoId').value = codigo.id;
+                document.getElementById('codigo').value = codigo.codigo;
+                document.getElementById('descripcion').value = codigo.descripcion;
+                document.getElementById('categoria').value = codigo.categoria || '';
+                document.getElementById('causa_probable').value = codigo.causa_probable || '';
+                document.getElementById('accion_correctiva').value = codigo.accion_correctiva || '';
+                document.getElementById('activo').checked = codigo.activo !== false;
+                document.getElementById('user_crea').value = codigo.user_crea || '';
+                document.getElementById('fecha_creacion').value = codigo.fecha_creacion ? new Date(codigo.fecha_creacion).toISOString().slice(0, 16) : '';
+
+                document.getElementById('modal').classList.add('active');
+            } catch (error) {
+                console.error('Error:', error);
+                showToast('Error al cargar código', 'error');
+            }
+        }
+
+        // Eliminar código
+        async function deleteCodigo(id) {
+            if (!confirm('¿Está seguro de eliminar este código?')) return;
+
+            try {
+                const response = await fetch(`/api/mantenimiento/codigos-reparacion/${id}`, { method: 'DELETE' });
+                if (response.ok) {
+                    showToast('Código eliminado exitosamente', 'success');
+                    loadCodigos();
+                } else {
+                    showToast('Error al eliminar código', 'error');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                showToast('Error al eliminar código', 'error');
+            }
+        }
+
+        // Inicialización
+        document.addEventListener('DOMContentLoaded', () => {
+            loadCodigos();
+        });
+    </script>
+</body>
+</html>

@@ -2,18 +2,19 @@ import { Request, Response } from 'express';
 import Componente from '../../models/Componente';
 import Equipo from '../../models/Equipo';
 import TipoComponente from '../../models/TipoComponente';
-import Criticidad from '../../models/Criticidad';
-import UnidadMedida from '../../models/UnidadMedida';
+import Criticidad from '../../models/catalogs/Criticidad';
+import UnidadMedida from '../../models/catalogs/UnidadMedida';
 
 export const getAllComponentes = async (req: Request, res: Response) => {
   try {
     const componentes = await Componente.findAll({
       include: [
-        { model: Equipo },
-        { model: TipoComponente },
-        { model: Criticidad },
-        { model: UnidadMedida }
-      ]
+        { model: Equipo, as: 'equipo' },
+        { model: TipoComponente, as: 'tipo' },
+        { model: Criticidad, as: 'criticidad' },
+        { model: UnidadMedida, as: 'unidad_medida' }
+      ],
+      order: [['componente_id', 'ASC']]
     });
     res.json(componentes);
   } catch (error) {
@@ -26,10 +27,10 @@ export const getComponenteById = async (req: Request, res: Response) => {
     const { id } = req.params;
     const componente = await Componente.findByPk(parseInt(id as string), {
       include: [
-        { model: Equipo },
-        { model: TipoComponente },
-        { model: Criticidad },
-        { model: UnidadMedida }
+        { model: Equipo, as: 'equipo' },
+        { model: TipoComponente, as: 'tipo' },
+        { model: Criticidad, as: 'criticidad' },
+        { model: UnidadMedida, as: 'unidad_medida' }
       ]
     });
     
@@ -49,9 +50,10 @@ export const getComponentesByEquipo = async (req: Request, res: Response) => {
     const componentes = await Componente.findAll({
       where: { equipo_id },
       include: [
-        { model: TipoComponente },
-        { model: Criticidad },
-        { model: UnidadMedida }
+        { model: Equipo, as: 'equipo' },
+        { model: TipoComponente, as: 'tipo' },
+        { model: Criticidad, as: 'criticidad' },
+        { model: UnidadMedida, as: 'unidad_medida' }
       ]
     });
     res.json(componentes);

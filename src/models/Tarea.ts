@@ -1,24 +1,46 @@
-import { DataTypes, Model } from 'sequelize';
+import { DataTypes, Model, Optional } from 'sequelize';
 import sequelize from '../config/database';
 
-class Tarea extends Model {
+// 4️⃣ 4_Log_prod - Task List Materiales — LOG + PROD
+
+interface TareaAttributes {
+  tarea_id: number;
+  actividad_codigo: string; // Autogenerado
+  cod_rep_codigo?: string; // Enlazado a Cod Rep
+  np_cod1?: string; // PROD + MANT
+  np_cod2?: string; // Campo extra
+  id_tubo?: string; // Campo extra
+  od_vas?: string; // Campo extra
+  descripcion: string;
+  item_numero: number; // Número de ítem
+  tipo_codigo: string;
+  material_codigo?: string; // Enlazado a Material (autogenerado)
+  requerimiento: number; // Cantidad requerida
+  ref_descripcion?: string; // Referencia
+  np?: string; // Número de parte
+  texto?: string; // Solo si es servicio
+  precio?: number; // LOGÍSTICA - Solo si es servicio
+}
+
+interface TareaCreationAttributes extends Optional<TareaAttributes, 'tarea_id'> {}
+
+class Tarea extends Model<TareaAttributes, TareaCreationAttributes> implements TareaAttributes {
   public tarea_id!: number;
-  public ot_id!: number;
-  public usuario!: string;
-  public actividad!: string;
-  public item!: number;
-  public tipo!: string;
-  public material_id?: number;
-  public servicio_id?: number;
-  public equipo_id?: number;
-  public componente_id?: number;
+  public actividad_codigo!: string;
+  public cod_rep_codigo?: string;
+  public np_cod1?: string;
+  public np_cod2?: string;
+  public id_tubo?: string;
+  public od_vas?: string;
+  public descripcion!: string;
+  public item_numero!: number;
+  public tipo_codigo!: string;
+  public material_codigo?: string;
   public requerimiento!: number;
-  public cantidad!: number;
-  public precio_unitario!: number;
-  public subtotal!: number;
+  public ref_descripcion?: string;
   public np?: string;
-  public referencia_descripcion?: string;
-  public observaciones?: string;
+  public texto?: string;
+  public precio?: number;
 }
 
 Tarea.init(
@@ -28,81 +50,87 @@ Tarea.init(
       primaryKey: true,
       autoIncrement: true,
     },
-    ot_id: {
-      type: DataTypes.INTEGER,
+    actividad_codigo: {
+      type: DataTypes.STRING(50),
       allowNull: false,
+      comment: 'Código de actividad (autogenerado por software)',
     },
-    usuario: {
-      type: DataTypes.STRING,
-      allowNull: false,
+    cod_rep_codigo: {
+      type: DataTypes.STRING(50),
+      allowNull: true,
+      references: { model: 'codigo_reparacion', key: 'codigo' },
+      comment: 'Enlazado a Cod Rep',
     },
-    actividad: {
+    np_cod1: {
+      type: DataTypes.STRING(100),
+      allowNull: true,
+      comment: 'PROD + MANT - Número de parte código 1',
+    },
+    np_cod2: {
+      type: DataTypes.STRING(100),
+      allowNull: true,
+      comment: 'Campo extra - Número de parte código 2',
+    },
+    id_tubo: {
+      type: DataTypes.STRING(50),
+      allowNull: true,
+      comment: 'Campo extra - ID TUBO',
+    },
+    od_vas: {
+      type: DataTypes.STRING(50),
+      allowNull: true,
+      comment: 'Campo extra - OD VAS',
+    },
+    descripcion: {
       type: DataTypes.TEXT,
       allowNull: false,
     },
-    item: {
-      type: DataTypes.DECIMAL,
+    item_numero: {
+      type: DataTypes.INTEGER,
       allowNull: false,
+      comment: 'Número de ítem en la lista',
     },
-    tipo: {
-      type: DataTypes.STRING(3),
+    tipo_codigo: {
+      type: DataTypes.STRING(10),
       allowNull: false,
+      references: { model: 'tipo_tarea', key: 'codigo' },
     },
-    material_id: {
-      type: DataTypes.INTEGER,
+    material_codigo: {
+      type: DataTypes.STRING(50),
       allowNull: true,
-    },
-    servicio_id: {
-      type: DataTypes.INTEGER,
-      allowNull: true,
-    },
-    equipo_id: {
-      type: DataTypes.INTEGER,
-      allowNull: true,
-    },
-    componente_id: {
-      type: DataTypes.INTEGER,
-      allowNull: true,
+      references: { model: 'material', key: 'codigo' },
+      comment: 'Enlazado a Material (código autogenerado)',
     },
     requerimiento: {
-      type: DataTypes.DECIMAL,
+      type: DataTypes.DECIMAL(10, 2),
       allowNull: false,
+      comment: 'Cantidad requerida',
     },
-    cantidad: {
-      type: DataTypes.DECIMAL,
-      allowNull: false,
-    },
-    precio_unitario: {
-      type: DataTypes.DECIMAL,
-      allowNull: false,
-    },
-    subtotal: {
-      type: DataTypes.DECIMAL,
-      allowNull: false,
+    ref_descripcion: {
+      type: DataTypes.TEXT,
+      allowNull: true,
+      comment: 'Referencia - descripción adicional',
     },
     np: {
-      type: DataTypes.STRING,
+      type: DataTypes.STRING(100),
       allowNull: true,
+      comment: 'Número de parte',
     },
-    referencia_descripcion: {
+    texto: {
       type: DataTypes.TEXT,
       allowNull: true,
+      comment: 'PROD + MANT - Texto libre (solo si es servicio)',
     },
-    observaciones: {
-      type: DataTypes.TEXT,
+    precio: {
+      type: DataTypes.DECIMAL(12, 2),
       allowNull: true,
+      comment: 'LOGÍSTICA - Precio (solo si es servicio)',
     },
   },
   {
     sequelize,
     tableName: 'tarea',
     timestamps: false,
-    indexes: [
-      {
-        unique: true,
-        fields: ['ot_id', 'item'],
-      },
-    ],
   }
 );
 

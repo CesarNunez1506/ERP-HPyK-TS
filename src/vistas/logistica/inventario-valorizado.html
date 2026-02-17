@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inventario Valorizado - HP&K ERP</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="/vistas/shared/navigation.js"></script>
+    <style>
+        .table-header {
+            background: linear-gradient(135deg, #2563eb 0%, #1e40af 100%);
+            color: white;
+            font-weight: bold;
+            font-size: 0.75rem;
+            text-align: center;
+            border: 1px solid #1e3a8a;
+        }
+        .table-cell {
+            border: 1px solid #e5e7eb;
+            padding: 0.5rem;
+            font-size: 0.875rem;
+        }
+        .table-row:hover {
+            background-color: #f3f4f6;
+        }
+        .stock-positive { color: #059669; font-weight: 600; }
+        .stock-zero { color: #dc2626; font-weight: 600; }
+        .codigo-cell { background-color: #fef08a; font-weight: 600; }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <!-- Navigation Menu will be loaded here -->
+    <div id="navigation-container"></div>
+
+    <!-- Header -->
+    <div class="bg-gradient-to-r from-blue-600 to-blue-800 text-white shadow-lg">
+        <div class="container mx-auto px-6 py-4">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center space-x-4">
+                    <i class="fas fa-warehouse text-3xl"></i>
+                    <div>
+                        <h1 class="text-2xl font-bold">Inventario Valorizado</h1>
+                        <p class="text-blue-200 text-sm">Control de Stock con Valorización</p>
+                    </div>
+                </div>
+                <div class="flex items-center space-x-3">
+                    <button onclick="exportarExcel()" class="bg-green-500 hover:bg-green-600 px-4 py-2 rounded-lg transition flex items-center space-x-2">
+                        <i class="fas fa-file-excel"></i>
+                        <span>Exportar Excel</span>
+                    </button>
+                    <button onclick="cargarInventario()" class="bg-white text-blue-600 hover:bg-blue-50 px-4 py-2 rounded-lg transition flex items-center space-x-2">
+                        <i class="fas fa-sync-alt"></i>
+                        <span>Actualizar</span>
+                    </button>
+                    <a href="/index.html" class="bg-blue-700 hover:bg-blue-800 px-4 py-2 rounded-lg transition">
+                        <i class="fas fa-home"></i> Inicio
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="container mx-auto px-6 py-6">
+        <!-- Filtros -->
+        <div class="bg-white rounded-lg shadow-md p-6 mb-6">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                        <i class="fas fa-calendar text-blue-600"></i> Fecha Inicio
+                    </label>
+                    <input type="date" id="fechaInicio" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                        <i class="fas fa-calendar text-blue-600"></i> Fecha Fin
+                    </label>
+                    <input type="date" id="fechaFin" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                        <i class="fas fa-search text-blue-600"></i> Buscar Inventario
+                    </label>
+                    <input type="text" id="buscarMaterial" placeholder="Código o descripción..." class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                </div>
+                <div class="flex items-end">
+                    <button onclick="aplicarFiltros()" class="w-full bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition">
+                        <i class="fas fa-filter"></i> Aplicar Filtros
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- KPI Cards -->
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
+            <div class="bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg shadow-lg p-6 text-white">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-blue-100 text-sm font-medium">Total Inventario</p>
+                        <p id="kpiTotalMateriales" class="text-3xl font-bold mt-2">0</p>
+                    </div>
+                    <i class="fas fa-box text-4xl text-blue-300"></i>
+                </div>
+            </div>
+            <div class="bg-gradient-to-br from-green-500 to-green-600 rounded-lg shadow-lg p-6 text-white">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-green-100 text-sm font-medium">Valor Total Inventario</p>
+                        <p id="kpiValorTotal" class="text-3xl font-bold mt-2">$0.00</p>
+                    </div>
+                    <i class="fas fa-dollar-sign text-4xl text-green-300"></i>
+                </div>
+            </div>
+            <div class="bg-gradient-to-br from-purple-500 to-purple-600 rounded-lg shadow-lg p-6 text-white">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-purple-100 text-sm font-medium">Items con Stock</p>
+                        <p id="kpiConStock" class="text-3xl font-bold mt-2">0</p>
+                    </div>
+                    <i class="fas fa-check-circle text-4xl text-purple-300"></i>
+                </div>
+            </div>
+            <div class="bg-gradient-to-br from-orange-500 to-orange-600 rounded-lg shadow-lg p-6 text-white">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-orange-100 text-sm font-medium">Movimientos del Mes</p>
+                        <p id="kpiMovimientos" class="text-3xl font-bold mt-2">0</p>
+                    </div>
+                    <i class="fas fa-exchange-alt text-4xl text-orange-300"></i>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tabla de Inventario Valorizado -->
+        <div class="bg-white rounded-lg shadow-md overflow-hidden">
+            <div class="overflow-x-auto">
+                <table class="w-full" style="border-collapse: collapse;">
+                    <thead>
+                        <tr>
+                            <th class="table-header py-3 px-2">N°</th>
+                            <th class="table-header py-3 px-3">FECHA 1</th>
+                            <th class="table-header py-3 px-2">#</th>
+                            <th class="table-header py-3 px-3">FECHA 2</th>
+                            <th class="table-header py-3 px-2">#</th>
+                            <th class="table-header py-3 px-4">CÓDIGO</th>
+                            <th class="table-header py-3 px-6">DESCRIPCIÓN</th>
+                            <th class="table-header py-3 px-3">STOCK INICIAL</th>
+                            <th class="table-header py-3 px-3">UBICACIÓN</th>
+                            <th class="table-header py-3 px-3">CAJA</th>
+                            <th class="table-header py-3 px-3">PC UNT</th>
+                            <th class="table-header py-3 px-3">STOCK FINAL</th>
+                            <th class="table-header py-3 px-4">TOTAL</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tablaInventario">
+                        <tr>
+                            <td colspan="13" class="table-cell text-center text-gray-500 py-8">
+                                <i class="fas fa-spinner fa-spin text-2xl mb-2"></i>
+                                <p>Cargando inventario...</p>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Resumen Pie de Tabla -->
+        <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 mt-4">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-center">
+                <div>
+                    <p class="text-sm text-gray-600">Total Items Mostrados</p>
+                    <p id="totalItemsMostrados" class="text-2xl font-bold text-blue-600">0</p>
+                </div>
+                <div>
+                    <p class="text-sm text-gray-600">Stock Total</p>
+                    <p id="stockTotalMostrado" class="text-2xl font-bold text-green-600">0</p>
+                </div>
+                <div>
+                    <p class="text-sm text-gray-600">Valor Total Mostrado</p>
+                    <p id="valorTotalMostrado" class="text-2xl font-bold text-purple-600">$0.00</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="fixed top-4 right-4 bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg hidden transition-opacity">
+        <div class="flex items-center space-x-2">
+            <i class="fas fa-check-circle"></i>
+            <span id="toastMessage">Operación exitosa</span>
+        </div>
+    </div>
+
+    <script>
+        let inventarioData = [];
+        let inventarioFiltrado = [];
+
+        // Cargar inventario al iniciar
+        document.addEventListener('DOMContentLoaded', () => {
+            cargarInventario();
+            cargarResumen();
+            
+            // Set default dates (last month to today)
+            const hoy = new Date();
+            const inicioMes = new Date(hoy.getFullYear(), hoy.getMonth(), 1);
+            document.getElementById('fechaFin').valueAsDate = hoy;
+            document.getElementById('fechaInicio').valueAsDate = inicioMes;
+
+            // Búsqueda en tiempo real
+            document.getElementById('buscarMaterial').addEventListener('input', aplicarFiltros);
+        });
+
+        async function cargarInventario() {
+            try {
+                const fechaInicio = document.getElementById('fechaInicio').value;
+                const fechaFin = document.getElementById('fechaFin').value;
+
+                let url = '/api/logistica/inventario-valorizado';
+                const params = new URLSearchParams();
+                if (fechaInicio) params.append('fechaInicio', fechaInicio);
+                if (fechaFin) params.append('fechaFin', fechaFin);
+                if (params.toString()) url += '?' + params.toString();
+
+                const response = await fetch(url);
+                if (!response.ok) throw new Error('Error al cargar inventario');
+
+                inventarioData = await response.json();
+                inventarioFiltrado = inventarioData;
+                renderizarTabla();
+                actualizarResumenTabla();
+                showToast('Inventario cargado exitosamente', 'success');
+            } catch (error) {
+                console.error('Error:', error);
+                showToast('Error al cargar inventario', 'error');
+                document.getElementById('tablaInventario').innerHTML = `
+                    <tr>
+                        <td colspan="13" class="table-cell text-center text-red-500 py-8">
+                            <i class="fas fa-exclamation-triangle text-2xl mb-2"></i>
+                            <p>Error al cargar el inventario</p>
+                        </td>
+                    </tr>
+                `;
+            }
+        }
+
+        async function cargarResumen() {
+            try {
+                const response = await fetch('/api/logistica/inventario-resumen');
+                if (!response.ok) throw new Error('Error al cargar resumen');
+
+                const resumen = await response.json();
+                document.getElementById('kpiTotalMateriales').textContent = resumen.totalMateriales;
+                document.getElementById('kpiValorTotal').textContent = '$' + parseFloat(resumen.valorTotal).toLocaleString('en-US', {minimumFractionDigits: 2});
+                document.getElementById('kpiMovimientos').textContent = resumen.movimientosMes;
+            } catch (error) {
+                console.error('Error al cargar resumen:', error);
+            }
+        }
+
+        function aplicarFiltros() {
+            const busqueda = document.getElementById('buscarMaterial').value.toLowerCase();
+            
+            inventarioFiltrado = inventarioData.filter(item => {
+                const matchBusqueda = !busqueda || 
+                    item.codigo.toLowerCase().includes(busqueda) || 
+                    item.descripcion.toLowerCase().includes(busqueda);
+                
+                return matchBusqueda;
+            });
+
+            renderizarTabla();
+            actualizarResumenTabla();
+        }
+
+        function renderizarTabla() {
+            const tbody = document.getElementById('tablaInventario');
+            
+            if (inventarioFiltrado.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="13" class="table-cell text-center text-gray-500 py-8">
+                            <i class="fas fa-inbox text-2xl mb-2"></i>
+                            <p>No hay registros para mostrar</p>
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+
+            tbody.innerHTML = inventarioFiltrado.map((item, index) => {
+                const stockFinalClass = item.stockFinal > 0 ? 'stock-positive' : 'stock-zero';
+                const fecha1 = item.fecha1 ? new Date(item.fecha1).toLocaleDateString('es-ES') : '-';
+                const fecha2 = item.fecha2 ? new Date(item.fecha2).toLocaleDateString('es-ES') : '-';
+
+                return `
+                    <tr class="table-row">
+                        <td class="table-cell text-center font-medium">${index + 1}</td>
+                        <td class="table-cell text-center text-xs">${fecha1}</td>
+                        <td class="table-cell text-center text-xs">${item.movimientos || 0}</td>
+                        <td class="table-cell text-center text-xs">${fecha2}</td>
+                        <td class="table-cell text-center text-xs">${item.movimientos || 0}</td>
+                        <td class="table-cell codigo-cell text-center font-mono">${item.codigo}</td>
+                        <td class="table-cell">${item.descripcion}</td>
+                        <td class="table-cell text-center font-mono">${item.stockInicial}</td>
+                        <td class="table-cell text-center font-medium ${item.ubicacion ? 'text-blue-600' : 'text-gray-400'}">${item.ubicacion || '-'}</td>
+                        <td class="table-cell text-center ${item.caja ? 'text-blue-600' : 'text-gray-400'}">${item.caja || '-'}</td>
+                        <td class="table-cell text-right font-mono" style="background-color: #dcfce7;">${item.precioUnitario.toFixed(2)}</td>
+                        <td class="table-cell text-center font-mono ${stockFinalClass}" style="background-color: #dcfce7;">${item.stockFinal}</td>
+                        <td class="table-cell text-right font-mono font-bold">${item.total.toFixed(2)}</td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        function actualizarResumenTabla() {
+            const totalItems = inventarioFiltrado.length;
+            const stockTotal = inventarioFiltrado.reduce((sum, item) => sum + item.stockFinal, 0);
+            const valorTotal = inventarioFiltrado.reduce((sum, item) => sum + item.total, 0);
+            const itemsConStock = inventarioFiltrado.filter(item => item.stockFinal > 0).length;
+
+            document.getElementById('totalItemsMostrados').textContent = totalItems;
+            document.getElementById('stockTotalMostrado').textContent = stockTotal.toFixed(0);
+            document.getElementById('valorTotalMostrado').textContent = '$' + valorTotal.toLocaleString('en-US', {minimumFractionDigits: 2});
+            document.getElementById('kpiConStock').textContent = itemsConStock;
+        }
+
+        function exportarExcel() {
+            showToast('Preparando archivo Excel...', 'info');
+            // TODO: Implementar exportación real con biblioteca como xlsx o ExcelJS
+            setTimeout(() => {
+                showToast('Funcionalidad de exportación en desarrollo', 'info');
+            }, 1000);
+        }
+
+        function showToast(message, type = 'success') {
+            const toast = document.getElementById('toast');
+            const toastMessage = document.getElementById('toastMessage');
+            
+            toastMessage.textContent = message;
+            
+            // Cambiar colores según tipo
+            toast.className = 'fixed top-4 right-4 px-6 py-3 rounded-lg shadow-lg transition-opacity';
+            if (type === 'success') toast.classList.add('bg-green-500', 'text-white');
+            else if (type === 'error') toast.classList.add('bg-red-500', 'text-white');
+            else if (type === 'info') toast.classList.add('bg-blue-500', 'text-white');
+            
+            toast.classList.remove('hidden');
+            
+            setTimeout(() => {
+                toast.classList.add('hidden');
+            }, 3000);
+        }
+
+        // Dropdown functions are now handled by NavigationManager
+
+        // Close dropdown when clicking outside
+        document.addEventListener('click', (event) => {
+            if (!event.target.closest('.dropdown')) {
+                document.querySelectorAll('.dropdown div').forEach(div => {
+                    div.classList.add('hidden');
+                });
+            }
+        });
+    </script>
+</body>
+</html>

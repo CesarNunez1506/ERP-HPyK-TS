@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import UnidadMedida from '../../models/UnidadMedida';
+import UnidadMedida from '../../models/catalogs/UnidadMedida';
 
 export const getAllUnidadesMedida = async (req: Request, res: Response) => {
   try {

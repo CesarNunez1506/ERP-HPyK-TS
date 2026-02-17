@@ -1,40 +1,39 @@
 import { Request, Response } from 'express';
 import OrdenTrabajo from '../../models/OrdenTrabajo';
-import Cliente from '../../models/Cliente';
-import EstrategiaOt from '../../models/EstrategiaOt';
-import RegistroReparacion from '../../models/RegistroReparacion';
+import Cliente from '../../models/catalogs/Cliente';
+import Estrategia from '../../models/Estrategia';
+import CodigoReparacion from '../../models/CodigoReparacion';
 import Equipo from '../../models/Equipo';
-import Componente from '../../models/Componente';
-import TipoReparacion from '../../models/TipoReparacion';
-import BaseMetalica from '../../models/BaseMetalica';
-import Garantia from '../../models/Garantia';
-import TipoGarantia from '../../models/TipoGarantia';
-import AtencionReparacion from '../../models/AtencionReparacion';
-import PrioridadAtencion from '../../models/PrioridadAtencion';
-import OtStatus from '../../models/OtStatus';
-import RecursosStatus from '../../models/RecursosStatus';
-import TallerStatus from '../../models/TallerStatus';
+import TipoReparacion from '../../models/catalogs/TipoReparacion';
+import BaseMetalica from '../../models/catalogs/BaseMetalica';
+import Garantia from '../../models/catalogs/Garantia';
+import TipoGarantia from '../../models/catalogs/TipoGarantia';
+import AtencionReparacion from '../../models/catalogs/AtencionReparacion';
+import PrioridadAtencion from '../../models/catalogs/PrioridadAtencion';
+import OtStatus from '../../models/catalogs/OtStatus';
+import RecursosStatus from '../../models/catalogs/RecursosStatus';
+import TallerStatus from '../../models/catalogs/TallerStatus';
 import Tarea from '../../models/Tarea';
 
 export const getAllOrdenesTrabajo = async (req: Request, res: Response) => {
   try {
     const ordenes = await OrdenTrabajo.findAll({
       include: [
-        { model: Cliente },
-        { model: EstrategiaOt },
-        { model: RegistroReparacion },
-        { model: Equipo },
-        { model: Componente },
-        { model: TipoReparacion },
-        { model: BaseMetalica },
-        { model: Garantia },
-        { model: TipoGarantia },
-        { model: AtencionReparacion },
-        { model: PrioridadAtencion },
-        { model: OtStatus },
-        { model: RecursosStatus },
-        { model: TallerStatus }
-      ]
+        { model: Cliente, as: 'cliente' },
+        { model: Estrategia, as: 'estrategia' },
+        { model: CodigoReparacion, as: 'codigo_reparacion' },
+        { model: Equipo, as: 'equipo' },
+        { model: Garantia, as: 'garantia' },
+        { model: AtencionReparacion, as: 'atencion_reparacion' },
+        { model: TipoReparacion, as: 'tipo_reparacion' },
+        { model: TipoGarantia, as: 'tipo_garantia' },
+        { model: PrioridadAtencion, as: 'prioridad_atencion' },
+        { model: BaseMetalica, as: 'base_metalica' },
+        { model: OtStatus, as: 'ot_status' },
+        { model: RecursosStatus, as: 'recursos_status' },
+        { model: TallerStatus, as: 'taller_status' }
+      ],
+      order: [['ot_id', 'DESC']]
     });
     res.json(ordenes);
   } catch (error) {
@@ -47,21 +46,20 @@ export const getOrdenTrabajoById = async (req: Request, res: Response) => {
     const { id } = req.params;
     const orden = await OrdenTrabajo.findByPk(parseInt(id as string), {
       include: [
-        { model: Cliente },
-        { model: EstrategiaOt },
-        { model: RegistroReparacion },
-        { model: Equipo },
-        { model: Componente },
-        { model: TipoReparacion },
-        { model: BaseMetalica },
-        { model: Garantia },
-        { model: TipoGarantia },
-        { model: AtencionReparacion },
-        { model: PrioridadAtencion },
-        { model: OtStatus },
-        { model: RecursosStatus },
-        { model: TallerStatus },
-        { model: Tarea }
+        { model: Cliente, as: 'cliente' },
+        { model: Estrategia, as: 'estrategia' },
+        { model: CodigoReparacion, as: 'codigo_reparacion' },
+        { model: Equipo, as: 'equipo' },
+        { model: Garantia, as: 'garantia' },
+        { model: AtencionReparacion, as: 'atencion_reparacion' },
+        { model: TipoReparacion, as: 'tipo_reparacion' },
+        { model: TipoGarantia, as: 'tipo_garantia' },
+        { model: PrioridadAtencion, as: 'prioridad_atencion' },
+        { model: BaseMetalica, as: 'base_metalica' },
+        { model: OtStatus, as: 'ot_status' },
+        { model: RecursosStatus, as: 'recursos_status' },
+        { model: TallerStatus, as: 'taller_status' },
+        { model: Tarea, as: 'tareas' }
       ]
     });
     

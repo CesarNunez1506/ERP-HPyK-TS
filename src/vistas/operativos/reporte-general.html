@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reporte General - OTs y Compras</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">    <script src="/vistas/shared/navigation.js"></script></head>
+<body class="bg-gray-100">
+    <!-- Navigation Menu will be loaded here -->
+    <div id="navigation-container"></div>
+
+    <!-- Header -->
+    <div class="bg-gradient-to-r from-orange-600 to-orange-800 text-white shadow-lg">
+        <div class="container mx-auto px-6 py-4">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center space-x-4">
+                    <i class="fas fa-chart-bar text-3xl"></i>
+                    <div>
+                        <h1 class="text-2xl font-bold">Reporte General del Sistema</h1>
+                        <p class="text-orange-200 text-sm">Vista consolidada de OTs, Repuestos y Órdenes de Compra</p>
+                    </div>
+                </div>
+                <div class="flex items-center space-x-3">
+                    <button onclick="exportarExcel()" class="bg-green-500 hover:bg-green-600 px-4 py-2 rounded-lg transition flex items-center space-x-2">
+                        <i class="fas fa-file-excel"></i>
+                        <span>Exportar Excel</span>
+                    </button>
+                    <a href="/index.html" class="bg-orange-700 hover:bg-orange-800 px-4 py-2 rounded-lg transition">
+                        <i class="fas fa-home"></i> Inicio
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container mx-auto px-4 py-8">
+        <!-- Header -->
+        <div class="bg-white rounded-lg shadow-md p-6 mb-6">
+            <div class="flex justify-between items-center">
+                <div>
+                    <h1 class="text-3xl font-bold text-gray-800">Reporte General del Sistema</h1>
+                    <p class="text-gray-600 mt-2">Vista consolidada de OTs, Repuestos y Órdenes de Compra</p>
+                </div>
+                <div class="flex gap-2">
+                    <button onclick="exportarExcel()" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg transition">
+                        <i class="fas fa-file-excel mr-2"></i> Exportar Excel
+                    </button>
+                    <button onclick="actualizarDatos()" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition">
+                        <i class="fas fa-sync-alt mr-2"></i> Actualizar
+                    </button>
+                    <a href="/" class="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded-lg transition">
+                        <i class="fas fa-home mr-2"></i> Inicio
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- KPIs Dashboard -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
+            <div class="bg-white rounded-lg shadow p-6">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-sm text-gray-600">Total OTs Activas</p>
+                        <p class="text-3xl font-bold text-blue-600" id="totalOTs">0</p>
+                    </div>
+                    <div class="bg-blue-100 p-3 rounded-full">
+                        <i class="fas fa-clipboard-list text-2xl text-blue-600"></i>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-lg shadow p-6">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-sm text-gray-600">Gasto Total en Repuestos</p>
+                        <p class="text-3xl font-bold text-green-600" id="gastoTotal">$0.00</p>
+                    </div>
+                    <div class="bg-green-100 p-3 rounded-full">
+                        <i class="fas fa-dollar-sign text-2xl text-green-600"></i>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-lg shadow p-6">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-sm text-gray-600">OCs Pendientes</p>
+                        <p class="text-3xl font-bold text-yellow-600" id="ocsPendientes">0</p>
+                    </div>
+                    <div class="bg-yellow-100 p-3 rounded-full">
+                        <i class="fas fa-hourglass-half text-2xl text-yellow-600"></i>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-lg shadow p-6">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-sm text-gray-600">Demoras Promedio</p>
+                        <p class="text-3xl font-bold text-red-600" id="demoraPromedio">0 días</p>
+                    </div>
+                    <div class="bg-red-100 p-3 rounded-full">
+                        <i class="fas fa-clock text-2xl text-red-600"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tabs -->
+        <div class="bg-white rounded-lg shadow-md mb-6">
+            <div class="border-b border-gray-200">
+                <nav class="flex -mb-px">
+                    <button onclick="cambiarTab('gastos-ot')" id="tab-gastos-ot" class="tab-button active px-6 py-4 text-sm font-medium border-b-2 border-blue-500 text-blue-600">
+                        <i class="fas fa-chart-line mr-2"></i> Gastos por OT
+                    </button>
+                    <button onclick="cambiarTab('ordenes-compra')" id="tab-ordenes-compra" class="tab-button px-6 py-4 text-sm font-medium border-b-2 border-transparent text-gray-500 hover:text-gray-700">
+                        <i class="fas fa-shopping-cart mr-2"></i> Órdenes de Compra
+                    </button>
+                    <button onclick="cambiarTab('demoras')" id="tab-demoras" class="tab-button px-6 py-4 text-sm font-medium border-b-2 border-transparent text-gray-500 hover:text-gray-700">
+                        <i class="fas fa-exclamation-triangle mr-2"></i> Análisis de Demoras
+                    </button>
+                    <button onclick="cambiarTab('detalle-items')" id="tab-detalle-items" class="tab-button px-6 py-4 text-sm font-medium border-b-2 border-transparent text-gray-500 hover:text-gray-700">
+                        <i class="fas fa-list mr-2"></i> Detalle por Item
+                    </button>
+                </nav>
+            </div>
+        </div>
+
+        <!-- Tab Content -->
+        
+        <!-- Gastos por OT -->
+        <div id="content-gastos-ot" class="tab-content">
+            <div class="bg-white rounded-lg shadow-md p-6">
+                <h2 class="text-xl font-bold text-gray-800 mb-4">Gastos por Orden de Trabajo</h2>
+                <div class="overflow-x-auto">
+                    <table class="min-w-full divide-y divide-gray-200">
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">OT</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Equipo</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Estado</th>
+                                <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Items Solicitados</th>
+                                <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Subtotal</th>
+                                <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">IGV</th>
+                                <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Total</th>
+                                <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase">Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tablaGastosOT" class="bg-white divide-y divide-gray-200">
+                            <tr>
+                                <td colspan="8" class="px-6 py-10 text-center text-gray-500">
+                                    <i class="fas fa-spinner fa-spin text-2xl"></i>
+                                    <p class="mt-2">Cargando datos...</p>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Órdenes de Compra -->
+        <div id="content-ordenes-compra" class="tab-content hidden">
+            <div class="bg-white rounded-lg shadow-md p-6">
+                <h2 class="text-xl font-bold text-gray-800 mb-4">Órdenes de Compra Generadas</h2>
+                <div class="overflow-x-auto">
+                    <table class="min-w-full divide-y divide-gray-200">
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Número PO</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">OT Relacionada</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Proveedor</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Estado</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Fecha Solicitud</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Fecha Entrega Esperada</th>
+                                <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Total</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tablaOrdenesCompra" class="bg-white divide-y divide-gray-200">
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Análisis de Demoras -->
+        <div id="content-demoras" class="tab-content hidden">
+            <div class="bg-white rounded-lg shadow-md p-6">
+                <h2 class="text-xl font-bold text-gray-800 mb-4">Análisis de Demoras</h2>
+                <div class="overflow-x-auto">
+                    <table class="min-w-full divide-y divide-gray-200">
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">OT / PO</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Tipo</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Fecha Esperada</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Fecha Real/Actual</th>
+                                <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Días de Demora</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Estado</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tablaDemoras" class="bg-white divide-y divide-gray-200">
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Detalle por Item -->
+        <div id="content-detalle-items" class="tab-content hidden">
+            <div class="bg-white rounded-lg shadow-md p-6">
+                <h2 class="text-xl font-bold text-gray-800 mb-4">Detalle por Item (Repuestos)</h2>
+                <div class="overflow-x-auto">
+                    <table class="min-w-full divide-y divide-gray-200">
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Material</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">OT</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Proveedor</th>
+                                <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Cantidad</th>
+                                <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Precio Unit.</th>
+                                <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Subtotal</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Fecha Entrega</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Estado</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tablaDetalleItems" class="bg-white divide-y divide-gray-200">
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let datosCompletos = {
+            ots: [],
+            repuestos: [],
+            compras: []
+        };
+
+        // Cambiar tabs
+        function cambiarTab(tabName) {
+            // Ocultar todos los contenidos
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.add('hidden');
+            });
+            
+            // Remover clase active de todos los tabs
+            document.querySelectorAll('.tab-button').forEach(btn => {
+                btn.classList.remove('active', 'border-blue-500', 'text-blue-600');
+                btn.classList.add('border-transparent', 'text-gray-500');
+            });
+            
+            // Mostrar contenido seleccionado
+            document.getElementById(`content-${tabName}`).classList.remove('hidden');
+            
+            // Activar tab button
+            const activeTab = document.getElementById(`tab-${tabName}`);
+            activeTab.classList.add('active', 'border-blue-500', 'text-blue-600');
+            activeTab.classList.remove('border-transparent', 'text-gray-500');
+        }
+
+        // Cargar datos iniciales
+        async function cargarDatos() {
+            try {
+                // Mostrar toast de carga
+                showToast('Cargando datos del sistema...', 'info');
+                
+                // Cargar OTs
+                const otsResponse = await fetch('/api/ot');
+                datosCompletos.ots = await otsResponse.json();
+                
+                // Cargar todos los repuestos
+                const allRepuestos = [];
+                for (const ot of datosCompletos.ots) {
+                    try {
+                        const repResponse = await fetch(`/api/ot/${ot.ot_id}/repuestos`);
+                        const repuestos = await repResponse.json();
+                        allRepuestos.push(...repuestos.map(r => ({ ...r, ot_numero: ot.numero_ot })));
+                    } catch(e) {}
+                }
+                datosCompletos.repuestos = allRepuestos;
+                
+                // Cargar compras
+                const comprasResponse = await fetch('/api/logistica/compras-extended');
+                datosCompletos.compras = await comprasResponse.json();
+                
+                // Actualizar UI
+                actualizarKPIs();
+                renderizarGastosOT();
+                renderizarOrdenesCompra();
+                renderizarDemoras();
+                renderizarDetalleItems();
+                
+                showToast('Datos cargados correctamente', 'success');
+            } catch (error) {
+                console.error('Error al cargar datos:', error);
+                showToast('Error al cargar datos del sistema', 'error');
+            }
+        }
+
+        // Actualizar KPIs
+        function actualizarKPIs() {
+            document.getElementById('totalOTs').textContent = datosCompletos.ots.length;
+            
+            const gastoTotal = datosCompletos.repuestos.reduce((sum, r) => {
+                const precio = parseFloat(r.precio_unitario) || 0;
+                return sum + (precio * r.cantidad * 1.18); // con IGV
+            }, 0);
+            document.getElementById('gastoTotal').textContent = '$' + gastoTotal.toFixed(2);
+            
+            const ocsPendientes = datosCompletos.compras.filter(c => c.estado === 'Pendiente').length;
+            document.getElementById('ocsPendientes').textContent = ocsPendientes;
+            
+            // Calcular demora promedio
+            let totalDemoras = 0;
+            let countDemoras = 0;
+            datosCompletos.compras.forEach(c => {
+                if (c.fecha_entrega_esperada) {
+                    const esperada = new Date(c.fecha_entrega_esperada);
+                    const real = c.fecha_entrega_real ? new Date(c.fecha_entrega_real) : new Date();
+                    const dias = Math.ceil((real - esperada) / (1000 * 60 * 60 * 24));
+                    if (dias > 0) {
+                        totalDemoras += dias;
+                        countDemoras++;
+                    }
+                }
+            });
+            const demoraPromedio = countDemoras > 0 ? Math.round(totalDemoras / countDemoras) : 0;
+            document.getElementById('demoraPromedio').textContent = demoraPromedio + ' días';
+        }
+
+        // Renderizar gastos por OT
+        function renderizarGastosOT() {
+            const tbody = document.getElementById('tablaGastosOT');
+            
+            // Agrupar repuestos por OT
+            const gastosPorOT = {};
+            datosCompletos.repuestos.forEach(rep => {
+                if (!gastosPorOT[rep.ot_id]) {
+                    gastosPorOT[rep.ot_id] = {
+                        ot_numero: rep.ot_numero,
+                        items: 0,
+                        subtotal: 0
+                    };
+                }
+                const precio = parseFloat(rep.precio_unitario) || 0;
+                gastosPorOT[rep.ot_id].items++;
+                gastosPorOT[rep.ot_id].subtotal += precio * rep.cantidad;
+            });
+            
+            tbody.innerHTML = '';
+            Object.entries(gastosPorOT).forEach(([otId, datos]) => {
+                const ot = datosCompletos.ots.find(o => o.ot_id == otId);
+                const igv = datos.subtotal * 0.18;
+                const total = datos.subtotal + igv;
+                
+                tbody.innerHTML += `
+                    <tr class="hover:bg-gray-50">
+                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">${datos.ot_numero || '-'}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${ot?.equipo_id || '-'}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                            <span class="px-2 py-1 text-xs rounded-full bg-blue-100 text-blue-800">${ot?.ot_status_codigo || 'N/A'}</span>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-right">${datos.items}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 text-right font-mono">$${datos.subtotal.toFixed(2)}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-right font-mono">$${igv.toFixed(2)}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm font-bold text-green-600 text-right font-mono">$${total.toFixed(2)}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-center text-sm">
+                            <a href="/operativos/ordenes-trabajo.html" class="text-blue-600 hover:text-blue-800">
+                                <i class="fas fa-eye"></i>
+                            </a>
+                        </td>
+                    </tr>
+                `;
+            });
+        }
+
+        // Renderizar órdenes de compra
+        function renderizarOrdenesCompra() {
+            const tbody = document.getElementById('tablaOrdenesCompra');
+            tbody.innerHTML = '';
+            
+            datosCompletos.compras.forEach(compra => {
+                const fechaSolicitud = new Date(compra.fecha_solicitud).toLocaleDateString('es-ES');
+                const fechaEntrega = compra.fecha_entrega_esperada ? 
+                    new Date(compra.fecha_entrega_esperada).toLocaleDateString('es-ES') : '-';
+                
+                tbody.innerHTML += `
+                    <tr class="hover:bg-gray-50">
+                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">${compra.numero_po}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${compra.ot_numero || '-'}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${compra.proveedor_nombre || '-'}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm">
+                            <span class="px-2 py-1 text-xs rounded-full ${
+                                compra.estado === 'Pendiente' ? 'bg-yellow-100 text-yellow-800' :
+                                compra.estado === 'Aprobado' ? 'bg-green-100 text-green-800' :
+                                compra.estado === 'Recibido' ? 'bg-purple-100 text-purple-800' :
+                                'bg-gray-100 text-gray-800'
+                            }">${compra.estado}</span>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${fechaSolicitud}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${fechaEntrega}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm font-bold text-green-600 text-right font-mono">$${parseFloat(compra.total || 0).toFixed(2)}</td>
+                    </tr>
+                `;
+            });
+        }
+
+        // Renderizar demoras
+        function renderizarDemoras() {
+            const tbody = document.getElementById('tablaDemoras');
+            tbody.innerHTML = '';
+            
+            datosCompletos.compras.forEach(compra => {
+                if (compra.fecha_entrega_esperada) {
+                    const esperada = new Date(compra.fecha_entrega_esperada);
+                    const real = compra.fecha_entrega_real ? new Date(compra.fecha_entrega_real) : new Date();
+                    const diasDemora = Math.ceil((real - esperada) / (1000 * 60 * 60 * 24));
+                    
+                    if (diasDemora !== 0) {
+                        tbody.innerHTML += `
+                            <tr class="hover:bg-gray-50">
+                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">${compra.numero_po}</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Orden de Compra</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${esperada.toLocaleDateString('es-ES')}</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${real.toLocaleDateString('es-ES')}</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-right font-bold ${
+                                    diasDemora > 0 ? 'text-red-600' : 'text-green-600'
+                                }">${diasDemora > 0 ? '+' : ''}${diasDemora}</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm">
+                                    <span class="px-2 py-1 text-xs rounded-full ${
+                                        diasDemora > 7 ? 'bg-red-100 text-red-800' :
+                                        diasDemora > 0 ? 'bg-yellow-100 text-yellow-800' :
+                                        'bg-green-100 text-green-800'
+                                    }">${diasDemora > 7 ? 'Crítico' : diasDemora > 0 ? 'Demorado' : 'A tiempo'}</span>
+                                </td>
+                            </tr>
+                        `;
+                    }
+                }
+            });
+        }
+
+        // Renderizar detalle por items
+        function renderizarDetalleItems() {
+            const tbody = document.getElementById('tablaDetalleItems');
+            tbody.innerHTML = '';
+            
+            datosCompletos.repuestos.forEach(rep => {
+                const precio = parseFloat(rep.precio_unitario) || 0;
+                const subtotal = precio * rep.cantidad;
+                const fechaEntrega = rep.fecha_entrega_esperada ? 
+                    new Date(rep.fecha_entrega_esperada).toLocaleDateString('es-ES') : '-';
+                
+                tbody.innerHTML += `
+                    <tr class="hover:bg-gray-50">
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${rep.material_nombre || '-'}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${rep.ot_numero || '-'}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${rep.proveedor_nombre || '-'}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-right">${rep.cantidad}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 text-right font-mono">${precio > 0 ? '$' + precio.toFixed(2) : '-'}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm font-bold text-green-600 text-right font-mono">${subtotal > 0 ? '$' + subtotal.toFixed(2) : '-'}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${fechaEntrega}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm">
+                            <span class="px-2 py-1 text-xs rounded-full ${
+                                rep.estado === 'Pendiente' ? 'bg-yellow-100 text-yellow-800' :
+                                rep.estado === 'En PO' ? 'bg-blue-100 text-blue-800' :
+                                rep.estado === 'Recibido' ? 'bg-green-100 text-green-800' :
+                                'bg-gray-100 text-gray-800'
+                            }">${rep.estado}</span>
+                        </td>
+                    </tr>
+                `;
+            });
+        }
+
+        // Función para actualizar datos
+        async function actualizarDatos() {
+            await cargarDatos();
+        }
+
+        // Exportar a Excel (simulado)
+        function exportarExcel() {
+            showToast('Funcionalidad de exportación a Excel en desarrollo', 'info');
+            // TODO: Implementar exportación real con biblioteca como SheetJS
+        }
+
+        // Toast notification
+        function showToast(message, type = 'info') {
+            const colors = {
+                success: 'bg-green-500',
+                error: 'bg-red-500',
+                info: 'bg-blue-500'
+            };
+            
+            const toast = document.createElement('div');
+            toast.className = `fixed top-4 right-4 ${colors[type]} text-white px-6 py-3 rounded-lg shadow-lg z-50 transition-all duration-300`;
+            toast.textContent = message;
+            
+            document.body.appendChild(toast);
+            
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
+
+        // Cargar datos al iniciar
+        document.addEventListener('DOMContentLoaded', cargarDatos);
+    </script>
+</body>
+</html>

@@ -1,12 +1,72 @@
 import { Request, Response } from 'express';
-import Area from '../../models/Area';
+import Area from '../../models/catalogs/Area';
+import Planta from '../../models/catalogs/Planta';
+import sequelize from '../../config/database';
+
+// Función para verificar y agregar columnas faltantes
+const ensureAreaTableStructure = async () => {
+  try {
+    console.log('[AREA MIGRATION] Verificando estructura de tabla area...');
+    
+    // Verificar si la columna planta_codigo existe
+    const [results] = await sequelize.query(`
+      SELECT column_name 
+      FROM information_schema.columns 
+      WHERE table_name = 'area' AND column_name = 'planta_codigo'
+    `);
+    
+    if (results.length === 0) {
+      console.log('[AREA MIGRATION] Columna planta_codigo no existe, agregándola...');
+      await sequelize.query(`
+        ALTER TABLE area 
+        ADD COLUMN planta_codigo VARCHAR(10)
+      `);
+      console.log('[AREA MIGRATION] ✅ Columna planta_codigo agregada exitosamente');
+    } else {
+      console.log('[AREA MIGRATION] ✅ Columna planta_codigo ya existe');
+    }
+  } catch (error) {
+    console.error('[AREA MIGRATION] ❌ Error en migración:', error);
+    throw error;
+  }
+};
 
 export const getAllAreas = async (req: Request, res: Response) => {
+  console.log('\n🔍 [GET ALL AREAS] === INICIO DE SOLICITUD ===');
   try {
-    const areas = await Area.findAll();
+    console.log('[GET ALL AREAS] Verificando estructura de tabla...');
+    await ensureAreaTableStructure();
+    
+    console.log('[GET ALL AREAS] Intentando obtener áreas...');
+    console.log('[GET ALL AREAS] Modelos importados:', { Area: !!Area, Planta: !!Planta });
+    
+    // Consulta con include
+    console.log('[GET ALL AREAS] Realizando consulta con include...');
+    const areas = await Area.findAll({
+      include: [{ 
+        model: Planta, 
+        as: 'planta', 
+        attributes: ['codigo', 'nombre'],
+        required: false  // LEFT JOIN en lugar de INNER JOIN
+      }],
+      order: [['codigo', 'ASC']]
+    });
+    
+    console.log(`[GET ALL AREAS] ✅ ${areas.length} areas encontradas con include`);
+    console.log('[GET ALL AREAS] Primera área (ejemplo):', areas[0] ? JSON.stringify(areas[0], null, 2) : 'No hay áreas');
+    
     res.json(areas);
   } catch (error) {
-    res.status(500).json({ error: 'Error al obtener áreas', details: error });
+    console.error('[GET ALL AREAS] ❌ ERROR DETALLADO:');
+    console.error('[GET ALL AREAS] Error message:', error instanceof Error ? error.message : 'Unknown error');
+    console.error('[GET ALL AREAS] Error stack:', error instanceof Error ? error.stack : 'No stack trace');
+    console.error('[GET ALL AREAS] Error completo:', error);
+    
+    res.status(500).json({ 
+      error: 'Error al obtener áreas', 
+      details: error instanceof Error ? error.message : 'Unknown error',
+      stack: process.env.NODE_ENV === 'development' ? (error instanceof Error ? error.stack : '') : undefined
+    });
   }
 };
 

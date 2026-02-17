@@ -1,11 +1,12 @@
 import { Request, Response } from 'express';
-import SubArea from '../../models/SubArea';
-import Area from '../../models/Area';
+import SubArea from '../../models/catalogs/SubArea';
+import Area from '../../models/catalogs/Area';
 
 export const getAllSubAreas = async (req: Request, res: Response) => {
   try {
     const subareas = await SubArea.findAll({
-      include: [{ model: Area }]
+      include: [{ model: Area, as: 'area' }],
+      order: [['codigo', 'ASC']]
     });
     res.json(subareas);
   } catch (error) {
@@ -17,7 +18,7 @@ export const getSubAreaById = async (req: Request, res: Response) => {
   try {
     const { codigo } = req.params;
     const subarea = await SubArea.findByPk(codigo as string, {
-      include: [{ model: Area }]
+      include: [{ model: Area, as: 'area' }]
     });
     
     if (!subarea) {

@@ -1,45 +1,54 @@
 import express, { Application, Request, Response, NextFunction } from 'express';
 import path from 'path';
+import cors from 'cors';
 import sequelize from './config/database';
 import { setupAssociations } from './models';
+import { runMigrations } from './utils/migrations';
 
-// Importar controladores
-import { 
-  getAllPlantas, 
-  getPlantaById, 
-  createPlanta, 
-  updatePlanta, 
-  deletePlanta 
-} from './controllers/catalogo/plantaController';
+// Importar TODOS los modelos para sincronización manual
+import Planta from './models/catalogs/Planta';
+import Area from './models/catalogs/Area';
+import SubArea from './models/catalogs/SubArea';
+import UnidadMedida from './models/catalogs/UnidadMedida';
+import Moneda from './models/catalogs/Moneda';
+import Fabricante from './models/catalogs/Fabricante';
+import Categoria from './models/catalogs/Categoria';
+import Clasificacion from './models/catalogs/Clasificacion';
+import StatusEquipo from './models/catalogs/StatusEquipo';
+import TipoEquipo from './models/catalogs/TipoEquipo';
+import Criticidad from './models/catalogs/Criticidad';
+import StatusEstrategia from './models/catalogs/StatusEstrategia';
+import TipoEstrategia from './models/catalogs/TipoEstrategia';
+import TipoTarea from './models/catalogs/TipoTarea';
+import TipoCodRep from './models/catalogs/TipoCodRep';
+import CategoriaCodRep from './models/catalogs/CategoriaCodRep';
+import FlotaEquipo from './models/catalogs/FlotaEquipo';
+import Posicion from './models/catalogs/Posicion';
+import Cliente from './models/catalogs/Cliente';
+import Garantia from './models/catalogs/Garantia';
+import AtencionReparacion from './models/catalogs/AtencionReparacion';
+import TipoReparacion from './models/catalogs/TipoReparacion';
+import TipoGarantia from './models/catalogs/TipoGarantia';
+import PrioridadAtencion from './models/catalogs/PrioridadAtencion';
+import BaseMetalica from './models/catalogs/BaseMetalica';
+import OtStatus from './models/catalogs/OtStatus';
+import RecursosStatus from './models/catalogs/RecursosStatus';
+import TallerStatus from './models/catalogs/TallerStatus';
+import Material from './models/Material';
+import Equipo from './models/Equipo';
+import Estrategia from './models/Estrategia';
+import CodigoReparacion from './models/CodigoReparacion';
+import Tarea from './models/Tarea';
+import OrdenTrabajo from './models/OrdenTrabajo';
 
-import { 
-  getAllAreas, 
-  getAreaById, 
-  createArea, 
-  updateArea, 
-  deleteArea 
-} from './controllers/catalogo/areaController';
-
-import { 
-  getAllEquipos, 
-  getEquipoById, 
-  createEquipo, 
-  updateEquipo, 
-  deleteEquipo 
-} from './controllers/maestros/equipoController';
-
-import { 
-  getAllOrdenesTrabajo, 
-  getOrdenTrabajoById, 
-  createOrdenTrabajo, 
-  updateOrdenTrabajo, 
-  deleteOrdenTrabajo 
-} from './controllers/operativos/ordenTrabajoController';
+// Importar rutas centralizadas
+import apiRoutes from './routes/index';
 
 const app: Application = express();
 const PORT = process.env.PORT || 3000;
 
 // Middleware
+app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
@@ -52,7 +61,153 @@ app.get('/', (req: Request, res: Response) => {
   res.sendFile(path.join(__dirname, 'vistas', 'index.html'));
 });
 
-// Catálogos
+app.get('/index.html', (req: Request, res: Response) => {
+  res.sendFile(path.join(__dirname, 'vistas', 'index.html'));
+});
+
+// LOGÍSTICA
+app.get('/logistica/materiales.html', (req: Request, res: Response) => {
+  res.sendFile(path.join(__dirname, 'vistas', 'logistica', 'materiales.html'));
+});
+
+app.get('/logistica/almacenes.html', (req: Request, res: Response) => {
+  res.sendFile(path.join(__dirname, 'vistas', 'logistica', 'almacenes.html'));
+});
+
+app.get('/logistica/movimientos.html', (req: Request, res: Response) => {
+  res.sendFile(path.join(__dirname, 'vistas', 'logistica', 'movimientos.html'));
+});
+
+app.get('/logistica/proveedores.html', (req: Request, res: Response) => {
+  res.sendFile(path.join(__dirname, 'vistas', 'logistica', 'proveedores.html'));
+});
+
+app.get('/logistica/compras.html', (req: Request, res: Response) => {
+  res.sendFile(path.join(__dirname, 'vistas', 'logistica', 'compras.html'));
+});
+
+// MANTENIMIENTO
+app.get('/mantenimiento/equipos.html', (req: Request, res: Response) => {
+  res.sendFile(path.join(__dirname, 'vistas', 'mantenimiento', 'equipos.html'));
+});
+
+app.get('/mantenimiento/herramientas.html', (req: Request, res: Response) => {
+  res.sendFile(path.join(__dirname, 'vistas', 'mantenimiento', 'herramientas.html'));
+});
+
+app.get('/mantenimiento/codigos-reparacion.html', (req: Request, res: Response) => {
+  res.sendFile(path.join(__dirname, 'vistas', 'mantenimiento', 'codigos-reparacion.html'));
+});
+
+app.get('/mantenimiento/ordenes-trabajo.html', (req: Request, res: Response) => {
+  res.sendFile(path.join(__dirname, 'vistas', 'mantenimiento', 'ordenes-trabajo.html'));
+});
+
+app.get('/mantenimiento/estrategias.html', (req: Request, res: Response) => {
+  res.sendFile(path.join(__dirname, 'vistas', 'mantenimiento', 'estrategias.html'));
+});
+
+// PRODUCCIÓN
+app.get('/produccion/productos.html', (req: Request, res: Response) => {
+  res.sendFile(path.join(__dirname, 'vistas', 'produccion', 'productos.html'));
+});
+
+app.get('/produccion/categorias.html', (req: Request, res: Response) => {
+  res.sendFile(path.join(__dirname, 'vistas', 'produccion', 'categorias.html'));
+});
+
+app.get('/produccion/recetas.html', (req: Request, res: Response) => {
+  res.sendFile(path.join(__dirname, 'vistas', 'produccion', 'recetas.html'));
+});
+
+app.get('/produccion/plantas.html', (req: Request, res: Response) => {
+  res.sendFile(path.join(__dirname, 'vistas', 'produccion', 'plantas.html'));
+});
+
+app.get('/produccion/produccion.html', (req: Request, res: Response) => {
+  res.sendFile(path.join(__dirname, 'vistas', 'produccion', 'produccion.html'));
+});
+
+app.get('/produccion/perdidas.html', (req: Request, res: Response) => {
+  res.sendFile(path.join(__dirname, 'vistas', 'produccion', 'perdidas.html'));
+});
+
+app.get('/produccion/tareas.html', (req: Request, res: Response) => {
+  res.sendFile(path.join(__dirname, 'vistas', 'produccion', 'tareas.html'));
+});
+
+// OPERATIVOS
+app.get('/operativos/ordenes-trabajo.html', (req: Request, res: Response) => {
+  res.sendFile(path.join(__dirname, 'vistas', 'operativos', 'ordenes-trabajo.html'));
+});
+
+// CATÁLOGOS
+app.get('/catalogos/plantas.html', (req: Request, res: Response) => {
+  res.sendFile(path.join(__dirname, 'vistas', 'catalogos', 'plantas.html'));
+});
+
+app.get('/catalogos/areas.html', (req: Request, res: Response) => {
+  res.sendFile(path.join(__dirname, 'vistas', 'catalogos', 'areas.html'));
+});
+
+app.get('/catalogos/subareas.html', (req: Request, res: Response) => {
+  res.sendFile(path.join(__dirname, 'vistas', 'catalogos', 'subareas.html'));
+});
+
+app.get('/catalogos/categorias.html', (req: Request, res: Response) => {
+  res.sendFile(path.join(__dirname, 'vistas', 'catalogos', 'categorias.html'));
+});
+
+app.get('/catalogos/clasificaciones.html', (req: Request, res: Response) => {
+  res.sendFile(path.join(__dirname, 'vistas', 'catalogos', 'clasificaciones.html'));
+});
+
+app.get('/catalogos/unidades-medida.html', (req: Request, res: Response) => {
+  res.sendFile(path.join(__dirname, 'vistas', 'catalogos', 'unidades-medida.html'));
+});
+
+app.get('/catalogos/monedas.html', (req: Request, res: Response) => {
+  res.sendFile(path.join(__dirname, 'vistas', 'catalogos', 'monedas.html'));
+});
+
+app.get('/catalogos/fabricantes.html', (req: Request, res: Response) => {
+  res.sendFile(path.join(__dirname, 'vistas', 'catalogos', 'fabricantes.html'));
+});
+
+app.get('/catalogos/criticidad.html', (req: Request, res: Response) => {
+  res.sendFile(path.join(__dirname, 'vistas', 'catalogos', 'criticidad.html'));
+});
+
+app.get('/catalogos/posiciones.html', (req: Request, res: Response) => {
+  res.sendFile(path.join(__dirname, 'vistas', 'catalogos', 'posiciones.html'));
+});
+
+app.get('/catalogos/clientes.html', (req: Request, res: Response) => {
+  res.sendFile(path.join(__dirname, 'vistas', 'catalogos', 'clientes.html'));
+});
+
+// COMPARTIDO
+app.get('/compartido/estrategias.html', (req: Request, res: Response) => {
+  res.sendFile(path.join(__dirname, 'vistas', 'compartido', 'estrategias.html'));
+});
+
+app.get('/compartido/ubicaciones.html', (req: Request, res: Response) => {
+  res.sendFile(path.join(__dirname, 'vistas', 'compartido', 'ubicaciones.html'));
+});
+
+app.get('/compartido/ventas.html', (req: Request, res: Response) => {
+  res.sendFile(path.join(__dirname, 'vistas', 'compartido', 'ventas.html'));
+});
+
+app.get('/compartido/clientes.html', (req: Request, res: Response) => {
+  res.sendFile(path.join(__dirname, 'vistas', 'compartido', 'clientes.html'));
+});
+
+app.get('/compartido/reportes.html', (req: Request, res: Response) => {
+  res.sendFile(path.join(__dirname, 'vistas', 'compartido', 'reportes.html'));
+});
+
+// RUTAS LEGACY (mantener compatibilidad)
 app.get('/catalogo/plantas', (req: Request, res: Response) => {
   res.sendFile(path.join(__dirname, 'vistas', 'catalogo', 'plantas.html'));
 });
@@ -61,45 +216,17 @@ app.get('/catalogo/areas', (req: Request, res: Response) => {
   res.sendFile(path.join(__dirname, 'vistas', 'catalogo', 'areas.html'));
 });
 
-// Maestros
 app.get('/maestros/equipos', (req: Request, res: Response) => {
   res.sendFile(path.join(__dirname, 'vistas', 'maestros', 'equipos.html'));
 });
 
-// Operativos
 app.get('/operativos/ordenes-trabajo', (req: Request, res: Response) => {
   res.sendFile(path.join(__dirname, 'vistas', 'operativos', 'ordenes-trabajo.html'));
 });
 
 // ============= RUTAS DE API =============
-
-// API Catálogos - Plantas
-app.get('/api/catalogo/plantas', getAllPlantas);
-app.get('/api/catalogo/plantas/:codigo', getPlantaById);
-app.post('/api/catalogo/plantas', createPlanta);
-app.put('/api/catalogo/plantas/:codigo', updatePlanta);
-app.delete('/api/catalogo/plantas/:codigo', deletePlanta);
-
-// API Catálogos - Áreas
-app.get('/api/catalogo/areas', getAllAreas);
-app.get('/api/catalogo/areas/:codigo', getAreaById);
-app.post('/api/catalogo/areas', createArea);
-app.put('/api/catalogo/areas/:codigo', updateArea);
-app.delete('/api/catalogo/areas/:codigo', deleteArea);
-
-// API Maestros - Equipos
-app.get('/api/maestros/equipos', getAllEquipos);
-app.get('/api/maestros/equipos/:id', getEquipoById);
-app.post('/api/maestros/equipos', createEquipo);
-app.put('/api/maestros/equipos/:id', updateEquipo);
-app.delete('/api/maestros/equipos/:id', deleteEquipo);
-
-// API Operativos - Órdenes de Trabajo
-app.get('/api/operativos/ordenes-trabajo', getAllOrdenesTrabajo);
-app.get('/api/operativos/ordenes-trabajo/:id', getOrdenTrabajoById);
-app.post('/api/operativos/ordenes-trabajo', createOrdenTrabajo);
-app.put('/api/operativos/ordenes-trabajo/:id', updateOrdenTrabajo);
-app.delete('/api/operativos/ordenes-trabajo/:id', deleteOrdenTrabajo);
+// Todas las rutas del API están centralizadas en /api
+app.use('/api', apiRoutes);
 
 // Manejo de errores
 app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
@@ -126,9 +253,59 @@ const startServer = async () => {
     setupAssociations();
     console.log('✓ Asociaciones de modelos configuradas');
 
-    // Sincronizar modelos con la base de datos
-    await sequelize.sync({ alter: true });
-    console.log('✓ Modelos sincronizados con la base de datos');
+    // Ejecutar migraciones manuales (comentado para primera migración)
+    // await runMigrations();
+
+    // Sincronizar modelos con la base de datos EN ORDEN CORRECTO
+    console.log('⚙️ Sincronizando modelos con NUEVA ESTRUCTURA...');
+    console.log('   1/4 Creando catálogos básicos...');
+    
+    // NIVEL 1: Catálogos sin dependencias
+    await Planta.sync({ force: false });
+    await Area.sync({ force: false });
+    await UnidadMedida.sync({ force: false });
+    await Moneda.sync({ force: false });
+    await Fabricante.sync({ force: false });
+    await Categoria.sync({ force: false });
+    await Clasificacion.sync({ force: false });
+    await StatusEquipo.sync({ force: false });
+    await TipoEquipo.sync({ force: false });
+    await Criticidad.sync({ force: false });
+    await StatusEstrategia.sync({ force: false });
+    await TipoEstrategia.sync({ force: false });
+    await TipoTarea.sync({ force: false });
+    await TipoCodRep.sync({ force: false });
+    await CategoriaCodRep.sync({ force: false });
+    await FlotaEquipo.sync({ force: false });
+    await Posicion.sync({ force: false });
+    await Cliente.sync({ force: false });
+    await Garantia.sync({ force: false });
+    await AtencionReparacion.sync({ force: false });
+    await TipoReparacion.sync({ force: false });
+    await TipoGarantia.sync({ force: false });
+    await PrioridadAtencion.sync({ force: false });
+    await BaseMetalica.sync({ force: false });
+    await OtStatus.sync({ force: false });
+    await RecursosStatus.sync({ force: false });
+    await TallerStatus.sync({ force: false });
+    
+    console.log('   2/4 Creando catálogos con dependencias...');
+    // NIVEL 2: Catálogos que dependen de otros catálogos
+    await SubArea.sync({ force: false });
+    
+    console.log('   3/4 Creando tablas principales...');
+    // NIVEL 3: Tablas principales
+    await Material.sync({ force: false });
+    await Equipo.sync({ force: false });
+    await Estrategia.sync({ force: false });
+    await CodigoReparacion.sync({ force: false });
+    
+    console.log('   4/4 Creando tablas de relación...');
+    // NIVEL 4: Tablas que dependen de tablas principales
+    await Tarea.sync({ force: false });
+    await OrdenTrabajo.sync({ force: false });
+    
+    console.log('✓ ¡TABLAS CREADAS CON NUEVA ESTRUCTURA!');
 
     // Iniciar servidor Express
     app.listen(PORT, () => {

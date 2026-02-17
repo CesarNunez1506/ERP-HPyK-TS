@@ -1,0 +1,55 @@
+/**
+ * Rutas para ÓRDENES DE TRABAJO (6_OTs)
+ * Área: TODOS (tabla central del ERP)
+ * 
+ * Campos principales: OT (código), Cliente, Estrategia, Cod Rep, Equipo, NS, 
+ *                     Plaqueteo, WO Cliente, PO Cliente, ID Viajero, Fecha recepción, 
+ *                     PCR, Horas, Garantía, Tipo Reparación, Prioridad, Contratos,
+ *                     Status (OT, Recursos, Taller), Comentarios, etc.
+ * 
+ * Catálogos asociados: Cliente, Estrategia, Garantía, Atención reparación, 
+ *                      Tipo Reparación, Tipo Garantía, Prioridad Atención, 
+ *                      Base Metálica, OT Status, Recursos Status, Taller Status
+ */
+
+import { Router } from 'express';
+import * as ordenTrabajoController from '../../controllers/operativos/ordenTrabajoController';
+import * as otRepuestoController from '../../controllers/operativos/otRepuestoController';
+import * as otHistorialController from '../../controllers/operativos/otHistorialController';
+
+const router = Router();
+
+// CRUD completo de órdenes de trabajo
+router.get('/', ordenTrabajoController.getAllOrdenesTrabajo);
+router.get('/:id', ordenTrabajoController.getOrdenTrabajoById);
+router.post('/', ordenTrabajoController.createOrdenTrabajo);
+router.put('/:id', ordenTrabajoController.updateOrdenTrabajo);
+router.delete('/:id', ordenTrabajoController.deleteOrdenTrabajo);
+
+// === REPUESTOS DE OT ===
+// Obtener repuestos de una OT específica
+router.get('/:otId/repuestos', otRepuestoController.getRepuestosByOT);
+
+// Crear repuestos para una OT (batch)
+router.post('/:otId/repuestos', otRepuestoController.createRepuestos);
+
+// Actualizar un repuesto específico (cambiar estado, aprobar, vincular a PO)
+router.put('/repuestos/:id', otRepuestoController.updateRepuesto);
+
+// Eliminar un repuesto (solo si está en estado Pendiente)
+router.delete('/repuestos/:id', otRepuestoController.deleteRepuesto);
+
+// === HISTORIAL DE OT ===
+// Obtener historial de operaciones de una OT
+router.get('/:otId/historial', otHistorialController.getHistorialByOT);
+
+// Obtener historial detallado con información relacionada
+router.get('/:otId/historial/detailed', otHistorialController.getHistorialDetailedByOT);
+
+// Obtener resumen de operaciones agrupadas
+router.get('/:otId/historial/resumen', otHistorialController.getResumenOperaciones);
+
+// Crear una entrada manual en el historial
+router.post('/:otId/historial', otHistorialController.createHistorialEntry);
+
+export default router;

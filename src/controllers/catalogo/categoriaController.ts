@@ -1,12 +1,23 @@
 import { Request, Response } from 'express';
-import Categoria from '../../models/Categoria';
+import Categoria from '../../models/catalogs/Categoria';
 
 export const getAllCategorias = async (req: Request, res: Response) => {
+  console.log('\n📁 [GET ALL CATEGORIAS] === INICIO DE SOLICITUD ===');
   try {
-    const categorias = await Categoria.findAll();
+    console.log('[GET ALL CATEGORIAS] Intentando obtener categorías...');
+    const categorias = await Categoria.findAll({
+      order: [['codigo', 'ASC']]
+    });
+    console.log(`[GET ALL CATEGORIAS] ✅ ${categorias.length} categorías encontradas`);
     res.json(categorias);
   } catch (error) {
-    res.status(500).json({ error: 'Error al obtener categorías', details: error });
+    console.error('[GET ALL CATEGORIAS] ❌ ERROR DETALLADO:');
+    console.error('[GET ALL CATEGORIAS] Error message:', error instanceof Error ? error.message : 'Unknown error');
+    console.error('[GET ALL CATEGORIAS] Error stack:', error instanceof Error ? error.stack : 'No stack trace');
+    res.status(500).json({ 
+      error: 'Error al obtener categorías', 
+      details: error instanceof Error ? error.message : 'Unknown error'
+    });
   }
 };
 

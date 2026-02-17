@@ -3,269 +3,2414 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard - ERP HPyK</title>
+    <title>HP&K ERP - Dashboard</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
+        .dropdown-menu { display: none; }
+        .dropdown.active .dropdown-menu { display: block; }
+        
+        .module-card {
+            transition: all 0.3s ease;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
         }
-        .fade-in { animation: fadeIn 0.5s ease-out; }
-        .stat-card { transition: all 0.3s; }
-        .stat-card:hover { transform: translateY(-5px); box-shadow: 0 10px 25px rgba(0,0,0,0.2); }
+        
+        .module-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 12px 24px rgba(0, 0, 0, 0.2);
+        }
+        
+        .module-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, rgba(255,255,255,0.1), rgba(255,255,255,0));
+            pointer-events: none;
+        }
+        
+        .submenu-card {
+            transition: all 0.3s ease;
+            cursor: pointer;
+            border: 2px solid transparent;
+        }
+        
+        .submenu-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
+        }
+        
+        .submenu-card.active {
+            border-color: #0891b2;
+            box-shadow: 0 8px 16px rgba(8, 145, 178, 0.3);
+        }
+        
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .fade-in-up {
+            animation: fadeInUp 0.6s ease-out forwards;
+            opacity: 0;
+        }
+        
+        .slide-in {
+            animation: slideInFromTop 0.5s ease-out forwards;
+        }
+        
+        @keyframes slideInFromTop {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .delay-1 { animation-delay: 0.1s; }
+        .delay-2 { animation-delay: 0.2s; }
+        .delay-3 { animation-delay: 0.3s; }
+        .delay-4 { animation-delay: 0.4s; }
+        .delay-5 { animation-delay: 0.5s; }
+        .delay-6 { animation-delay: 0.6s; }
+        
+        .content-section {
+            display: none;
+        }
+        
+        .content-section.active {
+            display: block;
+            animation: fadeInUp 0.4s ease-out;
+        }
+        
+        .logistics-submenu {
+            display: none;
+        }
+        
+        .production-submenu {
+            display: none;
+        }
+        
+        .production-submenu {
+            display: none;
+        }
+        
+        .selectable-cell {
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
     </style>
 </head>
-<body class="bg-gradient-to-br from-gray-50 to-blue-50 min-h-screen">
+<body class="bg-gray-100" onclick="closeAllDropdowns(event)">
     <!-- Navbar -->
-    <nav class="bg-gradient-to-r from-blue-900 to-blue-700 text-white shadow-lg sticky top-0 z-50">
-        <div class="max-w-7xl mx-auto px-4">
-            <div class="flex items-center justify-between h-16">
-                <div class="flex items-center space-x-4">
-                    <i class="fas fa-industry text-2xl"></i>
-                    <span class="text-xl font-bold">ERP HPyK</span>
+    <nav class="bg-gradient-to-r from-cyan-500 via-cyan-600 to-blue-600 text-white shadow-lg sticky top-0 z-50">
+        <div class="container mx-auto px-6">
+            <div class="flex justify-between items-center py-4">
+                <div class="flex items-center space-x-3">
+                    <i class="fas fa-church text-3xl"></i>
+                    <div>
+                        <span class="text-2xl font-bold">HP&K ERP</span>
+                        <p class="text-xs text-cyan-100">Sistema Integral de Gestión</p>
+                    </div>
                 </div>
-                <div class="flex space-x-4">
-                    <a href="/" class="bg-blue-800 px-3 py-2 rounded">
-                        <i class="fas fa-home mr-2"></i>Inicio
+                
+                <div class="flex items-center space-x-6">
+                    <a href="/index.html" class="hover:text-cyan-200 transition font-semibold flex items-center">
+                        <i class="fas fa-home mr-2"></i> INICIO
                     </a>
-                    <a href="/catalogo/plantas" class="hover:bg-blue-800 px-3 py-2 rounded transition">
-                        <i class="fas fa-clipboard-list mr-2"></i>Catálogo
+                    
+                    <a href="/reportes.html" class="hover:text-cyan-200 transition font-semibold flex items-center">
+                        <i class="fas fa-chart-line mr-2"></i> REPORTES
                     </a>
-                    <a href="/maestros/equipos" class="hover:bg-blue-800 px-3 py-2 rounded transition">
-                        <i class="fas fa-cogs mr-2"></i>Maestros
+                    
+                    <a href="/configuracion.html" class="hover:text-cyan-200 transition font-semibold flex items-center">
+                        <i class="fas fa-cog mr-2"></i> CONFIGURACIÓN
                     </a>
-                    <a href="/operativos/ordenes-trabajo" class="hover:bg-blue-800 px-3 py-2 rounded transition">
-                        <i class="fas fa-tasks mr-2"></i>Operativos
-                    </a>
+                    
+                    <div class="relative dropdown">
+                        <button onclick="toggleDropdown(event, this)" class="hover:text-cyan-200 transition font-semibold flex items-center">
+                            <i class="fas fa-user-circle mr-2 text-xl"></i>
+                            <span>Mi cuenta</span>
+                            <i class="fas fa-chevron-down ml-2 text-xs"></i>
+                        </button>
+                        <div class="dropdown-menu absolute right-0 mt-2 w-48 bg-white text-gray-800 rounded-lg shadow-xl py-2">
+                            <a href="#" class="block px-4 py-2 hover:bg-gray-100">
+                                <i class="fas fa-user mr-2"></i> Perfil
+                            </a>
+                            <a href="#" class="block px-4 py-2 hover:bg-gray-100">
+                                <i class="fas fa-key mr-2"></i> Cambiar Contraseña
+                            </a>
+                            <hr class="my-2">
+                            <a href="#" class="block px-4 py-2 hover:bg-red-50 text-red-600">
+                                <i class="fas fa-sign-out-alt mr-2"></i> Cerrar Sesión
+                            </a>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
     </nav>
 
-    <div class="max-w-7xl mx-auto px-4 py-8">
-        <!-- Hero Section -->
-        <div class="bg-gradient-to-r from-blue-600 to-indigo-700 rounded-2xl shadow-2xl p-8 mb-8 text-white fade-in">
-            <div class="flex items-center justify-between">
-                <div>
-                    <h1 class="text-4xl font-bold mb-2">¡Bienvenido al ERP HPyK!</h1>
-                    <p class="text-xl opacity-90">Sistema de gestión de mantenimiento y reparaciones</p>
-                    <p class="text-sm mt-2 opacity-75"><i class="far fa-clock mr-2"></i>Última actualización: <span id="lastUpdate"></span></p>
-                </div>
-                <i class="fas fa-industry text-8xl opacity-20"></i>
-            </div>
+    <!-- Main Content -->
+    <div class="container mx-auto px-6 py-8">
+        <!-- Header Section -->
+        <div class="mb-8">
+            <h1 class="text-4xl font-bold text-gray-800 mb-2">Módulos Principales</h1>
+            <p class="text-gray-600">Acceso rápido a los módulos del sistema HP&K ERP</p>
         </div>
 
-        <!-- Estadísticas -->
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-            <div class="stat-card bg-gradient-to-br from-purple-500 to-purple-700 rounded-xl shadow-lg p-6 text-white fade-in">
-                <div class="flex items-center justify-between">
-                    <div>
-                        <p class="text-sm opacity-80 font-semibold">Órdenes Activas</p>
-                        <p class="text-4xl font-bold mt-2" id="ordenesActivas">0</p>
-                        <p class="text-xs mt-2 opacity-75"><i class="fas fa-arrow-up mr-1"></i>Ver todas</p>
-                    </div>
-                    <div class="bg-white bg-opacity-20 p-4 rounded-lg">
-                        <i class="fas fa-clipboard-list text-4xl"></i>
-                    </div>
+        <!-- Main Modules Grid -->
+        <div id="main-modules-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-6 mb-12">
+            <!-- Órdenes de Trabajo -->
+            <a href="/operativos/ordenes-trabajo.html" class="module-card bg-gradient-to-br from-cyan-400 to-cyan-600 rounded-lg shadow-lg p-8 text-white fade-in-up delay-1">
+                <div class="text-center">
+                    <i class="fas fa-clipboard-list text-6xl mb-4 opacity-90"></i>
+                    <h3 class="text-xl font-bold">Órdenes de Trabajo</h3>
+                    <p class="text-sm text-cyan-100 mt-2">Gestión de OT</p>
+                </div>
+            </a>
+
+            <!-- Logística - Ahora es un botón -->
+            <div onclick="showLogisticsModule()" class="module-card bg-gradient-to-br from-blue-400 to-blue-600 rounded-lg shadow-lg p-8 text-white fade-in-up delay-2 cursor-pointer">
+                <div class="text-center">
+                    <i class="fas fa-boxes text-6xl mb-4 opacity-90"></i>
+                    <h3 class="text-xl font-bold">Logística</h3>
+                    <p class="text-sm text-blue-100 mt-2">Inventario y Stock</p>
                 </div>
             </div>
 
-            <div class="stat-card bg-gradient-to-br from-pink-500 to-rose-600 rounded-xl shadow-lg p-6 text-white fade-in" style="animation-delay: 0.1s;">
-                <div class="flex items-center justify-between">
-                    <div>
-                        <p class="text-sm opacity-80 font-semibold">Equipos Registrados</p>
-                        <p class="text-4xl font-bold mt-2" id="equiposTotal">0</p>
-                        <p class="text-xs mt-2 opacity-75"><i class="fas fa-arrow-up mr-1"></i>Ver todos</p>
-                    </div>
-                    <div class="bg-white bg-opacity-20 p-4 rounded-lg">
-                        <i class="fas fa-cogs text-4xl"></i>
-                    </div>
+            <!-- Producción -->
+            <div onclick="showProductionModule()" class="module-card bg-gradient-to-br from-purple-400 to-purple-600 rounded-lg shadow-lg p-8 text-white fade-in-up delay-3 cursor-pointer">
+                <div class="text-center">
+                    <i class="fas fa-industry text-6xl mb-4 opacity-90"></i>
+                    <h3 class="text-xl font-bold">Producción</h3>
+                    <p class="text-sm text-purple-100 mt-2">Tareas y Códigos</p>
                 </div>
             </div>
 
-            <div class="stat-card bg-gradient-to-br from-cyan-500 to-blue-600 rounded-xl shadow-lg p-6 text-white fade-in" style="animation-delay: 0.2s;">
-                <div class="flex items-center justify-between">
-                    <div>
-                        <p class="text-sm opacity-80 font-semibold">Materiales</p>
-                        <p class="text-4xl font-bold mt-2" id="materialesTotal">0</p>
-                        <p class="text-xs mt-2 opacity-75"><i class="fas fa-arrow-up mr-1"></i>Ver inventario</p>
-                    </div>
-                    <div class="bg-white bg-opacity-20 p-4 rounded-lg">
-                        <i class="fas fa-boxes text-4xl"></i>
-                    </div>
+            <!-- Mantenimiento -->
+            <div onclick="showMaintenanceModule()" class="module-card bg-gradient-to-br from-green-400 to-green-600 rounded-lg shadow-lg p-8 text-white fade-in-up delay-4 cursor-pointer">
+                <div class="text-center">
+                    <i class="fas fa-tools text-6xl mb-4 opacity-90"></i>
+                    <h3 class="text-xl font-bold">Mantenimiento</h3>
+                    <p class="text-sm text-green-100 mt-2">Equipos y Herramientas</p>
                 </div>
             </div>
 
-            <div class="stat-card bg-gradient-to-br from-green-500 to-emerald-600 rounded-xl shadow-lg p-6 text-white fade-in" style="animation-delay: 0.3s;">
-                <div class="flex items-center justify-between">
-                    <div>
-                        <p class="text-sm opacity-80 font-semibold">Clientes</p>
-                        <p class="text-4xl font-bold mt-2" id="clientesTotal">0</p>
-                        <p class="text-xs mt-2 opacity-75"><i class="fas fa-arrow-up mr-1"></i>Ver todos</p>
-                    </div>
-                    <div class="bg-white bg-opacity-20 p-4 rounded-lg">
-                        <i class="fas fa-users text-4xl"></i>
-                    </div>
+            <!-- Estrategias -->
+            <a href="/mantenimiento/estrategias.html" class="module-card bg-gradient-to-br from-lime-400 to-lime-600 rounded-lg shadow-lg p-8 text-white fade-in-up delay-5">
+                <div class="text-center">
+                    <i class="fas fa-lightbulb text-6xl mb-4 opacity-90"></i>
+                    <h3 class="text-xl font-bold">Estrategias</h3>
+                    <p class="text-sm text-lime-100 mt-2">Mantenimiento</p>
                 </div>
-            </div>
+            </a>
+
+            <!-- Reporte General -->
+            <a href="/operativos/reporte-general.html" class="module-card bg-gradient-to-br from-orange-400 to-orange-600 rounded-lg shadow-lg p-8 text-white fade-in-up delay-6">
+                <div class="text-center">
+                    <i class="fas fa-chart-line text-6xl mb-4 opacity-90"></i>
+                    <h3 class="text-xl font-bold">Reporte General</h3>
+                    <p class="text-sm text-orange-100 mt-2">Análisis y Métricas</p>
+                </div>
+            </a>
         </div>
 
-        <!-- Accesos rápidos -->
-        <div class="bg-white rounded-xl shadow-lg p-6 mb-8 fade-in" style="animation-delay: 0.4s;">
-            <h2 class="text-2xl font-bold text-gray-800 mb-6 flex items-center">
-                <i class="fas fa-bolt text-yellow-500 mr-3"></i>
-                Accesos Rápidos
-            </h2>
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                <a href="/operativos/ordenes-trabajo" class="group bg-gradient-to-br from-blue-50 to-blue-100 hover:from-blue-100 hover:to-blue-200 p-6 rounded-lg border-2 border-blue-200 transition transform hover:-translate-y-1">
-                    <i class="fas fa-clipboard-list text-3xl text-blue-600 mb-3"></i>
-                    <h3 class="font-bold text-gray-800">Nueva Orden</h3>
-                    <p class="text-sm text-gray-600 mt-1">Crear orden de trabajo</p>
-                </a>
-                <a href="/maestros/equipos" class="group bg-gradient-to-br from-green-50 to-green-100 hover:from-green-100 hover:to-green-200 p-6 rounded-lg border-2 border-green-200 transition transform hover:-translate-y-1">
-                    <i class="fas fa-cogs text-3xl text-green-600 mb-3"></i>
-                    <h3 class="font-bold text-gray-800">Equipos</h3>
-                    <p class="text-sm text-gray-600 mt-1">Gestionar equipos</p>
-                </a>
-                <a href="/catalogo/plantas" class="group bg-gradient-to-br from-orange-50 to-orange-100 hover:from-orange-100 hover:to-orange-200 p-6 rounded-lg border-2 border-orange-200 transition transform hover:-translate-y-1">
-                    <i class="fas fa-industry text-3xl text-orange-600 mb-3"></i>
-                    <h3 class="font-bold text-gray-800">Catálogo</h3>
-                    <p class="text-sm text-gray-600 mt-1">Gestionar catálogos</p>
-                </a>
-                <a href="/reportes" class="group bg-gradient-to-br from-purple-50 to-purple-100 hover:from-purple-100 hover:to-purple-200 p-6 rounded-lg border-2 border-purple-200 transition transform hover:-translate-y-1">
-                    <i class="fas fa-chart-bar text-3xl text-purple-600 mb-3"></i>
-                    <h3 class="font-bold text-gray-800">Reportes</h3>
-                    <p class="text-sm text-gray-600 mt-1">Ver estadísticas</p>
-                </a>
-            </div>
-        </div>
-
-        <!-- Órdenes recientes -->
-        <div class="bg-white rounded-xl shadow-lg p-6 fade-in" style="animation-delay: 0.5s;">
+        <!-- Submenu for Logistics (Initially Hidden) -->
+        <div id="logistics-submenu" class="logistics-submenu mb-8" style="display: none;">
             <div class="flex items-center justify-between mb-6">
-                <h2 class="text-2xl font-bold text-gray-800 flex items-center">
-                    <i class="far fa-clock text-blue-600 mr-3"></i>
-                    Órdenes Recientes
-                </h2>
-                <a href="/operativos/ordenes-trabajo" class="text-blue-600 hover:text-blue-800 font-semibold">
-                    Ver todas <i class="fas fa-arrow-right ml-1"></i>
-                </a>
+                <div>
+                    <h2 class="text-3xl font-bold text-gray-800 flex items-center">
+                        <i class="fas fa-boxes text-blue-600 mr-3"></i>
+                        Módulo de Logística
+                    </h2>
+                    <p class="text-gray-600 mt-1">Gestión integral de inventario, compras y recursos</p>
+                </div>
+                <button onclick="backToMainModules()" class="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-lg transition flex items-center">
+                    <i class="fas fa-arrow-left mr-2"></i> Volver
+                </button>
             </div>
-            <div class="overflow-x-auto">
-                <table class="w-full">
-                    <thead class="bg-gray-50 border-b-2 border-gray-200">
-                        <tr>
-                            <th class="px-6 py-3 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">Número OT</th>
-                            <th class="px-6 py-3 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">Cliente</th>
-                            <th class="px-6 py-3 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">Status</th>
-                            <th class="px-6 py-3 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">Fecha</th>
-                            <th class="px-6 py-3 text-center text-xs font-bold text-gray-700 uppercase tracking-wider">Acciones</th>
-                        </tr>
-                    </thead>
-                    <tbody id="ordenesRecientes" class="divide-y divide-gray-200">
-                        <tr>
-                            <td colspan="5" class="px-6 py-8 text-center">
-                                <i class="fas fa-spinner fa-spin text-2xl text-blue-600 mb-2"></i>
-                                <p class="text-gray-600">Cargando órdenes...</p>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
+
+            <!-- Logistics Submodules -->
+            <div class="grid grid-cols-1 md:grid-cols-5 gap-4 mb-8">
+                <!-- Almacén -->
+                <div onclick="showSubmodule('almacen')" class="submenu-card bg-gradient-to-br from-blue-100 to-blue-200 rounded-lg p-6 text-center">
+                    <i class="fas fa-warehouse text-3xl text-blue-600 mb-3"></i>
+                    <h4 class="font-bold text-blue-800">ALMACÉN</h4>
+                    <p class="text-sm text-blue-600 mt-1">Inventario y Stock</p>
+                </div>
+
+                <!-- Compras -->
+                <div onclick="showSubmodule('compras')" class="submenu-card bg-gradient-to-br from-green-100 to-green-200 rounded-lg p-6 text-center">
+                    <i class="fas fa-shopping-cart text-3xl text-green-600 mb-3"></i>
+                    <h4 class="font-bold text-green-800">COMPRAS</h4>
+                    <p class="text-sm text-green-600 mt-1">Órdenes y Proveedores</p>
+                </div>
+
+                <!-- Recursos Solicitados -->
+                <div onclick="showSubmodule('recursos')" class="submenu-card bg-gradient-to-br from-purple-100 to-purple-200 rounded-lg p-6 text-center">
+                    <i class="fas fa-hand-holding text-3xl text-purple-600 mb-3"></i>
+                    <h4 class="font-bold text-purple-800">RECURSOS SOLICITADOS</h4>
+                    <p class="text-sm text-purple-600 mt-1">Solicitudes y Asignaciones</p>
+                </div>
+
+                <!-- Transporte -->
+                <div onclick="showSubmodule('transporte')" class="submenu-card bg-gradient-to-br from-orange-100 to-orange-200 rounded-lg p-6 text-center">
+                    <i class="fas fa-truck text-3xl text-orange-600 mb-3"></i>
+                    <h4 class="font-bold text-orange-800">TRANSPORTE</h4>
+                    <p class="text-sm text-orange-600 mt-1">Logística y Movilidad</p>
+                </div>
+
+                <!-- Dashboard -->
+                <div onclick="showSubmodule('dashboard')" class="submenu-card bg-gradient-to-br from-cyan-100 to-cyan-200 rounded-lg p-6 text-center">
+                    <i class="fas fa-chart-pie text-3xl text-cyan-600 mb-3"></i>
+                    <h4 class="font-bold text-cyan-800">DASHBOARD</h4>
+                    <p class="text-sm text-cyan-600 mt-1">Métricas y Reportes</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Production Submenu -->
+        <div id="production-submenu" class="production-submenu mb-8" style="display: none;">
+            <div class="flex items-center justify-between mb-6">
+                <h2 class="text-3xl font-bold text-gray-800">Módulo de Producción</h2>
+                <button onclick="backToMainModules()" class="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-lg transition flex items-center">
+                    <i class="fas fa-arrow-left mr-2"></i> Volver al Dashboard
+                </button>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-5 gap-6">
+                <!-- BASE DE DATOS -->
+                <div onclick="showSubmodule('basededatos')" class="submenu-card bg-gradient-to-br from-cyan-400 to-cyan-600 text-white cursor-pointer">
+                    <i class="fas fa-database text-4xl mb-3"></i>
+                    <h3 class="text-lg font-bold mb-2">BASE DE DATOS</h3>
+                    <p class="text-sm opacity-90">Gestión de datos</p>
+                </div>
+
+                <!-- DASHBOARD -->
+                <div onclick="showSubmodule('dashboardprod')" class="submenu-card bg-gradient-to-br from-blue-400 to-blue-600 text-white cursor-pointer">
+                    <i class="fas fa-tachometer-alt text-4xl mb-3"></i>
+                    <h3 class="text-lg font-bold mb-2">DASHBOARD</h3>
+                    <p class="text-sm opacity-90">Panel de control</p>
+                </div>
+
+                <!-- REQUERIMIENTOS -->
+                <div onclick="showSubmodule('requerimientos')" class="submenu-card bg-gradient-to-br from-purple-400 to-purple-600 text-white cursor-pointer">
+                    <i class="fas fa-clipboard-list text-4xl mb-3"></i>
+                    <h3 class="text-lg font-bold mb-2">REQUERIMIENTOS</h3>
+                    <p class="text-sm opacity-90">Especificaciones</p>
+                </div>
+
+                <!-- PLANIFICACIÓN -->
+                <div onclick="showSubmodule('planificacion')" class="submenu-card bg-gradient-to-br from-orange-400 to-orange-600 text-white cursor-pointer">
+                    <i class="fas fa-calendar-alt text-4xl mb-3"></i>
+                    <h3 class="text-lg font-bold mb-2">PLANIFICACIÓN</h3>
+                    <p class="text-sm opacity-90">Cronogramas</p>
+                </div>
+
+                <!-- PROGRAMACIÓN -->
+                <div onclick="showSubmodule('programacion')" class="submenu-card bg-gradient-to-br from-green-400 to-green-600 text-white cursor-pointer">
+                    <i class="fas fa-code text-4xl mb-3"></i>
+                    <h3 class="text-lg font-bold mb-2">PROGRAMACIÓN</h3>
+                    <p class="text-sm opacity-90">Codificación</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Breadcrumb Navigation -->
+        <div class="mb-6">
+            <div id="breadcrumb" class="text-sm text-gray-600 bg-gray-50 px-4 py-2 rounded-lg">
+                <!-- El breadcrumb se actualizará dinámicamente -->
+            </div>
+        </div>
+
+        <!-- Dynamic Content Area -->
+        <div id="content-area">
+            <!-- Default Content (Catálogos, Reportes, Estadísticas) -->
+            <div id="default-content" class="content-section active">
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                    <!-- Catálogos Maestros -->
+                    <div class="bg-white rounded-lg shadow-lg p-6">
+                        <div class="flex items-center mb-4">
+                            <div class="bg-cyan-100 p-3 rounded-lg mr-3">
+                                <i class="fas fa-database text-cyan-600 text-2xl"></i>
+                            </div>
+                            <h2 class="text-xl font-bold text-gray-800">CATÁLOGOS MAESTROS</h2>
+                        </div>
+                        <ul class="space-y-2">
+                            <li>
+                                <a href="/catalogos/plantas.html" class="flex items-center text-gray-700 hover:text-cyan-600 hover:bg-cyan-50 p-2 rounded transition">
+                                    <i class="fas fa-building text-cyan-600 mr-3 w-5"></i>
+                                    <span>Plantas</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="/catalogos/areas.html" class="flex items-center text-gray-700 hover:text-cyan-600 hover:bg-cyan-50 p-2 rounded transition">
+                                    <i class="fas fa-map-marked-alt text-cyan-600 mr-3 w-5"></i>
+                                    <span>Áreas</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="/catalogos/categorias.html" class="flex items-center text-gray-700 hover:text-cyan-600 hover:bg-cyan-50 p-2 rounded transition">
+                                    <i class="fas fa-folder text-cyan-600 mr-3 w-5"></i>
+                                    <span>Categorías</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <!-- Reportes -->
+                    <div class="bg-white rounded-lg shadow-lg p-6">
+                        <div class="flex items-center mb-4">
+                            <div class="bg-blue-100 p-3 rounded-lg mr-3">
+                                <i class="fas fa-chart-bar text-blue-600 text-2xl"></i>
+                            </div>
+                            <h2 class="text-xl font-bold text-gray-800">REPORTES</h2>
+                        </div>
+                        <ul class="space-y-2">
+                            <li>
+                                <a href="/logistica/inventario-valorizado.html" class="flex items-center text-gray-700 hover:text-blue-600 hover:bg-blue-50 p-2 rounded transition">
+                                    <i class="fas fa-warehouse text-blue-600 mr-3 w-5"></i>
+                                    <span>Inventario Valorizado</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="/operativos/reporte-general.html" class="flex items-center text-gray-700 hover:text-blue-600 hover:bg-blue-50 p-2 rounded transition">
+                                    <i class="fas fa-chart-line text-blue-600 mr-3 w-5"></i>
+                                    <span>Reporte General OT</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <!-- Estadísticas Rápidas -->
+                    <div class="bg-white rounded-lg shadow-lg p-6">
+                        <div class="flex items-center mb-4">
+                            <div class="bg-green-100 p-3 rounded-lg mr-3">
+                                <i class="fas fa-tachometer-alt text-green-600 text-2xl"></i>
+                            </div>
+                            <h2 class="text-xl font-bold text-gray-800">ESTADÍSTICAS</h2>
+                        </div>
+                        <div class="space-y-4">
+                            <div class="flex justify-between items-center">
+                                <span class="text-gray-700">OTs Activas</span>
+                                <span class="text-2xl font-bold text-orange-600">12</span>
+                            </div>
+                            <div class="w-full bg-gray-200 rounded-full h-2">
+                                <div class="bg-orange-500 h-2 rounded-full" style="width: 60%"></div>
+                            </div>
+                            <div class="flex justify-between items-center mt-4">
+                                <span class="text-gray-700">Stock Disponible</span>
+                                <span class="text-2xl font-bold text-green-600">85%</span>
+                            </div>
+                            <div class="w-full bg-gray-200 rounded-full h-2">
+                                <div class="bg-green-500 h-2 rounded-full" style="width: 85%"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ALMACÉN Content -->
+            <div id="almacen-content" class="content-section">
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                    <!-- Stock Actual -->
+                    <div class="bg-white rounded-lg shadow-lg p-6">
+                        <div class="flex items-center justify-between mb-4">
+                            <div class="flex items-center">
+                                <div class="bg-blue-100 p-3 rounded-lg mr-3">
+                                    <i class="fas fa-boxes text-blue-600 text-2xl"></i>
+                                </div>
+                                <h3 class="text-xl font-bold text-gray-800">Stock Actual</h3>
+                            </div>
+                            <button class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm">
+                                <i class="fas fa-plus mr-1"></i> Nuevo Item
+                            </button>
+                        </div>
+                        <div class="space-y-3">
+                            <div class="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
+                                <div class="flex items-center">
+                                    <i class="fas fa-wrench text-gray-400 mr-3"></i>
+                                    <span class="font-medium">Herramientas</span>
+                                </div>
+                                <span class="text-blue-600 font-bold">250 items</span>
+                            </div>
+                            <div class="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
+                                <div class="flex items-center">
+                                    <i class="fas fa-cog text-gray-400 mr-3"></i>
+                                    <span class="font-medium">Repuestos</span>
+                                </div>
+                                <span class="text-green-600 font-bold">142 items</span>
+                            </div>
+                            <div class="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
+                                <div class="flex items-center">
+                                    <i class="fas fa-bolt text-gray-400 mr-3"></i>
+                                    <span class="font-medium">Material Eléctrico</span>
+                                </div>
+                                <span class="text-orange-600 font-bold">89 items</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Movimientos Recientes -->
+                    <div class="bg-white rounded-lg shadow-lg p-6">
+                        <div class="flex items-center mb-4">
+                            <div class="bg-green-100 p-3 rounded-lg mr-3">
+                                <i class="fas fa-exchange-alt text-green-600 text-2xl"></i>
+                            </div>
+                            <h3 class="text-xl font-bold text-gray-800">Movimientos Recientes</h3>
+                        </div>
+                        <div class="space-y-3">
+                            <div class="flex items-center justify-between p-3 border border-gray-200 rounded-lg">
+                                <div class="flex items-center">
+                                    <div class="w-3 h-3 bg-green-500 rounded-full mr-3"></div>
+                                    <div>
+                                        <p class="font-medium text-sm">Entrada - Tornillos M8</p>
+                                        <p class="text-xs text-gray-500">Hoy 14:30</p>
+                                    </div>
+                                </div>
+                                <span class="text-green-600 font-bold">+50</span>
+                            </div>
+                            <div class="flex items-center justify-between p-3 border border-gray-200 rounded-lg">
+                                <div class="flex items-center">
+                                    <div class="w-3 h-3 bg-red-500 rounded-full mr-3"></div>
+                                    <div>
+                                        <p class="font-medium text-sm">Salida - Válvula 1/2"</p>
+                                        <p class="text-xs text-gray-500">Hoy 12:15</p>
+                                    </div>
+                                </div>
+                                <span class="text-red-600 font-bold">-2</span>
+                            </div>
+                        </div>
+                        <button class="w-full mt-4 bg-gray-100 hover:bg-gray-200 text-gray-700 py-2 rounded-lg text-sm transition">
+                            Ver Todos los Movimientos
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Tabla de Inventario -->
+                <div class="mt-8 bg-white rounded-lg shadow-lg overflow-hidden">
+                    <div class="bg-blue-600 text-white p-4">
+                        <h3 class="text-lg font-bold">Inventario Detallado</h3>
+                    </div>
+                    <div class="p-4">
+                        <div class="flex gap-4 mb-4">
+                            <input type="text" placeholder="Buscar producto..." class="flex-1 border border-gray-300 rounded-lg px-3 py-2">
+                            <select class="border border-gray-300 rounded-lg px-3 py-2">
+                                <option>Todas las categorías</option>
+                                <option>Herramientas</option>
+                                <option>Repuestos</option>
+                                <option>Material Eléctrico</option>
+                            </select>
+                        </div>
+                        <div class="overflow-x-auto">
+                            <table class="w-full">
+                                <thead class="bg-gray-50">
+                                    <tr>
+                                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Código</th>
+                                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Descripción</th>
+                                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Categoría</th>
+                                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Stock</th>
+                                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Ubicación</th>
+                                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Estado</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-gray-200">
+                                    <tr>
+                                        <td class="px-4 py-3 text-sm">HER-001</td>
+                                        <td class="px-4 py-3 text-sm font-medium">Taladro Industrial 1200W</td>
+                                        <td class="px-4 py-3 text-sm">Herramientas</td>
+                                        <td class="px-4 py-3 text-sm">15</td>
+                                        <td class="px-4 py-3 text-sm">A-01-15</td>
+                                        <td class="px-4 py-3"><span class="px-2 py-1 text-xs bg-green-100 text-green-800 rounded-full">Disponible</span></td>
+                                    </tr>
+                                    <!-- Más filas aquí -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- COMPRAS Content -->
+            <div id="compras-content" class="content-section">
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    <!-- Órdenes Pendientes -->
+                    <div class="bg-white rounded-lg shadow-lg p-6">
+                        <div class="flex items-center justify-between mb-4">
+                            <div class="flex items-center">
+                                <div class="bg-orange-100 p-3 rounded-lg mr-3">
+                                    <i class="fas fa-clock text-orange-600 text-2xl"></i>
+                                </div>
+                                <h3 class="text-lg font-bold text-gray-800">Órdenes Pendientes</h3>
+                            </div>
+                        </div>
+                        <div class="text-center">
+                            <div class="text-3xl font-bold text-orange-600 mb-2">8</div>
+                            <p class="text-gray-500">Esperando aprobación</p>
+                        </div>
+                    </div>
+
+                    <!-- Proveedores Activos -->
+                    <div class="bg-white rounded-lg shadow-lg p-6">
+                        <div class="flex items-center justify-between mb-4">
+                            <div class="flex items-center">
+                                <div class="bg-blue-100 p-3 rounded-lg mr-3">
+                                    <i class="fas fa-truck text-blue-600 text-2xl"></i>
+                                </div>
+                                <h3 class="text-lg font-bold text-gray-800">Proveedores</h3>
+                            </div>
+                        </div>
+                        <div class="text-center">
+                            <div class="text-3xl font-bold text-blue-600 mb-2">24</div>
+                            <p class="text-gray-500">Proveedores activos</p>
+                        </div>
+                    </div>
+
+                    <!-- Total Gastado -->
+                    <div class="bg-white rounded-lg shadow-lg p-6">
+                        <div class="flex items-center justify-between mb-4">
+                            <div class="flex items-center">
+                                <div class="bg-green-100 p-3 rounded-lg mr-3">
+                                    <i class="fas fa-dollar-sign text-green-600 text-2xl"></i>
+                                </div>
+                                <h3 class="text-lg font-bold text-gray-800">Gasto Mensual</h3>
+                            </div>
+                        </div>
+                        <div class="text-center">
+                            <div class="text-3xl font-bold text-green-600 mb-2">$45,320</div>
+                            <p class="text-gray-500">Este mes</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Órdenes de Compra Recientes -->
+                <div class="mt-8 bg-white rounded-lg shadow-lg overflow-hidden">
+                    <div class="bg-green-600 text-white p-4">
+                        <div class="flex justify-between items-center">
+                            <h3 class="text-lg font-bold">Órdenes de Compra Recientes</h3>
+                            <button class="bg-green-700 hover:bg-green-800 px-4 py-2 rounded-lg text-sm">
+                                <i class="fas fa-plus mr-1"></i> Nueva OC
+                            </button>
+                        </div>
+                    </div>
+                    <div class="p-4">
+                        <div class="overflow-x-auto">
+                            <table class="w-full">
+                                <thead class="bg-gray-50">
+                                    <tr>
+                                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">No. OC</th>
+                                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Proveedor</th>
+                                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Fecha</th>
+                                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Total</th>
+                                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Estado</th>
+                                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Acciones</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-gray-200">
+                                    <tr>
+                                        <td class="px-4 py-3 text-sm font-medium">OC-2024-001</td>
+                                        <td class="px-4 py-3 text-sm">Ferretería Industrial S.A.</td>
+                                        <td class="px-4 py-3 text-sm">11/02/2026</td>
+                                        <td class="px-4 py-3 text-sm font-medium">$2,450.00</td>
+                                        <td class="px-4 py-3"><span class="px-2 py-1 text-xs bg-yellow-100 text-yellow-800 rounded-full">Pendiente</span></td>
+                                        <td class="px-4 py-3">
+                                            <button class="text-blue-600 hover:text-blue-800 mr-2"><i class="fas fa-eye"></i></button>
+                                            <button class="text-green-600 hover:text-green-800"><i class="fas fa-edit"></i></button>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- RECURSOS SOLICITADOS Content -->
+            <div id="recursos-content" class="content-section">
+                <div class="grid grid-cols-1 lg:grid-cols-4 gap-4">
+                    <div class="bg-white rounded-lg shadow-lg p-6 text-center">
+                        <i class="fas fa-hand-holding text-4xl text-purple-600 mb-3"></i>
+                        <h4 class="font-bold text-purple-800 mb-2">En Espera</h4>
+                        <div class="text-2xl font-bold text-purple-600">12</div>
+                    </div>
+                    <div class="bg-white rounded-lg shadow-lg p-6 text-center">
+                        <i class="fas fa-check-circle text-4xl text-green-600 mb-3"></i>
+                        <h4 class="font-bold text-green-800 mb-2">Aprobados</h4>
+                        <div class="text-2xl font-bold text-green-600">5</div>
+                    </div>
+                    <div class="bg-white rounded-lg shadow-lg p-6 text-center">
+                        <i class="fas fa-truck-loading text-4xl text-blue-600 mb-3"></i>
+                        <h4 class="font-bold text-blue-800 mb-2">En Tránsito</h4>
+                        <div class="text-2xl font-bold text-blue-600">3</div>
+                    </div>
+                    <div class="bg-white rounded-lg shadow-lg p-6 text-center">
+                        <i class="fas fa-box-check text-4xl text-orange-600 mb-3"></i>
+                        <h4 class="font-bold text-orange-800 mb-2">Entregados</h4>
+                        <div class="text-2xl font-bold text-orange-600">45</div>
+                    </div>
+                </div>
+                
+                <!-- Lista de Solicitudes -->
+                <div class="mt-8 bg-white rounded-lg shadow-lg overflow-hidden">
+                    <div class="bg-purple-600 text-white p-4">
+                        <div class="flex justify-between items-center">
+                            <h3 class="text-lg font-bold">Solicitudes de Recursos</h3>
+                            <button class="bg-purple-700 hover:bg-purple-800 px-4 py-2 rounded-lg text-sm">
+                                <i class="fas fa-plus mr-1"></i> Nueva Solicitud
+                            </button>
+                        </div>
+                    </div>
+                    <div class="p-6">
+                        <div class="space-y-4">
+                            <div class="border border-gray-200 rounded-lg p-4">
+                                <div class="flex justify-between items-start">
+                                    <div>
+                                        <h4 class="font-medium">Kit de Juntas Universal</h4>
+                                        <p class="text-sm text-gray-500">Solicitado por: Juan Pérez - Mantenimiento</p>
+                                        <p class="text-xs text-gray-400">Fecha: 11/02/2026 - 09:30</p>
+                                    </div>
+                                    <span class="px-3 py-1 text-xs bg-yellow-100 text-yellow-800 rounded-full">En Espera</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TRANSPORTE Content -->
+            <div id="transporte-content" class="content-section">
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    <div class="bg-white rounded-lg shadow-lg p-6 text-center">
+                        <i class="fas fa-truck text-4xl text-orange-600 mb-3"></i>
+                        <h4 class="font-bold text-orange-800 mb-2">Vehículos Activos</h4>
+                        <div class="text-2xl font-bold text-orange-600">8</div>
+                    </div>
+                    <div class="bg-white rounded-lg shadow-lg p-6 text-center">
+                        <i class="fas fa-route text-4xl text-blue-600 mb-3"></i>
+                        <h4 class="font-bold text-blue-800 mb-2">Rutas del Día</h4>
+                        <div class="text-2xl font-bold text-blue-600">12</div>
+                    </div>
+                    <div class="bg-white rounded-lg shadow-lg p-6 text-center">
+                        <i class="fas fa-gas-pump text-4xl text-green-600 mb-3"></i>
+                        <h4 class="font-bold text-green-800 mb-2">Consumo Promedio</h4>
+                        <div class="text-2xl font-bold text-green-600">15L/100km</div>
+                    </div>
+                </div>
+
+                <div class="mt-8 bg-white rounded-lg shadow-lg p-6">
+                    <h3 class="text-lg font-bold text-gray-800 mb-4">Control de Flota</h3>
+                    <p class="text-gray-600">Módulo de transporte en desarrollo...</p>
+                </div>
+            </div>
+
+            <!-- BASE DE DATOS Content -->
+            <div id="basededatos-content" class="content-section">
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    <!-- Bases de Datos Activas -->
+                    <div class="bg-white rounded-lg shadow-lg p-6">
+                        <div class="flex items-center justify-between mb-4">
+                            <div class="flex items-center">
+                                <div class="bg-cyan-100 p-3 rounded-lg mr-3">
+                                    <i class="fas fa-server text-cyan-600 text-2xl"></i>
+                                </div>
+                                <h3 class="text-lg font-bold text-gray-800">Bases Activas</h3>
+                            </div>
+                        </div>
+                        <div class="text-center">
+                            <div class="text-3xl font-bold text-cyan-600 mb-2">5</div>
+                            <p class="text-gray-500">Bases de datos en uso</p>
+                        </div>
+                    </div>
+
+                    <!-- Respaldos -->
+                    <div class="bg-white rounded-lg shadow-lg p-6">
+                        <div class="flex items-center mb-4">
+                            <div class="bg-blue-100 p-3 rounded-lg mr-3">
+                                <i class="fas fa-shield-alt text-blue-600 text-2xl"></i>
+                            </div>
+                            <h3 class="text-lg font-bold text-gray-800">Respaldos</h3>
+                        </div>
+                        <div class="text-center">
+                            <div class="text-3xl font-bold text-blue-600 mb-2">15</div>
+                            <p class="text-gray-500">Copias de seguridad</p>
+                        </div>
+                    </div>
+
+                    <!-- Sincronización -->
+                    <div class="bg-white rounded-lg shadow-lg p-6">
+                        <div class="flex items-center mb-4">
+                            <div class="bg-green-100 p-3 rounded-lg mr-3">
+                                <i class="fas fa-sync text-green-600 text-2xl"></i>
+                            </div>
+                            <h3 class="text-lg font-bold text-gray-800">Sincronización</h3>
+                        </div>
+                        <div class="text-center">
+                            <div class="text-3xl font-bold text-green-600 mb-2">98%</div>
+                            <p class="text-gray-500">Estado de sync</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tabla de Bases de Datos -->
+                <div class="mt-8 bg-white rounded-lg shadow-lg overflow-hidden">
+                    <div class="bg-cyan-600 text-white p-4">
+                        <h3 class="text-lg font-bold">Gestión de Bases de Datos</h3>
+                    </div>
+                    <div class="p-6">
+                        <div class="overflow-x-auto">
+                            <table class="w-full">
+                                <thead class="bg-gray-50">
+                                    <tr>
+                                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Base</th>
+                                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Tipo</th>
+                                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Tamaño</th>
+                                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Estado</th>
+                                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Acciones</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-gray-200">
+                                    <tr>
+                                        <td class="px-4 py-3 text-sm font-medium">produccion_main</td>
+                                        <td class="px-4 py-3 text-sm">PostgreSQL</td>
+                                        <td class="px-4 py-3 text-sm">2.5 GB</td>
+                                        <td class="px-4 py-3"><span class="px-2 py-1 text-xs bg-green-100 text-green-800 rounded-full">Activa</span></td>
+                                        <td class="px-4 py-3">
+                                            <button class="text-blue-600 hover:text-blue-800 mr-2"><i class="fas fa-search"></i></button>
+                                            <button class="text-green-600 hover:text-green-800"><i class="fas fa-download"></i></button>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- DASHBOARD PRODUCTION Content -->
+            <div id="dashboardprod-content" class="content-section">
+                <div class="grid grid-cols-1 lg:grid-cols-4 gap-4 mb-8">
+                    <div class="bg-gradient-to-br from-blue-400 to-blue-600 rounded-lg p-6 text-white text-center">
+                        <i class="fas fa-cogs text-3xl mb-3"></i>
+                        <h4 class="font-bold mb-1">Procesos Activos</h4>
+                        <div class="text-2xl font-bold">12</div>
+                    </div>
+                    <div class="bg-gradient-to-br from-green-400 to-green-600 rounded-lg p-6 text-white text-center">
+                        <i class="fas fa-check-circle text-3xl mb-3"></i>
+                        <h4 class="font-bold mb-1">Completadas Hoy</h4>
+                        <div class="text-2xl font-bold">8</div>
+                    </div>
+                    <div class="bg-gradient-to-br from-orange-400 to-orange-600 rounded-lg p-6 text-white text-center">
+                        <i class="fas fa-clock text-3xl mb-3"></i>
+                        <h4 class="font-bold mb-1">Tiempo Promedio</h4>
+                        <div class="text-2xl font-bold">3.5h</div>
+                    </div>
+                    <div class="bg-gradient-to-br from-purple-400 to-purple-600 rounded-lg p-6 text-white text-center">
+                        <i class="fas fa-users text-3xl mb-3"></i>
+                        <h4 class="font-bold mb-1">Equipo Activo</h4>
+                        <div class="text-2xl font-bold">15</div>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                    <div class="bg-white rounded-lg shadow-lg p-6">
+                        <h3 class="text-lg font-bold text-gray-800 mb-4">Gráfico de Productividad</h3>
+                        <div class="h-64 flex items-center justify-center bg-gray-50 rounded-lg">
+                            <p class="text-gray-500">Gráfico de productividad aquí</p>
+                        </div>
+                    </div>
+
+                    <div class="bg-white rounded-lg shadow-lg p-6">
+                        <h3 class="text-lg font-bold text-gray-800 mb-4">Actividad Reciente</h3>
+                        <div class="space-y-3">
+                            <div class="flex items-center p-3 bg-gray-50 rounded-lg">
+                                <div class="w-3 h-3 bg-green-500 rounded-full mr-3"></div>
+                                <div class="flex-1">
+                                    <p class="text-sm font-medium">Proceso APP-2024-001 completado</p>
+                                    <p class="text-xs text-gray-500">Hace 15 minutos</p>
+                                </div>
+                            </div>
+                            <div class="flex items-center p-3 bg-gray-50 rounded-lg">
+                                <div class="w-3 h-3 bg-blue-500 rounded-full mr-3"></div>
+                                <div class="flex-1">
+                                    <p class="text-sm font-medium">Nueva planificación iniciada</p>
+                                    <p class="text-xs text-gray-500">Hace 1 hora</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- REQUERIMIENTOS Content -->
+            <div id="requerimientos-content" class="content-section">
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    <div class="bg-white rounded-lg shadow-lg p-6 text-center">
+                        <i class="fas fa-file-alt text-4xl text-purple-600 mb-3"></i>
+                        <h4 class="font-bold text-purple-800 mb-2">Documentos</h4>
+                        <div class="text-2xl font-bold text-purple-600">25</div>
+                    </div>
+                    <div class="bg-white rounded-lg shadow-lg p-6 text-center">
+                        <i class="fas fa-exclamation-circle text-4xl text-red-600 mb-3"></i>
+                        <h4 class="font-bold text-red-800 mb-2">Críticos</h4>
+                        <div class="text-2xl font-bold text-red-600">3</div>
+                    </div>
+                    <div class="bg-white rounded-lg shadow-lg p-6 text-center">
+                        <i class="fas fa-check-double text-4xl text-green-600 mb-3"></i>
+                        <h4 class="font-bold text-green-800 mb-2">Aprobados</h4>
+                        <div class="text-2xl font-bold text-green-600">18</div>
+                    </div>
+                </div>
+                
+                <div class="mt-8 bg-white rounded-lg shadow-lg overflow-hidden">
+                    <div class="bg-purple-600 text-white p-4">
+                        <div class="flex justify-between items-center">
+                            <h3 class="text-lg font-bold">Lista de Requerimientos</h3>
+                            <button class="bg-purple-700 hover:bg-purple-800 px-4 py-2 rounded-lg text-sm">
+                                <i class="fas fa-plus mr-1"></i> Nuevo Requerimiento
+                            </button>
+                        </div>
+                    </div>
+                    <div class="p-6">
+                        <div class="space-y-4">
+                            <div class="border border-gray-200 rounded-lg p-4">
+                                <div class="flex justify-between items-start">
+                                    <div>
+                                        <h4 class="font-medium">Optimización de base de datos</h4>
+                                        <p class="text-sm text-gray-500">Solicitado por: Equipo de Desarrollo</p>
+                                        <p class="text-xs text-gray-400">Fecha: 11/02/2026</p>
+                                    </div>
+                                    <span class="px-3 py-1 text-xs bg-red-100 text-red-800 rounded-full">Crítico</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- PLANIFICACIÓN Content -->
+            <div id="planificacion-content" class="content-section">
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                    <div class="bg-white rounded-lg shadow-lg p-6">
+                        <h3 class="text-lg font-bold text-gray-800 mb-4">Calendario de Producción</h3>
+                        <div class="h-64 flex items-center justify-center bg-gray-50 rounded-lg">
+                            <p class="text-gray-500">Calendario interactivo aquí</p>
+                        </div>
+                    </div>
+
+                    <div class="bg-white rounded-lg shadow-lg p-6">
+                        <h3 class="text-lg font-bold text-gray-800 mb-4">Cronograma Semanal</h3>
+                        <div class="space-y-3">
+                            <div class="flex justify-between items-center p-3 bg-orange-50 rounded-lg">
+                                <div>
+                                    <p class="font-medium">Sprint Planning</p>
+                                    <p class="text-sm text-gray-500">Lunes 13/02 - 09:00</p>
+                                </div>
+                                <span class="px-2 py-1 text-xs bg-orange-100 text-orange-800 rounded-full">Planificado</span>
+                            </div>
+                            <div class="flex justify-between items-center p-3 bg-blue-50 rounded-lg">
+                                <div>
+                                    <p class="font-medium">Review Semanal</p>
+                                    <p class="text-sm text-gray-500">Viernes 17/02 - 16:00</p>
+                                </div>
+                                <span class="px-2 py-1 text-xs bg-blue-100 text-blue-800 rounded-full">Programado</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- PROGRAMACIÓN Content -->
+            <div id="programacion-content" class="content-section">
+                <div class="grid grid-cols-1 lg:grid-cols-5 gap-4">
+                    <div class="bg-white rounded-lg shadow-lg p-6 text-center">
+                        <i class="fas fa-industry text-4xl text-green-600 mb-3"></i>
+                        <h4 class="font-bold text-green-800 mb-2">Productos en Línea</h4>
+                        <div class="text-2xl font-bold text-green-600">24</div>
+                    </div>
+                    <div class="bg-white rounded-lg shadow-lg p-6 text-center">
+                        <i class="fas fa-check-circle text-4xl text-blue-600 mb-3"></i>
+                        <h4 class="font-bold text-blue-800 mb-2">Etapas Completadas</h4>
+                        <div class="text-2xl font-bold text-blue-600">156</div>
+                    </div>
+                    <div class="bg-white rounded-lg shadow-lg p-6 text-center">
+                        <i class="fas fa-cogs text-4xl text-orange-600 mb-3"></i>
+                        <h4 class="font-bold text-orange-800 mb-2">En Proceso</h4>
+                        <div class="text-2xl font-bold text-orange-600">8</div>
+                    </div>
+                    <div class="bg-white rounded-lg shadow-lg p-6 text-center">
+                        <i class="fas fa-exclamation-triangle text-4xl text-red-600 mb-3"></i>
+                        <h4 class="font-bold text-red-800 mb-2">Pendientes</h4>
+                        <div class="text-2xl font-bold text-red-600">12</div>
+                    </div>
+                    <div class="bg-white rounded-lg shadow-lg p-6 text-center">
+                        <i class="fas fa-clipboard-check text-4xl text-purple-600 mb-3"></i>
+                        <h4 class="font-bold text-purple-800 mb-2">Testing</h4>
+                        <div class="text-2xl font-bold text-purple-600">5</div>
+                    </div>
+                </div>
+                
+                <!-- Programación de Producción -->
+                <div class="mt-8 bg-white rounded-lg shadow-lg overflow-hidden">
+                    <div class="bg-green-600 text-white p-4">
+                        <div class="flex justify-between items-center">
+                            <h3 class="text-lg font-bold">Programación de Procesos de Producción</h3>
+                            <div class="flex gap-2">
+                                <button class="bg-green-700 hover:bg-green-800 px-3 py-1 rounded text-sm">
+                                    <i class="fas fa-filter mr-1"></i> Filtros
+                                </button>
+                                <button class="bg-green-700 hover:bg-green-800 px-3 py-1 rounded text-sm">
+                                    <i class="fas fa-download mr-1"></i> Exportar
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Leyenda de Estados -->
+                    <div class="bg-gray-50 p-4">
+                        <h4 class="font-bold text-gray-700 mb-2">Códigos de Estado:</h4>
+                        <div class="grid grid-cols-2 md:grid-cols-6 gap-4 text-sm">
+                            <div class="flex items-center">
+                                <span class="w-6 h-6 bg-green-500 text-white text-center rounded mr-2 font-bold text-xs">OK</span>
+                                <span>Completado</span>
+                            </div>
+                            <div class="flex items-center">
+                                <span class="w-6 h-6 bg-red-500 text-white text-center rounded mr-2 font-bold text-xs">X</span>
+                                <span>Pendiente</span>
+                            </div>
+                            <div class="flex items-center">
+                                <span class="w-6 h-6 bg-orange-500 text-white text-center rounded mr-2 font-bold text-xs">PR</span>
+                                <span>En Proceso</span>
+                            </div>
+                            <div class="flex items-center">
+                                <span class="w-6 h-6 bg-blue-500 text-white text-center rounded mr-2 font-bold text-xs">TS</span>
+                                <span>Testing</span>
+                            </div>
+                            <div class="flex items-center">
+                                <span class="w-6 h-6 bg-purple-500 text-white text-center rounded mr-2 font-bold text-xs">QC</span>
+                                <span>Control Calidad</span>
+                            </div>
+                            <div class="flex items-center">
+                                <span class="w-6 h-6 bg-gray-400 text-white text-center rounded mr-2 font-bold text-xs">-</span>
+                                <span>No Aplica</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="p-6">
+                        <!-- Filtros -->
+                        <div class="flex gap-4 mb-6">
+                            <select class="border border-gray-300 rounded-lg px-3 py-2 text-sm">
+                                <option>Todos los productos</option>
+                                <option>HP&K</option>
+                                <option>UNIMAQ</option>
+                                <option>ANTARAPCAV</option>
+                                <option>BAMBAS</option>
+                            </select>
+                            <select class="border border-gray-300 rounded-lg px-3 py-2 text-sm">
+                                <option>Todos los estados</option>
+                                <option>ENTREGADO</option>
+                                <option>LISTO PARA DESPACHO</option>
+                                <option>EN PROCESO</option>
+                            </select>
+                            <input type="text" placeholder="Buscar por modelo..." class="border border-gray-300 rounded-lg px-3 py-2 text-sm flex-1">
+                        </div>
+
+                        <!-- Sistema de Gestión de OT tipo Jira -->
+                        <div class="bg-white rounded-lg shadow-lg mb-6 p-4">
+                            <div class="flex justify-between items-center mb-4">
+                                <h3 class="text-xl font-bold text-gray-800">🎯 Gestión de Órdenes de Trabajo - Sprint Actual</h3>
+                                <div class="flex gap-3">
+                                    <select class="border border-gray-300 rounded px-3 py-2 text-sm">
+                                        <option>Sprint Febrero 2026</option>
+                                        <option>Sprint Enero 2026</option>
+                                        <option>Backlog</option>
+                                    </select>
+                                    <button onclick="crearNuevaOT()" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm">
+                                        <i class="fas fa-plus mr-2"></i>Nueva OT
+                                    </button>
+                                    <button onclick="mostrarReportesTiempo()" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg text-sm">
+                                        <i class="fas fa-clock mr-2"></i>Reportes Tiempo
+                                    </button>
+                                </div>
+                            </div>
+                            
+                            <!-- Filtros y métricas -->
+                            <div class="flex justify-between items-center mb-6">
+                                <div class="flex gap-4">
+                                    <div class="flex items-center space-x-2">
+                                        <label class="text-sm font-medium">Asignado a:</label>
+                                        <select class="border border-gray-300 rounded px-2 py-1 text-sm">
+                                            <option>Todos</option>
+                                            <option>Carlos Méndez</option>
+                                            <option>Ana Torres</option>
+                                            <option>Luis García</option>
+                                            <option>María López</option>
+                                        </select>
+                                    </div>
+                                    <div class="flex items-center space-x-2">
+                                        <label class="text-sm font-medium">Prioridad:</label>
+                                        <select class="border border-gray-300 rounded px-2 py-1 text-sm">
+                                            <option>Todas</option>
+                                            <option>🔴 Alta</option>
+                                            <option>🟡 Media</option>
+                                            <option>🟢 Baja</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="flex gap-4 text-sm">
+                                    <div class="text-center">
+                                        <div class="font-bold text-blue-600">24</div>
+                                        <div class="text-gray-500">Total OTs</div>
+                                    </div>
+                                    <div class="text-center">
+                                        <div class="font-bold text-orange-600">156h</div>
+                                        <div class="text-gray-500">Estimado</div>
+                                    </div>
+                                    <div class="text-center">
+                                        <div class="font-bold text-green-600">89h</div>
+                                        <div class="text-gray-500">Trabajado</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Tablero Kanban para OTs -->
+                        <div class="grid grid-cols-1 lg:grid-cols-4 gap-6 mb-8">
+                            <!-- Columna: Por Hacer -->
+                            <div class="bg-gray-50 rounded-lg p-4">
+                                <div class="flex justify-between items-center mb-4">
+                                    <h4 class="font-bold text-gray-700">📋 POR HACER</h4>
+                                    <span class="bg-gray-200 text-gray-700 px-2 py-1 rounded-full text-xs font-medium">6</span>
+                                </div>
+                                
+                                <!-- OT Card 1 -->
+                                <div class="bg-white rounded-lg p-4 mb-3 shadow-sm border-l-4 border-red-500 cursor-pointer hover:shadow-md" onclick="abrirDetalleOT('OT-2026-001')">
+                                    <div class="flex justify-between items-start mb-2">
+                                        <span class="text-xs font-medium text-gray-500">OT-2026-001</span>
+                                        <span class="bg-red-100 text-red-800 px-2 py-1 rounded-full text-xs font-medium">🔴 Alta</span>
+                                    </div>
+                                    <h5 class="font-medium text-sm mb-2">Cilindro Hidráulico - D11T</h5>
+                                    <p class="text-xs text-gray-600 mb-3">Fabricación completa de cilindro para bulldozer Caterpillar</p>
+                                    
+                                    <div class="flex justify-between items-center text-xs text-gray-500 mb-2">
+                                        <span>👤 Carlos Méndez</span>
+                                        <span>📅 20 Feb 2026</span>
+                                    </div>
+                                    
+                                    <!-- Tiempo estimado vs trabajado -->
+                                    <div class="bg-gray-100 rounded p-2 mb-2">
+                                        <div class="flex justify-between items-center text-xs">
+                                            <span class="font-medium">⏱️ Tiempo:</span>
+                                            <span class="text-blue-600 font-medium">0h / 24h</span>
+                                        </div>
+                                        <div class="w-full h-1 bg-gray-200 rounded-full mt-1">
+                                            <div class="h-1 bg-blue-600 rounded-full" style="width: 0%"></div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="flex justify-between items-center">
+                                        <div class="flex gap-1">
+                                            <span class="w-2 h-2 bg-blue-500 rounded-full" title="Cilindro"></span>
+                                            <span class="w-2 h-2 bg-orange-500 rounded-full" title="Vástago"></span>
+                                            <span class="w-2 h-2 bg-green-500 rounded-full" title="Tapa"></span>
+                                            <span class="w-2 h-2 bg-purple-500 rounded-full" title="Pistón"></span>
+                                        </div>
+                                        <button onclick="iniciarTrabajo('OT-2026-001'); event.stopPropagation();" class="bg-blue-500 hover:bg-blue-600 text-white px-2 py-1 rounded text-xs">
+                                            ▶️ Iniciar
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <!-- OT Card 2 -->
+                                <div class="bg-white rounded-lg p-4 mb-3 shadow-sm border-l-4 border-yellow-500 cursor-pointer hover:shadow-md" onclick="abrirDetalleOT('OT-2026-002')">
+                                    <div class="flex justify-between items-start mb-2">
+                                        <span class="text-xs font-medium text-gray-500">OT-2026-002</span>
+                                        <span class="bg-yellow-100 text-yellow-800 px-2 py-1 rounded-full text-xs font-medium">🟡 Media</span>
+                                    </div>
+                                    <h5 class="font-medium text-sm mb-2">Reparación Vástago - 930E</h5>
+                                    <p class="text-xs text-gray-600 mb-3">Rectificado y cromado de vástago dañado</p>
+                                    
+                                    <div class="flex justify-between items-center text-xs text-gray-500 mb-2">
+                                        <span>👤 Ana Torres</span>
+                                        <span>📅 22 Feb 2026</span>
+                                    </div>
+                                    
+                                    <div class="bg-gray-100 rounded p-2 mb-2">
+                                        <div class="flex justify-between items-center text-xs">
+                                            <span class="font-medium">⏱️ Tiempo:</span>
+                                            <span class="text-blue-600 font-medium">0h / 8h</span>
+                                        </div>
+                                        <div class="w-full h-1 bg-gray-200 rounded-full mt-1">
+                                            <div class="h-1 bg-blue-600 rounded-full" style="width: 0%"></div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="flex justify-between items-center">
+                                        <div class="flex gap-1">
+                                            <span class="w-2 h-2 bg-orange-500 rounded-full" title="Vástago"></span>
+                                        </div>
+                                        <button onclick="iniciarTrabajo('OT-2026-002'); event.stopPropagation();" class="bg-blue-500 hover:bg-blue-600 text-white px-2 py-1 rounded text-xs">
+                                            ▶️ Iniciar
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Columna: En Progreso -->
+                            <div class="bg-blue-50 rounded-lg p-4">
+                                <div class="flex justify-between items-center mb-4">
+                                    <h4 class="font-bold text-blue-700">⚙️ EN PROGRESO</h4>
+                                    <span class="bg-blue-200 text-blue-700 px-2 py-1 rounded-full text-xs font-medium">3</span>
+                                </div>
+                                
+                                <!-- OT en progreso -->
+                                <div class="bg-white rounded-lg p-4 mb-3 shadow-sm border-l-4 border-blue-500 cursor-pointer hover:shadow-md" onclick="abrirDetalleOT('OT-2026-003')">
+                                    <div class="flex justify-between items-start mb-2">
+                                        <span class="text-xs font-medium text-gray-500">OT-2026-003</span>
+                                        <span class="bg-red-100 text-red-800 px-2 py-1 rounded-full text-xs font-medium">🔴 Alta</span>
+                                    </div>
+                                    <h5 class="font-medium text-sm mb-2">Ensamble Pistón Completo</h5>
+                                    <p class="text-xs text-gray-600 mb-3">Ensamble final y pruebas de presión</p>
+                                    
+                                    <div class="flex justify-between items-center text-xs text-gray-500 mb-2">
+                                        <span>👤 Luis García</span>
+                                        <span>📅 ⏰ En curso</span>
+                                    </div>
+                                    
+                                    <div class="bg-blue-100 rounded p-2 mb-2">
+                                        <div class="flex justify-between items-center text-xs">
+                                            <span class="font-medium">⏱️ Tiempo:</span>
+                                            <span class="text-blue-600 font-medium">6h / 12h</span>
+                                        </div>
+                                        <div class="w-full h-1 bg-gray-200 rounded-full mt-1">
+                                            <div class="h-1 bg-blue-600 rounded-full" style="width: 50%"></div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="flex justify-between items-center">
+                                        <div class="flex gap-1">
+                                            <span class="w-2 h-2 bg-purple-500 rounded-full" title="Pistón"></span>
+                                        </div>
+                                        <div class="flex gap-1">
+                                            <button onclick="pausarTrabajo('OT-2026-003'); event.stopPropagation();" class="bg-yellow-500 hover:bg-yellow-600 text-white px-2 py-1 rounded text-xs">
+                                                ⏸️ Pausar
+                                            </button>
+                                            <button onclick="registrarTiempo('OT-2026-003'); event.stopPropagation();" class="bg-green-500 hover:bg-green-600 text-white px-2 py-1 rounded text-xs">
+                                                ⏱️ Log
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Columna: En Revisión -->
+                            <div class="bg-yellow-50 rounded-lg p-4">
+                                <div class="flex justify-between items-center mb-4">
+                                    <h4 class="font-bold text-yellow-700">🔍 EN REVISIÓN</h4>
+                                    <span class="bg-yellow-200 text-yellow-700 px-2 py-1 rounded-full text-xs font-medium">2</span>
+                                </div>
+                                
+                                <!-- OT en revisión -->
+                                <div class="bg-white rounded-lg p-4 mb-3 shadow-sm border-l-4 border-yellow-500 cursor-pointer hover:shadow-md" onclick="abrirDetalleOT('OT-2026-004')">
+                                    <div class="flex justify-between items-start mb-2">
+                                        <span class="text-xs font-medium text-gray-500">OT-2026-004</span>
+                                        <span class="bg-yellow-100 text-yellow-800 px-2 py-1 rounded-full text-xs font-medium">🟡 Media</span>
+                                    </div>
+                                    <h5 class="font-medium text-sm mb-2">Control de Calidad - Tapa</h5>
+                                    <p class="text-xs text-gray-600 mb-3">Inspección dimensional y pruebas</p>
+                                    
+                                    <div class="flex justify-between items-center text-xs text-gray-500 mb-2">
+                                        <span>👤 María López</span>
+                                        <span>📅 Esperando QC</span>
+                                    </div>
+                                    
+                                    <div class="bg-yellow-100 rounded p-2 mb-2">
+                                        <div class="flex justify-between items-center text-xs">
+                                            <span class="font-medium">⏱️ Tiempo:</span>
+                                            <span class="text-blue-600 font-medium">4h / 6h</span>
+                                        </div>
+                                        <div class="w-full h-1 bg-gray-200 rounded-full mt-1">
+                                            <div class="h-1 bg-yellow-600 rounded-full" style="width: 67%"></div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="flex justify-between items-center">
+                                        <div class="flex gap-1">
+                                            <span class="w-2 h-2 bg-green-500 rounded-full" title="Tapa"></span>
+                                        </div>
+                                        <button onclick="aprobarOT('OT-2026-004'); event.stopPropagation();" class="bg-green-500 hover:bg-green-600 text-white px-2 py-1 rounded text-xs">
+                                            ✅ Aprobar
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Columna: Completado -->
+                            <div class="bg-green-50 rounded-lg p-4">
+                                <div class="flex justify-between items-center mb-4">
+                                    <h4 class="font-bold text-green-700">✅ COMPLETADO</h4>
+                                    <span class="bg-green-200 text-green-700 px-2 py-1 rounded-full text-xs font-medium">13</span>
+                                </div>
+                                
+                                <!-- OT completada -->
+                                <div class="bg-white rounded-lg p-4 mb-3 shadow-sm border-l-4 border-green-500 cursor-pointer hover:shadow-md" onclick="abrirDetalleOT('OT-2026-005')">
+                                    <div class="flex justify-between items-start mb-2">
+                                        <span class="text-xs font-medium text-gray-500">OT-2026-005</span>
+                                        <span class="bg-green-100 text-green-800 px-2 py-1 rounded-full text-xs font-medium">✅ Done</span>
+                                    </div>
+                                    <h5 class="font-medium text-sm mb-2">Cilindro Completo - 988K</h5>
+                                    <p class="text-xs text-gray-600 mb-3">Entregado y facturado</p>
+                                    
+                                    <div class="flex justify-between items-center text-xs text-gray-500 mb-2">
+                                        <span>👤 Carlos Méndez</span>
+                                        <span>📅 15 Feb 2026</span>
+                                    </div>
+                                    
+                                    <div class="bg-green-100 rounded p-2 mb-2">
+                                        <div class="flex justify-between items-center text-xs">
+                                            <span class="font-medium">⏱️ Tiempo:</span>
+                                            <span class="text-green-600 font-medium">18h / 20h</span>
+                                        </div>
+                                        <div class="w-full h-1 bg-gray-200 rounded-full mt-1">
+                                            <div class="h-1 bg-green-600 rounded-full" style="width: 90%"></div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="flex justify-between items-center">
+                                        <div class="flex gap-1">
+                                            <span class="w-2 h-2 bg-blue-500 rounded-full" title="Cilindro"></span>
+                                            <span class="w-2 h-2 bg-orange-500 rounded-full" title="Vástago"></span>
+                                            <span class="w-2 h-2 bg-green-500 rounded-full" title="Tapa"></span>
+                                        </div>
+                                        <span class="text-xs text-green-600 font-medium">Completado</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Modal para Registro de Tiempo -->
+                        <div id="modalRegistroTiempo" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+                            <div class="bg-white rounded-lg p-6 w-96">
+                                <h3 class="text-lg font-bold mb-4">⏱️ Registrar Tiempo Trabajado</h3>
+                                <div class="space-y-4">
+                                    <div>
+                                        <label class="block text-sm font-medium mb-2">OT:</label>
+                                        <input type="text" id="otTiempo" readonly class="w-full border rounded px-3 py-2 bg-gray-100">
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-medium mb-2">Horas trabajadas:</label>
+                                        <input type="number" id="horasTrabajadas" min="0" max="24" step="0.5" class="w-full border rounded px-3 py-2">
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-medium mb-2">Descripción del trabajo:</label>
+                                        <textarea id="descripcionTrabajo" rows="3" class="w-full border rounded px-3 py-2" placeholder="Describe lo que se realizó..."></textarea>
+                                    </div>
+                                </div>
+                                <div class="flex gap-3 mt-6">
+                                    <button onclick="guardarTiempo()" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded flex-1">
+                                        Guardar Tiempo
+                                    </button>
+                                    <button onclick="cerrarModalTiempo()" class="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded">
+                                        Cancelar
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <script>
+                            // Sistema de gestión de OTs tipo Jira
+let otActual = null;
+                            let tiempoInicio = null;
+
+                            function crearNuevaOT() {
+                                alert('🆕 Creando nueva Orden de Trabajo...\n\n' +
+                                      '• Asigne prioridad\n' +
+                                      '• Defina componentes\n' +
+                                      '• Establezca tiempo estimado\n' +
+                                      '• Asigne técnico responsable');
+                            }
+
+                            function abrirDetalleOT(otId) {
+                                alert(`📋 Detalles de ${otId}\n\n` +
+                                      '• Estado: En progreso\n' +
+                                      '• Técnico: Carlos Méndez\n' +
+                                      '• Tiempo estimado: 24h\n' +
+                                      '• Tiempo trabajado: 6h\n' +
+                                      '• Comentarios: 3\n' +
+                                      '• Archivos adjuntos: 2');
+                            }
+
+                            function iniciarTrabajo(otId) {
+                                otActual = otId;
+                                tiempoInicio = new Date();
+                                alert(`▶️ Trabajo iniciado en ${otId}\n\n` +
+                                      `Hora de inicio: ${tiempoInicio.toLocaleTimeString()}\n` +
+                                      'Cronómetro activado ⏰');
+                                
+                                // Simular actualización visual
+                                actualizarEstadoOT(otId, 'en-progreso');
+                            }
+
+                            function pausarTrabajo(otId) {
+                                if (tiempoInicio) {
+                                    const tiempoTrabajado = Math.round((new Date() - tiempoInicio) / 60000); // minutos
+                                    alert(`⏸️ Trabajo pausado en ${otId}\n\n` +
+                                          `Tiempo trabajado: ${tiempoTrabajado} minutos\n` +
+                                          '¿Desea registrar este tiempo?');
+                                    
+                                    registrarTiempo(otId);
+                                }
+                            }
+
+                            function registrarTiempo(otId) {
+                                document.getElementById('otTiempo').value = otId;
+                                document.getElementById('modalRegistroTiempo').classList.remove('hidden');
+                            }
+
+                            function cerrarModalTiempo() {
+                                document.getElementById('modalRegistroTiempo').classList.add('hidden');
+                                document.getElementById('horasTrabajadas').value = '';
+                                document.getElementById('descripcionTrabajo').value = '';
+                            }
+
+                            function guardarTiempo() {
+                                const otId = document.getElementById('otTiempo').value;
+                                const horas = document.getElementById('horasTrabajadas').value;
+                                const descripcion = document.getElementById('descripcionTrabajo').value;
+
+                                if (!horas || !descripcion) {
+                                    alert('⚠️ Por favor complete todos los campos');
+                                    return;
+                                }
+
+                                alert(`⏱️ Tiempo registrado exitosamente:\n\n` +
+                                      `• OT: ${otId}\n` +
+                                      `• Horas: ${horas}h\n` +
+                                      `• Trabajo: ${descripcion}`);
+                                
+                                cerrarModalTiempo();
+                                tiempoInicio = null;
+                            }
+
+                            function aprobarOT(otId) {
+                                alert(`✅ OT ${otId} aprobada\n\n` +
+                                      'La orden será movida a "Completado"\n' +
+                                      'Se generará automáticamente la facturación');
+                                
+                                actualizarEstadoOT(otId, 'completado');
+                            }
+
+                            function mostrarReportesTiempo() {
+                                alert('📊 Reportes de Tiempo\n\n' +
+                                      '📅 Esta semana:\n' +
+                                      '• Carlos Méndez: 42h\n' +
+                                      '• Ana Torres: 38h\n' +
+                                      '• Luis García: 40h\n' +
+                                      '• María López: 35h\n\n' +
+                                      'Total acumulado: 155h\n' +
+                                      'Eficiencia promedio: 87%');
+                            }
+
+                            function actualizarEstadoOT(otId, estado) {
+                                console.log(`Actualizando ${otId} a estado: ${estado}`);
+                                // Aquí iría la lógica para actualizar visualmente la OT
+                            }
+
+                            // Auto-refresh cada 30 segundos para actualizar tiempos
+                            setInterval(() => {
+                                if (tiempoInicio) {
+                                    console.log('Actualizando cronómetro...');
+                                }
+                            }, 30000);
+                                        </script>
+                                <tbody>
+                                    <!-- Fila 1 -->
+                                    <tr class="hover:bg-gray-50">
+                                        <td class="px-2 py-1 text-center border border-gray-400 text-xs font-medium">291624</td>
+                                        <td class="px-2 py-1 text-center border border-gray-400 text-xs font-medium">BAMBAS</td>
+                                        <td class="px-2 py-1 border border-gray-400 text-xs">CILINDRO DE LEVANTE DE BULLDOZER</td>
+                                        <td class="px-2 py-1 text-center border border-gray-400 text-xs">D41H</td>
+                                        <td class="px-2 py-1 text-center border border-gray-400 bg-green-100 text-xs">LISTO PARA DESPACHO</td>
+                                        <td class="px-2 py-1 text-center border border-gray-400 text-xs">CHQ</td>
+                                        <td class="px-2 py-1 text-center border border-gray-400 text-xs"></td>
+                                        <!-- Cilindro cells -->
+                                        <td class="px-1 py-1 text-center border border-gray-400 bg-green-200 text-xs font-bold">OK</td>
+                                        <td class="px-1 py-1 text-center border border-gray-400 bg-green-200 text-xs font-bold">OK</td>
+                                        <td class="px-1 py-1 text-center border border-gray-400 bg-green-200 text-xs font-bold">OK</td>
+                                        <td class="px-1 py-1 text-center border border-gray-400 bg-green-200 text-xs font-bold">OK</td>
+                                        <td class="px-1 py-1 text-center border border-gray-400 bg-green-200 text-xs font-bold">OK</td>
+                                        <td class="px-1 py-1 text-center border border-gray-400 bg-gray-200 text-xs"></td>
+                                        <td class="px-1 py-1 text-center border border-gray-400 bg-green-200 text-xs font-bold">OK</td>
+                                        <td class="px-1 py-1 text-center border border-gray-400 bg-green-200 text-xs font-bold">OK</td>
+                                        <td class="px-1 py-1 text-center border border-gray-400 bg-green-200 text-xs font-bold">OK</td>
+                                        <td class="px-1 py-1 text-center border border-gray-400 bg-green-200 text-xs font-bold">OK</td>
+                                        <td class="px-1 py-1 text-center border border-gray-400 bg-green-200 text-xs font-bold">OK</td>
+                                        <td class="px-1 py-1 text-center border border-gray-400 bg-gray-200 text-xs"></td>
+                                        <td class="px-1 py-1 text-center border border-gray-400 bg-blue-200 text-xs font-bold">100%</td>
+                                        <!-- Vastago cells -->
+                                        <td class="px-1 py-1 text-center border border-gray-400 bg-green-200 text-xs font-bold">OK</td>
+                                        <td class="px-1 py-1 text-center border border-gray-400 bg-gray-200 text-xs"></td>
+                                        <td class="px-1 py-1 text-center border border-gray-400 bg-green-200 text-xs font-bold">OK</td>
+                                        <td class="px-1 py-1 text-center border border-gray-400 bg-gray-200 text-xs"></td>
+                                        <td class="px-1 py-1 text-center border border-gray-400 bg-green-200 text-xs font-bold">OK</td>
+                                        <td class="px-1 py-1 text-center border border-gray-400 bg-gray-200 text-xs"></td>
+                                        <td class="px-1 py-1 text-center border border-gray-400 bg-green-200 text-xs font-bold">OK</td>
+                                        <td class="px-1 py-1 text-center border border-gray-400 bg-gray-200 text-xs"></td>
+                                        <td class="px-1 py-1 text-center border border-gray-400 bg-green-200 text-xs font-bold">OK</td>
+                                        <td class="px-1 py-1 text-center border border-gray-400 bg-gray-200 text-xs"></td>
+                                        <td class="px-1 py-1 text-center border border-gray-400 bg-green-200 text-xs font-bold">OK</td>
+                                        <td class="px-1 py-1 text-center border border-gray-400 bg-gray-200 text-xs"></td>
+                                        <td class="px-1 py-1 text-center border border-gray-400 bg-orange-200 text-xs font-bold">100%</td>
+                                        <!-- Tapa cells -->
+                                        <td class="px-1 py-1 text-center border border-gray-400 bg-green-200 text-xs font-bold">OK</td>
+                                        <td class="px-1 py-1 text-center border border-gray-400 bg-gray-200 text-xs"></td>
+                                        <td class="px-1 py-1 text-center border border-gray-400 bg-green-200 text-xs font-bold">OK</td>
+                                        <td class="px-1 py-1 text-center border border-gray-400 bg-gray-200 text-xs"></td>
+                                        <td class="px-1 py-1 text-center border border-gray-400 bg-green-200 text-xs font-bold">100%</td>
+                                        <!-- Piston cells -->
+                                        <td class="px-1 py-1 text-center border border-gray-400 bg-green-200 text-xs font-bold">OK</td>
+                                        <td class="px-1 py-1 text-center border border-gray-400 bg-green-200 text-xs font-bold">OK</td>
+                                        <!-- Fin cell -->
+                                        <td class="px-1 py-1 text-center border border-gray-400 bg-green-200 text-xs font-bold">OK</td>
+                                    </tr>
+                                    
+                                    <!-- Fila 2 -->
+                                    <tr class="hover:bg-gray-50">
+                                        <td class="px-2 py-1 text-center border border-gray-400 text-xs font-medium">291724</td>
+                                        <td class="px-2 py-1 text-center border border-gray-400 text-xs font-medium">BAMBAS</td>
+                                        <td class="px-2 py-1 border border-gray-400 text-xs">RUEDA DELANTERA</td>
+                                        <td class="px-2 py-1 text-center border border-gray-400 text-xs">930E-4SE</td>
+                                        <td class="px-2 py-1 text-center border border-gray-400 bg-green-100 text-xs">LISTO PARA DESPACHO</td>
+                                        <td class="px-2 py-1 text-center border border-gray-400 text-xs">CHQ</td>
+                                        <td class="px-2 py-1 text-center border border-gray-400 text-xs"></td>
+                                        <!-- Cilindro cells -->
+                                        <td class="px-1 py-1 text-center border border-gray-400 bg-green-200 text-xs font-bold">OK</td>
+                                        <td class="px-1 py-1 text-center border border-gray-400 bg-green-200 text-xs font-bold">OK</td>
+                                        <td class="px-1 py-1 text-center border border-gray-400 bg-green-200 text-xs font-bold">OK</td>
+                                        <td class="px-1 py-1 text-center border border-gray-400 bg-green-200 text-xs font-bold">OK</td>
+                                        <td class="px-1 py-1 text-center border border-gray-400 bg-green-200 text-xs font-bold">OK</td>
+                                        <td class="px-1 py-1 text-center border border-gray-400 bg-gray-200 text-xs"></td>
+                                        <td class="px-1 py-1 text-center border border-gray-400 bg-green-200 text-xs font-bold">OK</td>
+                                        <td class="px-1 py-1 text-center border border-gray-400 bg-green-200 text-xs font-bold">OK</td>
+                                        <td class="px-1 py-1 text-center border border-gray-400 bg-green-200 text-xs font-bold">OK</td>
+                                        <td class="px-1 py-1 text-center border border-gray-400 bg-green-200 text-xs font-bold">OK</td>
+                                        <td class="px-1 py-1 text-center border border-gray-400 bg-green-200 text-xs font-bold">OK</td>
+                                        <td class="px-1 py-1 text-center border border-gray-400 bg-gray-200 text-xs"></td>
+                                        <td class="px-1 py-1 text-center border border-gray-400 bg-blue-200 text-xs font-bold">100%</td>
+                                        <!-- Vastago cells -->
+                                        <td class="px-1 py-1 text-center border border-gray-400 bg-green-200 text-xs font-bold">OK</td>
+                                        <td class="px-1 py-1 text-center border border-gray-400 bg-gray-200 text-xs"></td>
+                                        <td class="px-1 py-1 text-center border border-gray-400 bg-green-200 text-xs font-bold">OK</td>
+                                        <td class="px-1 py-1 text-center border border-gray-400 bg-gray-200 text-xs"></td>
+                                        <td class="px-1 py-1 text-center border border-gray-400 bg-green-200 text-xs font-bold">OK</td>
+                                        <td class="px-1 py-1 text-center border border-gray-400 bg-gray-200 text-xs"></td>
+                                        <td class="px-1 py-1 text-center border border-gray-400 bg-green-200 text-xs font-bold">OK</td>
+                                        <td class="px-1 py-1 text-center border border-gray-400 bg-gray-200 text-xs"></td>
+                                        <td class="px-1 py-1 text-center border border-gray-400 bg-green-200 text-xs font-bold">OK</td>
+                                        <td class="px-1 py-1 text-center border border-gray-400 bg-gray-200 text-xs"></td>
+                                        <td class="px-1 py-1 text-center border border-gray-400 bg-green-200 text-xs font-bold">OK</td>
+                                        <td class="px-1 py-1 text-center border border-gray-400 bg-gray-200 text-xs"></td>
+                                        <td class="px-1 py-1 text-center border border-gray-400 bg-orange-200 text-xs font-bold">100%</td>
+                                        <!-- Tapa cells -->
+                                        <td class="px-1 py-1 text-center border border-gray-400 bg-green-200 text-xs font-bold">OK</td>
+                                        <td class="px-1 py-1 text-center border border-gray-400 bg-gray-200 text-xs"></td>
+                                        <td class="px-1 py-1 text-center border border-gray-400 bg-green-200 text-xs font-bold">OK</td>
+                                        <td class="px-1 py-1 text-center border border-gray-400 bg-gray-200 text-xs"></td>
+                                        <td class="px-1 py-1 text-center border border-gray-400 bg-green-200 text-xs font-bold">100%</td>
+                                        <!-- Piston cells -->
+                                        <td class="px-1 py-1 text-center border border-gray-400 bg-green-200 text-xs font-bold">OK</td>
+                                        <td class="px-1 py-1 text-center border border-gray-400 bg-green-200 text-xs font-bold">OK</td>
+                                        <!-- Fin cell -->
+                                        <td class="px-1 py-1 text-center border border-gray-400 bg-green-200 text-xs font-bold">OK</td>
+                                    </tr>
+
+                                    <!-- Fila 3 -->
+                                    <tr class="hover:bg-gray-50">
+                                        <td class="px-2 py-1 text-center border border-gray-400 text-xs font-medium">291824</td>
+                                        <td class="px-2 py-1 text-center border border-gray-400 text-xs font-medium">BAMBAS</td>
+                                        <td class="px-2 py-1 border border-gray-400 text-xs">CILINDRO DE SUSPENSION DELANTERA</td>
+                                        <td class="px-2 py-1 text-center border border-gray-400 text-xs">930E-4SE</td>
+                                        <td class="px-2 py-1 text-center border border-gray-400 bg-yellow-100 text-xs">ENTREGADO</td>
+                                        <td class="px-2 py-1 text-center border border-gray-400 text-xs">CHQ</td>
+                                        <td class="px-2 py-1 text-center border border-gray-400 text-xs"></td>
+                                        <!-- Cilindro cells -->
+                                        <td class="px-1 py-1 text-center border border-gray-400 bg-green-200 text-xs font-bold">OK</td>
+                                        <td class="px-1 py-1 text-center border border-gray-400 bg-green-200 text-xs font-bold">OK</td>
+                                        <td class="px-1 py-1 text-center border border-gray-400 bg-green-200 text-xs font-bold">OK</td>
+                                        <td class="px-1 py-1 text-center border border-gray-400 bg-green-200 text-xs font-bold">OK</td>
+                                        <td class="px-1 py-1 text-center border border-gray-400 bg-green-200 text-xs font-bold">OK</td>
+                                        <td class="px-1 py-1 text-center border border-gray-400 bg-gray-200 text-xs"></td>
+                                        <td class="px-1 py-1 text-center border border-gray-400 bg-green-200 text-xs font-bold">OK</td>
+                                        <td class="px-1 py-1 text-center border border-gray-400 bg-green-200 text-xs font-bold">OK</td>
+                                        <td class="px-1 py-1 text-center border border-gray-400 bg-green-200 text-xs font-bold">OK</td>
+                                        <td class="px-1 py-1 text-center border border-gray-400 bg-green-200 text-xs font-bold">OK</td>
+                                        <td class="px-1 py-1 text-center border border-gray-400 bg-green-200 text-xs font-bold">OK</td>
+                                        <td class="px-1 py-1 text-center border border-gray-400 bg-gray-200 text-xs"></td>
+                                        <td class="px-1 py-1 text-center border border-gray-400 bg-blue-200 text-xs font-bold">100%</td>
+                                        <!-- Vastago cells -->
+                                        <td class="px-1 py-1 text-center border border-gray-400 bg-green-200 text-xs font-bold">OK</td>
+                                        <td class="px-1 py-1 text-center border border-gray-400 bg-gray-200 text-xs"></td>
+                                        <td class="px-1 py-1 text-center border border-gray-400 bg-green-200 text-xs font-bold">OK</td>
+                                        <td class="px-1 py-1 text-center border border-gray-400 bg-gray-200 text-xs"></td>
+                                        <td class="px-1 py-1 text-center border border-gray-400 bg-green-200 text-xs font-bold">OK</td>
+                                        <td class="px-1 py-1 text-center border border-gray-400 bg-gray-200 text-xs"></td>
+                                        <td class="px-1 py-1 text-center border border-gray-400 bg-green-200 text-xs font-bold">OK</td>
+                                        <td class="px-1 py-1 text-center border border-gray-400 bg-gray-200 text-xs"></td>
+                                        <td class="px-1 py-1 text-center border border-gray-400 bg-green-200 text-xs font-bold">OK</td>
+                                        <td class="px-1 py-1 text-center border border-gray-400 bg-gray-200 text-xs"></td>
+                                        <td class="px-1 py-1 text-center border border-gray-400 bg-green-200 text-xs font-bold">OK</td>
+                                        <td class="px-1 py-1 text-center border border-gray-400 bg-gray-200 text-xs"></td>
+                                        <td class="px-1 py-1 text-center border border-gray-400 bg-orange-200 text-xs font-bold">100%</td>
+                                        <!-- Tapa cells -->
+                                        <td class="px-1 py-1 text-center border border-gray-400 bg-green-200 text-xs font-bold">OK</td>
+                                        <td class="px-1 py-1 text-center border border-gray-400 bg-gray-200 text-xs"></td>
+                                        <td class="px-1 py-1 text-center border border-gray-400 bg-green-200 text-xs font-bold">OK</td>
+                                        <td class="px-1 py-1 text-center border border-gray-400 bg-gray-200 text-xs"></td>
+                                        <td class="px-1 py-1 text-center border border-gray-400 bg-green-200 text-xs font-bold">100%</td>
+                                        <!-- Piston cells -->
+                                        <td class="px-1 py-1 text-center border border-gray-400 bg-green-200 text-xs font-bold">OK</td>
+                                        <td class="px-1 py-1 text-center border border-gray-400 bg-green-200 text-xs font-bold">OK</td>
+                                        <!-- Fin cell -->
+                                        <td class="px-1 py-1 text-center border border-gray-400 bg-green-200 text-xs font-bold">OK</td>
+                                    </tr>
+
+                                    <!-- Fila 4 - En proceso -->
+                                    <tr class="hover:bg-gray-50">
+                                        <td class="px-2 py-1 text-center border border-gray-400 text-xs font-medium">291924</td>
+                                        <td class="px-2 py-1 text-center border border-gray-400 text-xs font-medium">BAMBAS</td>
+                                        <td class="px-2 py-1 border border-gray-400 text-xs">CILINDRO DE INCLINACION</td>
+                                        <td class="px-2 py-1 text-center border border-gray-400 text-xs">988G</td>
+                                        <td class="px-2 py-1 text-center border border-gray-400 bg-orange-100 text-xs font-medium">EN PROCESO</td>
+                                        <td class="px-2 py-1 text-center border border-gray-400 text-xs">CHQ</td>
+                                        <td class="px-2 py-1 text-center border border-gray-400 text-xs">10</td>
+                                        <!-- Cilindro cells -->
+                                        <td class="px-1 py-1 text-center border border-gray-400 bg-green-200 text-xs font-bold">OK</td>
+                                        <td class="px-1 py-1 text-center border border-gray-400 bg-green-200 text-xs font-bold">OK</td>
+                                        <td class="px-1 py-1 text-center border border-gray-400 bg-green-200 text-xs font-bold">OK</td>
+                                        <td class="px-1 py-1 text-center border border-gray-400 bg-gray-200 text-xs"></td>
+                                        <td class="px-1 py-1 text-center border border-gray-400 bg-green-200 text-xs font-bold">OK</td>
+                                        <td class="px-1 py-1 text-center border border-gray-400 bg-gray-200 text-xs"></td>
+                                        <td class="px-1 py-1 text-center border border-gray-400 bg-green-200 text-xs font-bold">OK</td>
+                                        <td class="px-1 py-1 text-center border border-gray-400 bg-green-200 text-xs font-bold">OK</td>
+                                        <td class="px-1 py-1 text-center border border-gray-400 bg-green-200 text-xs font-bold">OK</td>
+                                        <td class="px-1 py-1 text-center border border-gray-400 bg-green-200 text-xs font-bold">OK</td>
+                                        <td class="px-1 py-1 text-center border border-gray-400 bg-green-200 text-xs font-bold">OK</td>
+                                        <td class="px-1 py-1 text-center border border-gray-400 bg-gray-200 text-xs"></td>
+                                        <td class="px-1 py-1 text-center border border-gray-400 bg-blue-200 text-xs font-bold">92%</td>
+                                        <!-- Vastago cells -->
+                                        <td class="px-1 py-1 text-center border border-gray-400 bg-green-200 text-xs font-bold">OK</td>
+                                        <td class="px-1 py-1 text-center border border-gray-400 bg-gray-200 text-xs"></td>
+                                        <td class="px-1 py-1 text-center border border-gray-400 bg-green-200 text-xs font-bold">OK</td>
+                                        <td class="px-1 py-1 text-center border border-gray-400 bg-gray-200 text-xs"></td>
+                                        <td class="px-1 py-1 text-center border border-gray-400 bg-green-200 text-xs font-bold">OK</td>
+                                        <td class="px-1 py-1 text-center border border-gray-400 bg-gray-200 text-xs"></td>
+                                        <td class="px-1 py-1 text-center border border-gray-400 bg-green-200 text-xs font-bold">OK</td>
+                                        <td class="px-1 py-1 text-center border border-gray-400 bg-gray-200 text-xs"></td>
+                                        <td class="px-1 py-1 text-center border border-gray-400 bg-green-200 text-xs font-bold">OK</td>
+                                        <td class="px-1 py-1 text-center border border-gray-400 bg-gray-200 text-xs"></td>
+                                        <td class="px-1 py-1 text-center border border-gray-400 bg-green-200 text-xs font-bold">OK</td>
+                                        <td class="px-1 py-1 text-center border border-gray-400 bg-gray-200 text-xs"></td>
+                                        <td class="px-1 py-1 text-center border border-gray-400 bg-orange-200 text-xs font-bold">100%</td>
+                                        <!-- Tapa cells -->
+                                        <td class="px-1 py-1 text-center border border-gray-400 bg-green-200 text-xs font-bold">OK</td>
+                                        <td class="px-1 py-1 text-center border border-gray-400 bg-gray-200 text-xs"></td>
+                                        <td class="px-1 py-1 text-center border border-gray-400 bg-green-200 text-xs font-bold">OK</td>
+                                        <td class="px-1 py-1 text-center border border-gray-400 bg-gray-200 text-xs"></td>
+                                        <td class="px-1 py-1 text-center border border-gray-400 bg-green-200 text-xs font-bold">100%</td>
+                                        <!-- Piston cells -->
+                                        <td class="px-1 py-1 text-center border border-gray-400 bg-green-200 text-xs font-bold">OK</td>
+                                        <td class="px-1 py-1 text-center border border-gray-400 bg-green-200 text-xs font-bold">OK</td>
+                                        <!-- Fin cell -->
+                                        <td class="px-1 py-1 text-center border border-gray-400 bg-yellow-200 text-xs font-bold">98%</td>
+                                    </tr>
+
+                                    <!-- Fila 5 -->
+                                    <tr class="hover:bg-gray-50">
+                                        <td class="px-2 py-1 text-center border border-gray-400 text-xs font-medium">292024</td>
+                                        <td class="px-2 py-1 text-center border border-gray-400 text-xs font-medium">BAMBAS</td>
+                                        <td class="px-2 py-1 border border-gray-400 text-xs">CILINDRO DE INCLINACION DE BULLDOZER</td>
+                                        <td class="px-2 py-1 text-center border border-gray-400 text-xs">D11T</td>
+                                        <td class="px-2 py-1 text-center border border-gray-400 bg-yellow-100 text-xs">ENTREGADO</td>
+                                        <td class="px-2 py-1 text-center border border-gray-400 text-xs">CHQ</td>
+                                        <td class="px-2 py-1 text-center border border-gray-400 text-xs">5</td>
+                                        <!-- Cilindro cells completamente verdes -->
+                                        <td class="px-1 py-1 text-center border border-gray-400 bg-green-200 text-xs font-bold">OK</td>
+                                        <td class="px-1 py-1 text-center border border-gray-400 bg-green-200 text-xs font-bold">OK</td>
+                                        <td class="px-1 py-1 text-center border border-gray-400 bg-green-200 text-xs font-bold">OK</td>
+                                        <td class="px-1 py-1 text-center border border-gray-400 bg-green-200 text-xs font-bold">OK</td>
+                                        <td class="px-1 py-1 text-center border border-gray-400 bg-green-200 text-xs font-bold">OK</td>
+                                        <td class="px-1 py-1 text-center border border-gray-400 bg-gray-200 text-xs"></td>
+                                        <td class="px-1 py-1 text-center border border-gray-400 bg-green-200 text-xs font-bold">OK</td>
+                                        <td class="px-1 py-1 text-center border border-gray-400 bg-green-200 text-xs font-bold">OK</td>
+                                        <td class="px-1 py-1 text-center border border-gray-400 bg-green-200 text-xs font-bold">OK</td>
+                                        <td class="px-1 py-1 text-center border border-gray-400 bg-green-200 text-xs font-bold">OK</td>
+                                        <td class="px-1 py-1 text-center border border-gray-400 bg-green-200 text-xs font-bold">OK</td>
+                                        <td class="px-1 py-1 text-center border border-gray-400 bg-gray-200 text-xs"></td>
+                                        <td class="px-1 py-1 text-center border border-gray-400 bg-blue-200 text-xs font-bold">100%</td>
+                                        <!-- Vastago cells -->
+                                        <td class="px-1 py-1 text-center border border-gray-400 bg-green-200 text-xs font-bold">OK</td>
+                                        <td class="px-1 py-1 text-center border border-gray-400 bg-gray-200 text-xs"></td>
+                                        <td class="px-1 py-1 text-center border border-gray-400 bg-green-200 text-xs font-bold">OK</td>
+                                        <td class="px-1 py-1 text-center border border-gray-400 bg-gray-200 text-xs"></td>
+                                        <td class="px-1 py-1 text-center border border-gray-400 bg-green-200 text-xs font-bold">OK</td>
+                                        <td class="px-1 py-1 text-center border border-gray-400 bg-gray-200 text-xs"></td>
+                                        <td class="px-1 py-1 text-center border border-gray-400 bg-green-200 text-xs font-bold">OK</td>
+                                        <td class="px-1 py-1 text-center border border-gray-400 bg-gray-200 text-xs"></td>
+                                        <td class="px-1 py-1 text-center border border-gray-400 bg-green-200 text-xs font-bold">OK</td>
+                                        <td class="px-1 py-1 text-center border border-gray-400 bg-gray-200 text-xs"></td>
+                                        <td class="px-1 py-1 text-center border border-gray-400 bg-green-200 text-xs font-bold">OK</td>
+                                        <td class="px-1 py-1 text-center border border-gray-400 bg-gray-200 text-xs"></td>
+                                        <td class="px-1 py-1 text-center border border-gray-400 bg-orange-200 text-xs font-bold">100%</td>
+                                        <!-- Tapa cells -->
+                                        <td class="px-1 py-1 text-center border border-gray-400 bg-green-200 text-xs font-bold">OK</td>
+                                        <td class="px-1 py-1 text-center border border-gray-400 bg-gray-200 text-xs"></td>
+                                        <td class="px-1 py-1 text-center border border-gray-400 bg-green-200 text-xs font-bold">OK</td>
+                                        <td class="px-1 py-1 text-center border border-gray-400 bg-gray-200 text-xs"></td>
+                                        <td class="px-1 py-1 text-center border border-gray-400 bg-green-200 text-xs font-bold">100%</td>
+                                        <!-- Piston cells -->
+                                        <td class="px-1 py-1 text-center border border-gray-400 bg-green-200 text-xs font-bold">OK</td>
+                                        <td class="px-1 py-1 text-center border border-gray-400 bg-green-200 text-xs font-bold">OK</td>
+                                        <!-- Fin cell -->
+                                        <td class="px-1 py-1 text-center border border-gray-400 bg-green-200 text-xs font-bold">OK</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Resumen de Procesos -->
+                <div class="mt-8 grid grid-cols-1 lg:grid-cols-2 gap-8">
+                    <div class="bg-white rounded-lg shadow-lg p-6">
+                        <h3 class="text-lg font-bold text-gray-800 mb-4">Avance por Proceso</h3>
+                        <div class="space-y-4">
+                            <div class="flex justify-between items-center">
+                                <span class="font-medium">CILINDRO</span>
+                                <div class="flex items-center space-x-2">
+                                    <div class="w-32 h-2 bg-gray-200 rounded-full">
+                                        <div class="w-28 h-2 bg-blue-600 rounded-full"></div>
+                                    </div>
+                                    <span class="text-sm font-medium">88%</span>
+                                </div>
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <span class="font-medium">VASTAGO</span>
+                                <div class="flex items-center space-x-2">
+                                    <div class="w-32 h-2 bg-gray-200 rounded-full">
+                                        <div class="w-24 h-2 bg-orange-600 rounded-full"></div>
+                                    </div>
+                                    <span class="text-sm font-medium">75%</span>
+                                </div>
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <span class="font-medium">TAPA</span>
+                                <div class="flex items-center space-x-2">
+                                    <div class="w-32 h-2 bg-gray-200 rounded-full">
+                                        <div class="w-20 h-2 bg-green-600 rounded-full"></div>
+                                    </div>
+                                    <span class="text-sm font-medium">62%</span>
+                                </div>
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <span class="font-medium">PISTON</span>
+                                <div class="flex items-center space-x-2">
+                                    <div class="w-32 h-2 bg-gray-200 rounded-full">
+                                        <div class="w-16 h-2 bg-purple-600 rounded-full"></div>
+                                    </div>
+                                    <span class="text-sm font-medium">50%</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-white rounded-lg shadow-lg p-6">
+                        <h3 class="text-lg font-bold text-gray-800 mb-4">Alertas y Prioridades</h3>
+                        <div class="space-y-3">
+                            <div class="flex items-center p-3 bg-red-50 rounded-lg">
+                                <i class="fas fa-exclamation-triangle text-red-600 mr-3"></i>
+                                <div>
+                                    <p class="font-medium text-red-800">Retraso en PISTON</p>
+                                    <p class="text-sm text-red-600">BAMBAS 988K requiere atención</p>
+                                </div>
+                            </div>
+                            <div class="flex items-center p-3 bg-yellow-50 rounded-lg">
+                                <i class="fas fa-clock text-yellow-600 mr-3"></i>
+                                <div>
+                                    <p class="font-medium text-yellow-800">VASTAGO en proceso</p>
+                                    <p class="text-sm text-yellow-600">UNIMAQ 1320 - 75% completado</p>
+                                </div>
+                            </div>
+                            <div class="flex items-center p-3 bg-green-50 rounded-lg">
+                                <i class="fas fa-check-circle text-green-600 mr-3"></i>
+                                <div>
+                                    <p class="font-medium text-green-800">Listo para entrega</p>
+                                    <p class="text-sm text-green-600">HP&K D11T completado</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Estructura de la Tabla - Documentación Técnica -->
+                <div class="mt-8 bg-white rounded-lg shadow-lg overflow-hidden">
+                    <div class="bg-gray-800 text-white p-4">
+                        <h3 class="text-lg font-bold">ESTRUCTURA DE LA TABLA DE PROGRAMACIÓN</h3>
+                        <p class="text-sm text-gray-300 mt-1">Documentación técnica de procesos de producción</p>
+                    </div>
+                    
+                    <div class="p-6">
+                        <!-- Resumen de Componentes -->
+                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+                            <div class="bg-blue-50 border-l-4 border-blue-500 p-4">
+                                <h4 class="font-bold text-blue-800">CILINDRO</h4>
+                                <p class="text-sm text-blue-600">STD: 3 procesos</p>
+                                <p class="text-sm text-blue-600">NO STD: 10 procesos</p>
+                            </div>
+                            <div class="bg-orange-50 border-l-4 border-orange-500 p-4">
+                                <h4 class="font-bold text-orange-800">VÁSTAGO</h4>
+                                <p class="text-sm text-orange-600">STD: 3 procesos</p>
+                                <p class="text-sm text-orange-600">NO STD: 8 procesos</p>
+                            </div>
+                            <div class="bg-green-50 border-l-4 border-green-500 p-4">
+                                <h4 class="font-bold text-green-800">TAPA</h4>
+                                <p class="text-sm text-green-600">STD: 3 procesos</p>
+                                <p class="text-sm text-green-600">(2 secciones)</p>
+                            </div>
+                            <div class="bg-purple-50 border-l-4 border-purple-500 p-4">
+                                <h4 class="font-bold text-purple-800">PISTÓN</h4>
+                                <p class="text-sm text-purple-600">STD: 3 procesos</p>
+                                <p class="text-sm text-purple-600">(2 secciones)</p>
+                            </div>
+                        </div>
+
+                        <!-- Tipos de Procesos -->
+                        <div class="mb-8">
+                            <h4 class="text-lg font-bold text-gray-800 mb-4">Tipos de Procesos</h4>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div class="bg-gray-50 rounded-lg p-4">
+                                    <h5 class="font-bold text-green-700 mb-2">STD (Estándar)</h5>
+                                    <p class="text-sm text-gray-600">Procesos para componentes estándar o de catálogo</p>
+                                    <div class="mt-2 text-xs">
+                                        <span class="inline-block bg-green-100 text-green-800 px-2 py-1 rounded mr-2">Cilindro: 3 pasos</span>
+                                        <span class="inline-block bg-green-100 text-green-800 px-2 py-1 rounded">Vástago: 3 pasos</span>
+                                    </div>
+                                </div>
+                                <div class="bg-gray-50 rounded-lg p-4">
+                                    <h5 class="font-bold text-red-700 mb-2">NO STD (No Estándar)</h5>
+                                    <p class="text-sm text-gray-600">Procesos para componentes personalizados o especiales</p>
+                                    <div class="mt-2 text-xs">
+                                        <span class="inline-block bg-red-100 text-red-800 px-2 py-1 rounded mr-2">Cilindro: 10 pasos</span>
+                                        <span class="inline-block bg-red-100 text-red-800 px-2 py-1 rounded">Vástago: 8 pasos</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Detalle de Procesos por Componente -->
+                        <div class="mb-8">
+                            <h4 class="text-lg font-bold text-gray-800 mb-6">DETALLE COMPLETO DE PROCESOS POR COMPONENTE</h4>
+                            
+                            <!-- Acordeón de Componentes -->
+                            <div class="space-y-4">
+                                <!-- CILINDRO -->
+                                <div class="border border-gray-200 rounded-lg">
+                                    <div class="bg-blue-50 p-4 cursor-pointer" onclick="toggleProcessDetail('cilindro')">
+                                        <h5 class="font-bold text-blue-800 flex items-center justify-between">
+                                            <span><i class="fas fa-cylinder text-blue-600 mr-2"></i>1. CILINDRO</span>
+                                            <i class="fas fa-chevron-down text-blue-600" id="cilindro-icon"></i>
+                                        </h5>
+                                    </div>
+                                    <div id="cilindro-detail" class="hidden p-4">
+                                        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                                            <div>
+                                                <h6 class="font-bold text-green-700 mb-3">CILINDRO ESTÁNDAR (STD) - 3 procesos</h6>
+                                                <div class="space-y-2">
+                                                    <div class="flex items-center p-2 bg-green-50 rounded">
+                                                        <span class="w-6 h-6 bg-green-500 text-white text-center rounded mr-3 text-xs font-bold">1</span>
+                                                        <div>
+                                                            <span class="font-medium text-sm">RELC</span>
+                                                            <p class="text-xs text-gray-600">Rellenado de alojamiento de cilindro</p>
+                                                        </div>
+                                                    </div>
+                                                    <div class="flex items-center p-2 bg-green-50 rounded">
+                                                        <span class="w-6 h-6 bg-green-500 text-white text-center rounded mr-3 text-xs font-bold">2</span>
+                                                        <div>
+                                                            <span class="font-medium text-sm">BARC</span>
+                                                            <p class="text-xs text-gray-600">Barrenado de alojamiento de cilindro</p>
+                                                        </div>
+                                                    </div>
+                                                    <div class="flex items-center p-2 bg-green-50 rounded">
+                                                        <span class="w-6 h-6 bg-green-500 text-white text-center rounded mr-3 text-xs font-bold">3</span>
+                                                        <div>
+                                                            <span class="font-medium text-sm">BRUC</span>
+                                                            <p class="text-xs text-gray-600">Bruñido de cilindro</p>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <p class="text-xs text-green-700 font-medium mt-2">Secuencia: Rellenado → Barrenado → Bruñido</p>
+                                            </div>
+                                            
+                                            <div>
+                                                <h6 class="font-bold text-red-700 mb-3">CILINDRO NO ESTÁNDAR (NO STD) - 10 procesos</h6>
+                                                <div class="space-y-1 max-h-64 overflow-y-auto">
+                                                    <div class="flex items-center p-1 bg-red-50 rounded text-xs">
+                                                        <span class="w-5 h-5 bg-red-500 text-white text-center rounded mr-2 text-xs font-bold">1</span>
+                                                        <span class="font-medium">COR-C</span> - Corte de cilindro
+                                                    </div>
+                                                    <div class="flex items-center p-1 bg-red-50 rounded text-xs">
+                                                        <span class="w-5 h-5 bg-red-500 text-white text-center rounded mr-2 text-xs font-bold">2</span>
+                                                        <span class="font-medium">MAQ-ENBC</span> - Maquinado de encastre de brida
+                                                    </div>
+                                                    <div class="flex items-center p-1 bg-red-50 rounded text-xs">
+                                                        <span class="w-5 h-5 bg-red-500 text-white text-center rounded mr-2 text-xs font-bold">3</span>
+                                                        <span class="font-medium">MAQ-ENCC</span> - Maquinado de encastre de cáncamo
+                                                    </div>
+                                                    <div class="flex items-center p-1 bg-red-50 rounded text-xs">
+                                                        <span class="w-5 h-5 bg-red-500 text-white text-center rounded mr-2 text-xs font-bold">4</span>
+                                                        <span class="font-medium">ENC-TC</span> - Encastre de tubo de cilindro
+                                                    </div>
+                                                    <div class="flex items-center p-1 bg-red-50 rounded text-xs">
+                                                        <span class="w-5 h-5 bg-red-500 text-white text-center rounded mr-2 text-xs font-bold">5</span>
+                                                        <span class="font-medium">SOL-JC</span> - Soldadura de juntas de cilindro
+                                                    </div>
+                                                    <div class="flex items-center p-1 bg-red-50 rounded text-xs">
+                                                        <span class="w-5 h-5 bg-red-500 text-white text-center rounded mr-2 text-xs font-bold">6</span>
+                                                        <span class="font-medium">RELC</span> - Rellenado de alojamiento
+                                                    </div>
+                                                    <div class="flex items-center p-1 bg-red-50 rounded text-xs">
+                                                        <span class="w-5 h-5 bg-red-500 text-white text-center rounded mr-2 text-xs font-bold">7</span>
+                                                        <span class="font-medium">MAQ-DSALC</span> - Maquinado diámetro de salida
+                                                    </div>
+                                                    <div class="flex items-center p-1 bg-red-50 rounded text-xs">
+                                                        <span class="w-5 h-5 bg-red-500 text-white text-center rounded mr-2 text-xs font-bold">8</span>
+                                                        <span class="font-medium">FAB-SC</span> - Fabricación dados/soportes
+                                                    </div>
+                                                    <div class="flex items-center p-1 bg-red-50 rounded text-xs">
+                                                        <span class="w-5 h-5 bg-red-500 text-white text-center rounded mr-2 text-xs font-bold">9</span>
+                                                        <span class="font-medium">SOLD SC</span> - Soldadura dados/soportes
+                                                    </div>
+                                                    <div class="flex items-center p-1 bg-red-50 rounded text-xs">
+                                                        <span class="w-5 h-5 bg-red-500 text-white text-center rounded mr-2 text-xs font-bold">10</span>
+                                                        <span class="font-medium">FAB-BC</span> - Fabricación bocina cilindro
+                                                    </div>
+                                                </div>
+                                                <p class="text-xs text-red-700 font-medium mt-2">Nota: Requiere procesos adicionales de fabricación, soldadura y ensamble</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- VÁSTAGO -->
+                                <div class="border border-gray-200 rounded-lg">
+                                    <div class="bg-orange-50 p-4 cursor-pointer" onclick="toggleProcessDetail('vastago')">
+                                        <h5 class="font-bold text-orange-800 flex items-center justify-between">
+                                            <span><i class="fas fa-arrows-alt-v text-orange-600 mr-2"></i>2. VÁSTAGO</span>
+                                            <i class="fas fa-chevron-down text-orange-600" id="vastago-icon"></i>
+                                        </h5>
+                                    </div>
+                                    <div id="vastago-detail" class="hidden p-4">
+                                        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                                            <div>
+                                                <h6 class="font-bold text-green-700 mb-3">VÁSTAGO ESTÁNDAR (STD) - 3 procesos</h6>
+                                                <div class="space-y-2">
+                                                    <div class="flex items-center p-2 bg-green-50 rounded">
+                                                        <span class="w-6 h-6 bg-green-500 text-white text-center rounded mr-3 text-xs font-bold">1</span>
+                                                        <div>
+                                                            <span class="font-medium text-sm">RELV</span>
+                                                            <p class="text-xs text-gray-600">Rellenado de alojamiento de vástago</p>
+                                                        </div>
+                                                    </div>
+                                                    <div class="flex items-center p-2 bg-green-50 rounded">
+                                                        <span class="w-6 h-6 bg-green-500 text-white text-center rounded mr-3 text-xs font-bold">2</span>
+                                                        <div>
+                                                            <span class="font-medium text-sm">BARV</span>
+                                                            <p class="text-xs text-gray-600">Barrenado de alojamiento de vástago</p>
+                                                        </div>
+                                                    </div>
+                                                    <div class="flex items-center p-2 bg-green-50 rounded">
+                                                        <span class="w-6 h-6 bg-green-500 text-white text-center rounded mr-3 text-xs font-bold">3</span>
+                                                        <div>
+                                                            <span class="font-medium text-sm">CROV</span>
+                                                            <p class="text-xs text-gray-600">Cromado de vástago</p>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <p class="text-xs text-green-700 font-medium mt-2">Secuencia: Rellenado → Barrenado → Cromado</p>
+                                            </div>
+                                            
+                                            <div>
+                                                <h6 class="font-bold text-red-700 mb-3">VÁSTAGO NO ESTÁNDAR (NO STD) - 8 procesos</h6>
+                                                <div class="space-y-1 max-h-64 overflow-y-auto">
+                                                    <div class="flex items-center p-1 bg-red-50 rounded text-xs">
+                                                        <span class="w-5 h-5 bg-red-500 text-white text-center rounded mr-2 text-xs font-bold">1</span>
+                                                        <span class="font-medium">COR-V</span> - Corte de vástago
+                                                    </div>
+                                                    <div class="flex items-center p-1 bg-red-50 rounded text-xs">
+                                                        <span class="w-5 h-5 bg-red-500 text-white text-center rounded mr-2 text-xs font-bold">2</span>
+                                                        <span class="font-medium">ENC-CV</span> - Encastre de cáncamo de vástago
+                                                    </div>
+                                                    <div class="flex items-center p-1 bg-red-50 rounded text-xs">
+                                                        <span class="w-5 h-5 bg-red-500 text-white text-center rounded mr-2 text-xs font-bold">3</span>
+                                                        <span class="font-medium">ENC-BV</span> - Encastre de barra de vástago
+                                                    </div>
+                                                    <div class="flex items-center p-1 bg-red-50 rounded text-xs">
+                                                        <span class="w-5 h-5 bg-red-500 text-white text-center rounded mr-2 text-xs font-bold">4</span>
+                                                        <span class="font-medium">MAQ-EV</span> - Maquinado de espiga de vástago
+                                                    </div>
+                                                    <div class="flex items-center p-1 bg-red-50 rounded text-xs">
+                                                        <span class="w-5 h-5 bg-red-500 text-white text-center rounded mr-2 text-xs font-bold">5</span>
+                                                        <span class="font-medium">SOL-JV</span> - Soldadura de junta de vástago
+                                                    </div>
+                                                    <div class="flex items-center p-1 bg-red-50 rounded text-xs">
+                                                        <span class="w-5 h-5 bg-red-500 text-white text-center rounded mr-2 text-xs font-bold">6</span>
+                                                        <span class="font-medium">RELV</span> - Rellenado de alojamiento
+                                                    </div>
+                                                    <div class="flex items-center p-1 bg-red-50 rounded text-xs">
+                                                        <span class="w-5 h-5 bg-red-500 text-white text-center rounded mr-2 text-xs font-bold">7</span>
+                                                        <span class="font-medium">MAQ-SV</span> - Maquinado de soldadura
+                                                    </div>
+                                                    <div class="flex items-center p-1 bg-red-50 rounded text-xs">
+                                                        <span class="w-5 h-5 bg-red-500 text-white text-center rounded mr-2 text-xs font-bold">8</span>
+                                                        <span class="font-medium">FAB-BV</span> - Fabricación bocina vástago
+                                                    </div>
+                                                </div>
+                                                <p class="text-xs text-red-700 font-medium mt-2">Nota: Incluye procesos de encastre, soldadura y fabricación</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- TAPA y PISTÓN simplificados -->
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div class="border border-gray-200 rounded-lg">
+                                        <div class="bg-green-50 p-3">
+                                            <h5 class="font-bold text-green-800"><i class="fas fa-circle text-green-600 mr-2"></i>3. TAPA</h5>
+                                            <div class="mt-2 text-sm">
+                                                <p class="text-xs"><strong>Sección 1:</strong> PUL-T (Pulido)</p>
+                                                <p class="text-xs"><strong>Sección 2:</strong> REC-T (Rectificado), FAB-T (Fabricación)</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="border border-gray-200 rounded-lg">
+                                        <div class="bg-purple-50 p-3">
+                                            <h5 class="font-bold text-purple-800"><i class="fas fa-circle text-purple-600 mr-2"></i>4. PISTÓN</h5>
+                                            <div class="mt-2 text-sm">
+                                                <p class="text-xs"><strong>Sección 1:</strong> PUL-P (Pulido)</p>
+                                                <p class="text-xs"><strong>Sección 2:</strong> REC-P (Rectificado), FAB-P (Fabricación)</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Análisis de Procesos -->
+                        <div class="mb-8">
+                            <h4 class="text-lg font-bold text-gray-800 mb-4">ANÁLISIS DE PROCESOS</h4>
+                            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                                <div class="bg-blue-50 p-4 rounded-lg">
+                                    <h6 class="font-bold text-blue-800 mb-2">Acabado Superficial</h6>
+                                    <div class="text-xs space-y-1">
+                                        <span class="block bg-blue-100 px-2 py-1 rounded">BRUC - Bruñido</span>
+                                        <span class="block bg-blue-100 px-2 py-1 rounded">CROV - Cromado</span>
+                                        <span class="block bg-blue-100 px-2 py-1 rounded">PUL - Pulido</span>
+                                        <span class="block bg-blue-100 px-2 py-1 rounded">REC - Rectificado</span>
+                                    </div>
+                                </div>
+                                <div class="bg-green-50 p-4 rounded-lg">
+                                    <h6 class="font-bold text-green-800 mb-2">Maquinado</h6>
+                                    <div class="text-xs space-y-1">
+                                        <span class="block bg-green-100 px-2 py-1 rounded">BAR - Barrenado</span>
+                                        <span class="block bg-green-100 px-2 py-1 rounded">MAQ-ENC - Encastres</span>
+                                        <span class="block bg-green-100 px-2 py-1 rounded">MAQ-EV - Espiga</span>
+                                        <span class="block bg-green-100 px-2 py-1 rounded">MAQ-DSAL - Diámetro</span>
+                                    </div>
+                                </div>
+                                <div class="bg-orange-50 p-4 rounded-lg">
+                                    <h6 class="font-bold text-orange-800 mb-2">Unión</h6>
+                                    <div class="text-xs space-y-1">
+                                        <span class="block bg-orange-100 px-2 py-1 rounded">SOL-J - Soldadura juntas</span>
+                                        <span class="block bg-orange-100 px-2 py-1 rounded">SOLD - Soldadura</span>
+                                        <span class="block bg-orange-100 px-2 py-1 rounded">ENC - Encastre</span>
+                                    </div>
+                                </div>
+                                <div class="bg-purple-50 p-4 rounded-lg">
+                                    <h6 class="font-bold text-purple-800 mb-2">Fabricación</h6>
+                                    <div class="text-xs space-y-1">
+                                        <span class="block bg-purple-100 px-2 py-1 rounded">COR - Corte</span>
+                                        <span class="block bg-purple-100 px-2 py-1 rounded">REL - Rellenado</span>
+                                        <span class="block bg-purple-100 px-2 py-1 rounded">FAB - Fabricación</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Resumen Estadístico -->
+                        <div class="bg-gray-50 rounded-lg p-6">
+                            <h4 class="text-lg font-bold text-gray-800 mb-4">RESUMEN ESTADÍSTICO</h4>
+                            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                                <div class="text-center">
+                                    <div class="text-2xl font-bold text-blue-600">4</div>
+                                    <div class="text-sm text-gray-600">Componentes únicos</div>
+                                </div>
+                                <div class="text-center">
+                                    <div class="text-2xl font-bold text-green-600">30</div>
+                                    <div class="text-sm text-gray-600">Total procesos</div>
+                                </div>
+                                <div class="text-center">
+                                    <div class="text-2xl font-bold text-orange-600">13</div>
+                                    <div class="text-sm text-gray-600">Procesos STD</div>
+                                </div>
+                                <div class="text-center">
+                                    <div class="text-2xl font-bold text-red-600">18</div>
+                                    <div class="text-sm text-gray-600">Procesos NO STD</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <script>
+                function toggleProcessDetail(component) {
+                    const detail = document.getElementById(component + '-detail');
+                    const icon = document.getElementById(component + '-icon');
+                    
+                    if (detail.classList.contains('hidden')) {
+                        detail.classList.remove('hidden');
+                        icon.classList.replace('fa-chevron-down', 'fa-chevron-up');
+                    } else {
+                        detail.classList.add('hidden');
+                        icon.classList.replace('fa-chevron-up', 'fa-chevron-down');
+                    }
+                }
+            </script>
+                <div class="grid grid-cols-1 lg:grid-cols-4 gap-4">
+                    <div class="bg-gradient-to-br from-blue-400 to-blue-600 rounded-lg p-6 text-white text-center">
+                        <i class="fas fa-boxes text-3xl mb-3"></i>
+                        <h4 class="font-bold mb-1">Total Items</h4>
+                        <div class="text-2xl font-bold">1,247</div>
+                    </div>
+                    <div class="bg-gradient-to-br from-green-400 to-green-600 rounded-lg p-6 text-white text-center">
+                        <i class="fas fa-dollar-sign text-3xl mb-3"></i>
+                        <h4 class="font-bold mb-1">Valor Total</h4>
+                        <div class="text-2xl font-bold">$125,890</div>
+                    </div>
+                    <div class="bg-gradient-to-br from-orange-400 to-orange-600 rounded-lg p-6 text-white text-center">
+                        <i class="fas fa-exclamation-triangle text-3xl mb-3"></i>
+                        <h4 class="font-bold mb-1">Stock Mínimo</h4>
+                        <div class="text-2xl font-bold">23</div>
+                    </div>
+                    <div class="bg-gradient-to-br from-purple-400 to-purple-600 rounded-lg p-6 text-white text-center">
+                        <i class="fas fa-chart-line text-3xl mb-3"></i>
+                        <h4 class="font-bold mb-1">Rotación</h4>
+                        <div class="text-2xl font-bold">4.2x</div>
+                    </div>
+                </div>
+
+                <div class="mt-8 grid grid-cols-1 lg:grid-cols-2 gap-8">
+                    <div class="bg-white rounded-lg shadow-lg p-6">
+                        <h3 class="text-lg font-bold text-gray-800 mb-4">Gráfico de Movimientos</h3>
+                        <div class="h-64 flex items-center justify-center bg-gray-50 rounded-lg">
+                            <p class="text-gray-500">Gráfico interactivo aquí</p>
+                        </div>
+                    </div>
+
+                    <div class="bg-white rounded-lg shadow-lg p-6">
+                        <h3 class="text-lg font-bold text-gray-800 mb-4">Top 5 Productos Más Utilizados</h3>
+                        <div class="space-y-3">
+                            <div class="flex justify-between items-center">
+                                <span>Tornillos M8</span>
+                                <div class="flex items-center">
+                                    <div class="w-20 h-2 bg-gray-200 rounded-full mr-3">
+                                        <div class="w-4/5 h-2 bg-blue-600 rounded-full"></div>
+                                    </div>
+                                    <span class="text-sm font-medium">80%</span>
+                                </div>
+                            </div>
+                            <!-- Más items aquí -->
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
 
+    <!-- Footer -->
+    <footer class="bg-gray-800 text-white mt-12 py-6">
+        <div class="container mx-auto px-6 text-center">
+            <p class="text-sm">© 2024 HP&K ERP - Sistema Integral de Gestión Empresarial</p>
+            <p class="text-xs text-gray-400 mt-2">Desarrollado para Monasterio HP&K</p>
+        </div>
+    </footer>
+
     <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            updateTimestamp();
-            loadDashboardData();
-            loadRecentOrders();
-            setInterval(updateTimestamp, 60000);
-        });
-
-        function updateTimestamp() {
-            const now = new Date();
-            document.getElementById('lastUpdate').textContent = now.toLocaleTimeString('es-ES');
-        }
-
-        async function loadDashboardData() {
-            try {
-                const [ordenes, equipos, materiales, clientes] = await Promise.all([
-                    fetch('/api/operativos/ordenes-trabajo').then(r => r.json()).catch(() => []),
-                    fetch('/api/maestros/equipos').then(r => r.json()).catch(() => []),
-                    fetch('/api/maestros/materiales').then(r => r.json()).catch(() => []),
-                    fetch('/api/catalogo/clientes').then(r => r.json()).catch(() => [])
-                ]);
-
-                animateCounter('ordenesActivas', ordenes.length);
-                animateCounter('equiposTotal', equipos.length);
-                animateCounter('materialesTotal', materiales.length);
-                animateCounter('clientesTotal', clientes.length);
-            } catch (error) {
-                console.error('Error al cargar datos del dashboard:', error);
+        // Función para mostrar el módulo de logística
+        function showLogisticsModule() {
+            console.log('showLogisticsModule called'); // Debug
+            // Ocultar el grid de módulos principales
+            const mainGrid = document.getElementById('main-modules-grid');
+            if (mainGrid) {
+                mainGrid.style.display = 'none';
+                console.log('Main grid hidden'); // Debug
+            } else {
+                console.error('main-modules-grid not found'); // Debug
             }
+            
+            // Mostrar el submenu de logística  
+            const logisticsSubmenu = document.getElementById('logistics-submenu');
+            if (logisticsSubmenu) {
+                logisticsSubmenu.style.display = 'block';
+                console.log('Logistics submenu shown'); // Debug
+            } else {
+                console.error('logistics-submenu not found'); // Debug
+            }
+            
+            // Actualizar el breadcrumb
+            updateBreadcrumb(['Dashboard', 'Logística']);
         }
 
-        function animateCounter(id, target) {
-            const element = document.getElementById(id);
-            const duration = 1000;
-            const start = 0;
-            const increment = target / (duration / 16);
-            let current = start;
+        // Función para mostrar un submódulo específico
+        function showSubmodule(submoduleName) {
+            // Ocultar todas las secciones de contenido
+            const contentSections = document.querySelectorAll('.content-section');
+            contentSections.forEach(section => {
+                section.classList.remove('active');
+            });
+            
+            // Mostrar la sección correspondiente
+            const targetContent = document.getElementById(submoduleName.toLowerCase() + '-content');
+            if (targetContent) {
+                targetContent.classList.add('active');
+            }
+            
+            // Determinar el módulo padre basado en el submódulo
+            let parentModule = 'Logística';
+            const productionSubmods = ['basededatos', 'dashboardprod', 'requerimientos', 'planificacion', 'programacion'];
+            if (productionSubmods.includes(submoduleName)) {
+                parentModule = 'Producción';
+            }
+            
+            // Actualizar el breadcrumb
+            updateBreadcrumb(['Dashboard', parentModule, getSubmoduleDisplayName(submoduleName)]);
+        }
 
-            const timer = setInterval(() => {
-                current += increment;
-                if (current >= target) {
-                    element.textContent = target;
-                    clearInterval(timer);
+        // Función para volver al menu principal de módulos
+        function backToMainModules() {
+            console.log('backToMainModules called'); // Debug
+            // Mostrar el grid de módulos principales
+            const mainGrid = document.getElementById('main-modules-grid');
+            if (mainGrid) {
+                mainGrid.style.display = 'grid';
+                console.log('Main grid shown'); // Debug
+            }
+            
+            // Ocultar todos los submenus
+            const logisticsSubmenu = document.getElementById('logistics-submenu');
+            const productionSubmenu = document.getElementById('production-submenu');
+            if (logisticsSubmenu) {
+                logisticsSubmenu.style.display = 'none';
+                console.log('Logistics submenu hidden'); // Debug
+            }
+            if (productionSubmenu) {
+                productionSubmenu.style.display = 'none';
+                console.log('Production submenu hidden'); // Debug
+            }
+            
+            // Mostrar el contenido por defecto
+            const contentSections = document.querySelectorAll('.content-section');
+            contentSections.forEach(section => {
+                section.classList.remove('active');
+            });
+            
+            const defaultContent = document.getElementById('default-content');
+            if (defaultContent) {
+                defaultContent.classList.add('active');
+            }
+            
+            // Actualizar el breadcrumb
+            updateBreadcrumb(['Dashboard']);
+        }
+
+        // Función auxiliar para obtener el nombre de visualización del submódulo
+        function getSubmoduleDisplayName(submoduleName) {
+            const displayNames = {
+                // Logística
+                'almacen': 'Almacén',
+                'compras': 'Compras',  
+                'recursos': 'Recursos Solicitados',
+                'transporte': 'Transporte',
+                'dashboard': 'Dashboard',
+                // Producción
+                'basededatos': 'Base de Datos',
+                'dashboardprod': 'Dashboard',
+                'requerimientos': 'Requerimientos',
+                'planificacion': 'Planificación',
+                'programacion': 'Programación'
+            };
+            return displayNames[submoduleName] || submoduleName;
+        }
+
+        // Función para actualizar el breadcrumb
+        function updateBreadcrumb(items) {
+            const breadcrumb = document.getElementById('breadcrumb');
+            breadcrumb.innerHTML = items.map((item, index) => {
+                if (index === items.length - 1) {
+                    return `<span class="text-blue-600">${item}</span>`;
                 } else {
-                    element.textContent = Math.floor(current);
+                    return `<span class="text-gray-500">${item}</span>`;
                 }
-            }, 16);
+            }).join(' <i class="fas fa-chevron-right text-gray-400 mx-2"></i> ');
         }
 
-        async function loadRecentOrders() {
-            try {
-                const response = await fetch('/api/operativos/ordenes-trabajo');
-                const ordenes = await response.json();
+        // Función para manejar clics en las tarjetas del submódulo
+        function handleSubmoduleClick(submoduleName) {
+            // Remover la clase active de todas las tarjetas
+            document.querySelectorAll('.submenu-card').forEach(card => {
+                card.classList.remove('ring-2', 'ring-opacity-50');
+                card.classList.remove('ring-blue-400', 'ring-green-400', 'ring-purple-400', 'ring-orange-400', 'ring-cyan-400');
+            });
+            
+            // Añadir la clase active a la tarjeta seleccionada
+            if (event.target.closest('.submenu-card')) {
+                event.target.closest('.submenu-card').classList.add('ring-2', 'ring-opacity-50');
                 
-                const tbody = document.getElementById('ordenesRecientes');
-                const recientes = ordenes.slice(0, 5);
+                // Determinar el color del anillo basado en el submódulo
+                const ringColors = {
+                    // Logística
+                    'almacen': 'ring-blue-400',
+                    'compras': 'ring-green-400',
+                    'recursos': 'ring-purple-400', 
+                    'transporte': 'ring-orange-400',
+                    'dashboard': 'ring-cyan-400',
+                    // Producción
+                    'basededatos': 'ring-cyan-400',
+                    'dashboardprod': 'ring-blue-400',
+                    'requerimientos': 'ring-purple-400',
+                    'planificacion': 'ring-orange-400',
+                    'programacion': 'ring-green-400'
+                };
                 
-                if (recientes.length === 0) {
-                    tbody.innerHTML = '<tr><td colspan="5" class="px-6 py-8 text-center text-gray-600">No hay órdenes registradas</td></tr>';
-                    return;
+                if (ringColors[submoduleName]) {
+                    event.target.closest('.submenu-card').classList.add(ringColors[submoduleName]);
                 }
-                
-                tbody.innerHTML = recientes.map(orden => `
-                    <tr class="hover:bg-gray-50 transition">
-                        <td class="px-6 py-4">
-                            <span class="font-semibold text-blue-600">${orden.numero_ot}</span>
-                        </td>
-                        <td class="px-6 py-4 text-gray-700">${orden.Cliente?.descripcion || '-'}</td>
-                        <td class="px-6 py-4">
-                            <span class="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-xs font-semibold">
-                                ${orden.OtStatus?.descripcion || 'N/A'}
-                            </span>
-                        </td>
-                        <td class="px-6 py-4 text-gray-600">
-                            <i class="far fa-calendar mr-2"></i>${new Date(orden.fecha_creacion).toLocaleDateString()}
-                        </td>
-                        <td class="px-6 py-4 text-center">
-                            <a href="/operativos/ordenes-trabajo?id=${orden.ot_id}" 
-                               class="inline-flex items-center px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg transition">
-                                <i class="fas fa-eye mr-2"></i>Ver
-                            </a>
-                        </td>
-                    </tr>
-                `).join('');
-            } catch (error) {
-                console.error('Error:', error);
-                document.getElementById('ordenesRecientes').innerHTML = 
-                    '<tr><td colspan="5" class="px-6 py-8 text-center text-red-600">Error al cargar órdenes</td></tr>';
+            }
+            
+            // Mostrar el contenido del submódulo
+            showSubmodule(submoduleName);
+        }
+
+        // Funciones placeholder para otros módulos
+        function showProductionModule() {
+            console.log('showProductionModule called'); // Debug
+            // Ocultar el grid de módulos principales
+            const mainGrid = document.getElementById('main-modules-grid');
+            if (mainGrid) {
+                mainGrid.style.display = 'none';
+                console.log('Main grid hidden for production'); // Debug
+            }
+            
+            // Mostrar el submenu de producción  
+            const productionSubmenu = document.getElementById('production-submenu');
+            if (productionSubmenu) {
+                productionSubmenu.style.display = 'block';
+                console.log('Production submenu shown'); // Debug
+            }
+            
+            // Actualizar el breadcrumb
+            updateBreadcrumb(['Dashboard', 'Producción']);
+        }
+
+        function showMaintenanceModule() {
+            alert('Módulo de Mantenimiento - En desarrollo');
+            console.log('showMaintenanceModule called - placeholder');
+        }
+
+        // Funciones del dropdown y efectos originales
+        function toggleDropdown(event, button) {
+            event.stopPropagation();
+            const dropdown = button.closest('.dropdown');
+            const isActive = dropdown.classList.contains('active');
+            
+            // Close all dropdowns
+            document.querySelectorAll('.dropdown').forEach(d => d.classList.remove('active'));
+            
+            // Toggle current dropdown
+            if (!isActive) {
+                dropdown.classList.add('active');
             }
         }
+
+        function closeAllDropdowns(event) {
+            if (!event.target.closest('.dropdown')) {
+                document.querySelectorAll('.dropdown').forEach(d => d.classList.remove('active'));
+            }
+        }
+
+        // Inicialización al cargar la página
+        document.addEventListener('DOMContentLoaded', function() {
+            // Asegurar que el contenido por defecto esté visible
+            document.getElementById('default-content').classList.add('active');
+            
+            // Configurar el breadcrumb inicial
+            updateBreadcrumb(['Dashboard']);
+            
+            // Añadir event listeners a las tarjetas del submódulo (logística y producción)
+            document.querySelectorAll('.submenu-card').forEach(card => {
+                card.addEventListener('click', function() {
+                    const submoduleText = this.querySelector('h3').textContent.toLowerCase();
+                    let submoduleName;
+                    
+                    // Mapeo específico para los nombres de submódulos de logística
+                    if (submoduleText.includes('almacén')) submoduleName = 'almacen';
+                    else if (submoduleText.includes('compras')) submoduleName = 'compras';
+                    else if (submoduleText.includes('recursos')) submoduleName = 'recursos';
+                    else if (submoduleText.includes('transporte')) submoduleName = 'transporte';
+                    else if (submoduleText.includes('dashboard')) {
+                        // Distinguir entre dashboard de logística y producción
+                        const isInProduction = this.closest('#production-submenu');
+                        submoduleName = isInProduction ? 'dashboardprod' : 'dashboard';
+                    }
+                    // Mapeo específico para los nombres de submódulos de producción
+                    else if (submoduleText.includes('base de datos')) submoduleName = 'basededatos';
+                    else if (submoduleText.includes('requerimientos')) submoduleName = 'requerimientos';
+                    else if (submoduleText.includes('planificación')) submoduleName = 'planificacion';
+                    else if (submoduleText.includes('programación')) submoduleName = 'programacion';
+                    
+                    if (submoduleName) {
+                        handleSubmoduleClick(submoduleName);
+                    }
+                });
+            });
+            
+            // Add hover effect to module cards
+            document.querySelectorAll('.module-card').forEach(card => {
+                card.addEventListener('mouseenter', function() {
+                    this.style.transform = 'translateY(-8px) scale(1.02)';
+                });
+                
+                card.addEventListener('mouseleave', function() {
+                    this.style.transform = '';
+                });
+            });
+            
+            // Añadir event listener para cerrar dropdowns
+            document.addEventListener('click', closeAllDropdowns);
+        });
     </script>
 </body>
 </html>

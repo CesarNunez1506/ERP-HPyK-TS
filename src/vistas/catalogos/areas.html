@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Áreas - HP&K ERP</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="/vistas/shared/navigation.js"></script>
+    <style>
+        .dropdown-menu { display: none; }
+        .dropdown.active .dropdown-menu { display: block; }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <!-- Navigation Menu will be loaded here -->
+    <div id="navigation-container"></div>
+
+    <div class="container mx-auto px-6 py-8">
+        <div class="bg-white rounded-lg shadow-lg p-6 mb-8">
+            <div class="flex justify-between items-center">
+                <div>
+                    <h1 class="text-3xl font-bold text-gray-800 flex items-center">
+                        <i class="fas fa-map-marked-alt text-cyan-600 mr-3"></i>
+                        Gestión de Áreas
+                    </h1>
+                    <p class="text-gray-600 mt-1">Catálogo de Áreas y Sectores</p>
+                </div>
+                <button onclick="showCreateForm()" class="bg-gradient-to-r from-cyan-500 to-cyan-600 hover:from-cyan-600 hover:to-cyan-700 text-white px-6 py-3 rounded-lg shadow-lg transition flex items-center">
+                    <i class="fas fa-plus mr-2"></i> Nueva Área
+                </button>
+            </div>
+        </div>
+
+        <div id="formSection" class="hidden bg-white rounded-lg shadow-lg p-6 mb-8">
+            <h3 class="text-2xl font-bold text-gray-800 mb-6" id="formTitle">Nueva Área</h3>
+            <form id="areaForm" class="space-y-6">
+                <div class="bg-gray-50 rounded-lg p-4">
+                    <h4 class="text-lg font-semibold text-gray-700 mb-4 flex items-center">
+                        <i class="fas fa-id-card text-cyan-600 mr-2"></i>
+                        Información del Área
+                    </h4>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Código*</label>
+                            <input type="text" id="codigo" maxlength="10" required class="w-full px-3 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-cyan-500 focus:border-transparent">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Nombre*</label>
+                            <input type="text" id="nombre" maxlength="100" required class="w-full px-3 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-cyan-500 focus:border-transparent">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Planta*</label>
+                            <select id="planta_id" required class="w-full px-3 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-cyan-500 focus:border-transparent">
+                                <option value="">Seleccione planta...</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="flex items-center cursor-pointer">
+                                <input type="checkbox" id="activo" checked class="w-4 h-4 text-cyan-600 border-gray-300 rounded focus:ring-cyan-500">
+                                <span class="ml-2 text-sm font-medium text-gray-700">Área Activa</span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flex gap-4 pt-4">
+                    <button type="submit" class="flex-1 bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white px-6 py-3 rounded-lg shadow-lg transition flex items-center justify-center">
+                        <i class="fas fa-save mr-2"></i> Guardar
+                    </button>
+                    <button type="button" onclick="cancelForm()" class="flex-1 bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white px-6 py-3 rounded-lg shadow-lg transition flex items-center justify-center">
+                        <i class="fas fa-times mr-2"></i> Cancelar
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <div class="bg-white rounded-lg shadow-lg p-6 mb-8">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <input type="text" id="searchInput" placeholder="Buscar área..." onkeyup="filterTable()" class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-500">
+                <button onclick="clearFilters()" class="bg-gray-300 hover:bg-gray-400 text-gray-800 px-4 py-2 rounded-lg transition">
+                    <i class="fas fa-redo mr-2"></i> Limpiar
+                </button>
+            </div>
+        </div>
+
+        <div class="bg-white rounded-lg shadow-lg overflow-hidden">
+            <div class="overflow-x-auto">
+                <table class="min-w-full">
+                    <thead class="bg-gradient-to-r from-gray-100 to-gray-200">
+                        <tr>
+                            <th class="px-6 py-4 text-left text-xs font-bold text-gray-700 uppercase">Código</th>
+                            <th class="px-6 py-4 text-left text-xs font-bold text-gray-700 uppercase">Nombre</th>
+                            <th class="px-6 py-4 text-left text-xs font-bold text-gray-700 uppercase">Planta</th>
+                            <th class="px-6 py-4 text-left text-xs font-bold text-gray-700 uppercase">Estado</th>
+                            <th class="px-6 py-4 text-center text-xs font-bold text-gray-700 uppercase">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tableBody" class="divide-y divide-gray-200"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div id="toast" class="hidden fixed top-4 right-4 px-6 py-4 rounded-lg shadow-lg z-50 text-white">
+        <div class="flex items-center">
+            <i class="fas fa-check-circle mr-2"></i>
+            <span id="toastMessage"></span>
+        </div>
+    </div>
+
+    <script>
+        let areas = []; // Inicialización segura como array
+        let editingCodigo = null;
+
+        // Verificar inicialización al cargar
+        console.log('Initial areas variable:', areas, 'Type:', typeof areas, 'IsArray:', Array.isArray(areas));
+
+        function toggleDropdown(event, button) {
+            event.stopPropagation();
+            const dropdown = button.closest('.dropdown');
+            const isActive = dropdown.classList.contains('active');
+            document.querySelectorAll('.dropdown').forEach(d => d.classList.remove('active'));
+            if (!isActive) dropdown.classList.add('active');
+        }
+
+        function closeAllDropdowns(event) {
+            if (!event.target.closest('.dropdown')) {
+                document.querySelectorAll('.dropdown').forEach(d => d.classList.remove('active'));
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            loadAreas();
+            loadPlantas();
+            
+            // Cerrar dropdowns al hacer clic fuera
+            document.body.addEventListener('click', (event) => {
+                if (!event.target.closest('.dropdown')) {
+                    document.querySelectorAll('.dropdown').forEach(d => d.classList.remove('active'));
+                }
+            });
+        });
+
+        function showToast(message, type = 'success') {
+            const toast = document.getElementById('toast');
+            const toastMessage = document.getElementById('toastMessage');
+            toastMessage.textContent = message;
+            
+            toast.classList.remove('hidden', 'bg-green-500', 'bg-red-500', 'bg-blue-500');
+            toast.classList.add(type === 'success' ? 'bg-green-500' : type === 'error' ? 'bg-red-500' : 'bg-blue-500');
+            
+            setTimeout(() => toast.classList.add('hidden'), 3000);
+        }
+
+        function showCreateForm() {
+            editingCodigo = null;
+            document.getElementById('formSection').classList.remove('hidden');
+            document.getElementById('formTitle').textContent = 'Nueva Área';
+            document.getElementById('areaForm').reset();
+            document.getElementById('codigo').disabled = false;
+            document.getElementById('activo').checked = true;
+            document.getElementById('codigo').focus();
+        }
+
+        function showToast(message, type = 'success') {
+            const toast = document.getElementById('toast');
+            toast.className = `fixed top-4 right-4 px-6 py-4 rounded-lg shadow-lg z-50 text-white ${type === 'success' ? 'bg-green-500' : 'bg-red-500'}`;
+            document.getElementById('toastMessage').textContent = message;
+            toast.classList.remove('hidden');
+            setTimeout(() => toast.classList.add('hidden'), 3000);
+        }
+
+        async function loadPlantas() {
+            try {
+                const response = await fetch('/api/catalogos/plantas');
+                const plantas = await response.json();
+                const select = document.getElementById('planta_id');
+                select.innerHTML = '<option value="">Seleccione planta...</option>';
+                plantas.forEach(p => {
+                    select.innerHTML += `<option value="${p.codigo}">${p.nombre}</option>`;
+                });
+            } catch (error) {
+                console.error('Error:', error);
+            }
+        }
+
+        async function loadAreas() {
+            console.log('loadAreas called. Current areas:', areas);
+            
+            // Asegurar que areas sea un array desde el inicio
+            if (!Array.isArray(areas)) {
+                console.warn('areas was not an array, resetting to []');
+                areas = [];
+            }
+            
+            try {
+                console.log('Fetching /api/catalogos/areas...');
+                const response = await fetch('/api/catalogos/areas');
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                const data = await response.json();
+                console.log('Data received from API:', data, 'Type:', typeof data, 'IsArray:', Array.isArray(data));
+                
+                // Validación ultra robusta
+                if (Array.isArray(data)) {
+                    areas = data;
+                    console.log('areas set successfully:', areas.length, 'items');
+                } else {
+                    console.error('API did not return an array:', data);
+                    areas = [];
+                    showToast('Error: datos inválidos recibidos', 'error');
+                }
+                
+                renderTable();
+            } catch (error) {
+                console.error('Error loading areas:', error);
+                areas = []; // Forzar array vacío
+                showToast('Error al cargar áreas: ' + error.message, 'error');
+                renderTable(); // Mostrar tabla vacía en caso de error
+            }
+        }
+
+        function renderTable() {
+            console.log('renderTable called. areas:', areas, 'Type:', typeof areas, 'IsArray:', Array.isArray(areas));
+            
+            const tbody = document.getElementById('tableBody');
+            if (!tbody) {
+                console.error('tableBody element not found!');
+                return;
+            }
+            
+            tbody.innerHTML = '';
+            
+            // Verificación super robusta
+            if (areas === null || areas === undefined) {
+                console.error('areas is null or undefined');
+                areas = [];
+            }
+            
+            if (!Array.isArray(areas)) {
+                console.error('areas is not an array:', areas, typeof areas);
+                tbody.innerHTML = '<tr><td colspan="5" class="px-6 py-8 text-center text-red-500">Error: Datos inválidos</td></tr>';
+                return;
+            }
+            
+            if (areas.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="5" class="px-6 py-8 text-center text-gray-500">No hay áreas registradas</td></tr>';
+                return;
+            }
+            
+            console.log('About to process', areas.length, 'areas');
+            
+            try {
+                areas.forEach((area, index) => {
+                    console.log('Processing area', index, ':', area);
+                    const plantaNombre = area.planta ? area.planta.nombre : '-';
+                    tbody.innerHTML += `
+                        <tr class="hover:bg-gray-50 transition">
+                            <td class="px-6 py-4 text-sm font-semibold">${area.codigo || '-'}</td>
+                            <td class="px-6 py-4 text-sm">${area.nombre || '-'}</td>
+                            <td class="px-6 py-4 text-sm">${plantaNombre}</td>
+                            <td class="px-6 py-4"><span class="px-3 py-1 text-xs font-semibold rounded-full ${area.activo ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}">${area.activo ? 'Activa' : 'Inactiva'}</span></td>
+                            <td class="px-6 py-4 text-center">
+                                <button onclick="editArea('${area.codigo}')" class="text-blue-600 hover:text-blue-800 mx-1"><i class="fas fa-edit"></i></button>
+                                <button onclick="deleteArea('${area.codigo}')" class="text-red-600 hover:text-red-800 mx-1"><i class="fas fa-trash"></i></button>
+                            </td>
+                        </tr>
+                    `;
+                });
+                console.log('Table rendered successfully');
+            } catch (error) {
+                console.error('Error in forEach:', error);
+                tbody.innerHTML = '<tr><td colspan="5" class="px-6 py-8 text-center text-red-500">Error al renderizar datos</td></tr>';
+            }
+        }
+
+        function filterTable() {
+            const search = document.getElementById('searchInput').value.toLowerCase();
+            document.querySelectorAll('#tableBody tr').forEach(row => {
+                const text = row.textContent.toLowerCase();
+                row.style.display = text.includes(search) ? '' : 'none';
+            });
+        }
+
+        function clearFilters() {
+            document.getElementById('searchInput').value = '';
+            filterTable();
+        }
+
+        function cancelForm() {
+            document.getElementById('formSection').classList.add('hidden');
+            document.getElementById('areaForm').reset();
+            editingCodigo = null;
+        }
+
+        function editArea(codigo) {
+            const area = areas.find(a => a.codigo === codigo);
+            if (!area) return;
+            editingCodigo = codigo;
+            document.getElementById('formSection').classList.remove('hidden');
+            document.getElementById('formTitle').textContent = 'Editar Área';
+            document.getElementById('codigo').value = area.codigo || '';
+            document.getElementById('nombre').value = area.nombre || '';
+            document.getElementById('planta_id').value = area.planta_codigo || '';
+            document.getElementById('activo').checked = area.activo || false;
+        }
+
+        async function deleteArea(codigo) {
+            if (!confirm('¿Eliminar esta área?')) return;
+            try {
+                const response = await fetch(`/api/catalogos/areas/${codigo}`, {method: 'DELETE'});
+                if (response.ok) {
+                    showToast('Área eliminada', 'success');
+                    loadAreas();
+                } else {
+                    showToast('Error al eliminar', 'error');
+                }
+            } catch (error) {
+                showToast('Error al eliminar', 'error');
+            }
+        }
+
+        document.getElementById('areaForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const data = {
+                codigo: document.getElementById('codigo').value,
+                nombre: document.getElementById('nombre').value,
+                planta_codigo: document.getElementById('planta_id').value || null,
+                activo: document.getElementById('activo').checked
+            };
+            
+            try {
+                const url = editingCodigo ? `/api/catalogos/areas/${editingCodigo}` : '/api/catalogos/areas';
+                const response = await fetch(url, {
+                    method: editingCodigo ? 'PUT' : 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify(data)
+                });
+                
+                if (response.ok) {
+                    showToast(editingCodigo ? 'Área actualizada' : 'Área creada', 'success');
+                    cancelForm();
+                    loadAreas();
+                } else {
+                    showToast('Error al guardar', 'error');
+                }
+            } catch (error) {
+                showToast('Error al guardar', 'error');
+            }
+        });
+
+    </script>
+</body>
+</html>

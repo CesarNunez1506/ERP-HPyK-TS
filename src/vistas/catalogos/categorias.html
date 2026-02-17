@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Categorías - HP&K ERP</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="/vistas/shared/navigation.js"></script>
+    <style>
+    </style>
+</head>
+<body class="bg-gray-50">
+    <div id="navigation-container"></div>
+
+    <div class="bg-gradient-to-r from-gray-600 to-gray-800 text-white shadow-lg">
+        <div class="container mx-auto px-6 py-4">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center space-x-4">
+                    <i class="fas fa-tags text-3xl"></i>
+                    <div>
+                        <h1 class="text-2xl font-bold">Gestión de Categorías</h1>
+                        <p class="text-gray-200 text-sm">Clasificación y Organización</p>
+                    </div>
+                </div>
+                <div class="flex items-center space-x-3">
+                    <a href="/index.html" class="bg-gray-700 hover:bg-gray-800 px-4 py-2 rounded-lg transition">
+                        <i class="fas fa-home"></i> Inicio
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container mx-auto px-6 py-8">
+        <div class="bg-white rounded-lg shadow-lg p-6 mb-8">
+            <div class="flex justify-between items-center">
+                <div>
+                    <h1 class="text-3xl font-bold text-gray-800 flex items-center">
+                        <i class="fas fa-folder text-cyan-600 mr-3"></i>
+                        Gestión de Categorías
+                    </h1>
+                    <p class="text-gray-600 mt-1">Catálogo de Categorías de Inventario y Equipos</p>
+                </div>
+                <button onclick="showCreateForm()" class="bg-gradient-to-r from-cyan-500 to-cyan-600 hover:from-cyan-600 hover:to-cyan-700 text-white px-6 py-3 rounded-lg shadow-lg transition flex items-center">
+                    <i class="fas fa-plus mr-2"></i> Nueva Categoría
+                </button>
+            </div>
+        </div>
+
+        <div id="formSection" class="hidden bg-white rounded-lg shadow-lg p-6 mb-8">
+            <h3 class="text-2xl font-bold text-gray-800 mb-6" id="formTitle">Nueva Categoría</h3>
+            <form id="categoriaForm" class="space-y-6">
+                <div class="bg-gray-50 rounded-lg p-4">
+                    <h4 class="text-lg font-semibold text-gray-700 mb-4 flex items-center">
+                        <i class="fas fa-id-card text-cyan-600 mr-2"></i>
+                        Identificación
+                    </h4>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Código*</label>
+                            <input type="text" id="codigo" required maxlength="3" class="w-full px-3 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-cyan-500 focus:border-transparent" placeholder="Ej: MAT">
+                            <p class="text-xs text-gray-500 mt-1">Máximo 3 caracteres</p>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Descripción*</label>
+                            <input type="text" id="descripcion" required class="w-full px-3 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-cyan-500 focus:border-transparent" placeholder="Ej: Materiales">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-gray-50 rounded-lg p-4">
+                    <h4 class="text-lg font-semibold text-gray-700 mb-4 flex items-center">
+                        <i class="fas fa-toggle-on text-purple-600 mr-2"></i>
+                        Estado
+                    </h4>
+                    <div>
+                        <label class="flex items-center cursor-pointer">
+                            <input type="checkbox" id="activo" checked class="w-4 h-4 text-cyan-600 border-gray-300 rounded focus:ring-cyan-500">
+                            <span class="ml-2 text-sm font-medium text-gray-700">Categoría Activa</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="bg-gray-50 rounded-lg p-4">
+                    <h4 class="text-lg font-semibold text-gray-700 mb-4 flex items-center">
+                        <i class="fas fa-user text-pink-600 mr-2"></i>
+                        Usuario
+                    </h4>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">User_crea</label>
+                            <input type="text" id="user_crea" readonly class="w-full px-3 py-2 border border-gray-300 rounded bg-gray-100">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Fecha Creación</label>
+                            <input type="datetime-local" id="fecha_creacion" readonly class="w-full px-3 py-2 border border-gray-300 rounded bg-gray-100">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flex gap-4 pt-4">
+                    <button type="submit" class="flex-1 bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white px-6 py-3 rounded-lg shadow-lg transition flex items-center justify-center">
+                        <i class="fas fa-save mr-2"></i> Guardar
+                    </button>
+                    <button type="button" onclick="cancelForm()" class="flex-1 bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white px-6 py-3 rounded-lg shadow-lg transition flex items-center justify-center">
+                        <i class="fas fa-times mr-2"></i> Cancelar
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <div class="bg-white rounded-lg shadow-lg p-6 mb-8">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <input type="text" id="searchInput" placeholder="Buscar categoría..." onkeyup="filterTable()" class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-500">
+                <button onclick="clearFilters()" class="bg-gray-300 hover:bg-gray-400 text-gray-800 px-4 py-2 rounded-lg transition">
+                    <i class="fas fa-redo mr-2"></i> Limpiar
+                </button>
+            </div>
+        </div>
+
+        <div class="bg-white rounded-lg shadow-lg overflow-hidden">
+            <div class="overflow-x-auto">
+                <table class="min-w-full">
+                    <thead class="bg-gradient-to-r from-gray-100 to-gray-200">
+                        <tr>
+                            <th class="px-6 py-4 text-left text-xs font-bold text-gray-700 uppercase">Código</th>
+                            <th class="px-6 py-4 text-left text-xs font-bold text-gray-700 uppercase">Descripción</th>
+                            <th class="px-6 py-4 text-left text-xs font-bold text-gray-700 uppercase">Estado</th>
+                            <th class="px-6 py-4 text-center text-xs font-bold text-gray-700 uppercase">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tableBody" class="divide-y divide-gray-200"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div id="toast" class="hidden fixed top-4 right-4 px-6 py-4 rounded-lg shadow-lg z-50 text-white">
+        <div class="flex items-center">
+            <i class="fas fa-check-circle mr-2"></i>
+            <span id="toastMessage"></span>
+        </div>
+    </div>
+
+    <script>
+        let categorias = []; // Inicialización segura como array
+        let editingCodigo = null;
+
+        // Verificar inicialización al cargar
+        console.log('Initial categorias variable:', categorias, 'Type:', typeof categorias, 'IsArray:', Array.isArray(categorias));
+
+
+
+        document.addEventListener('DOMContentLoaded', () => {
+            loadCategorias();
+            document.getElementById('user_crea').value = 'Admin';
+        });
+
+        function showToast(message, type = 'success') {
+            const toast = document.getElementById('toast');
+            toast.className = `fixed top-4 right-4 px-6 py-4 rounded-lg shadow-lg z-50 text-white ${type === 'success' ? 'bg-green-500' : 'bg-red-500'}`;
+            document.getElementById('toastMessage').textContent = message;
+            toast.classList.remove('hidden');
+            setTimeout(() => toast.classList.add('hidden'), 3000);
+        }
+
+        async function loadCategorias() {
+            console.log('loadCategorias called. Current categorias:', categorias);
+            
+            // Asegurar que categorias sea un array desde el inicio
+            if (!Array.isArray(categorias)) {
+                console.warn('categorias was not an array, resetting to []');
+                categorias = [];
+            }
+            
+            try {
+                console.log('Fetching /api/catalogos/categorias...');
+                const response = await fetch('/api/catalogos/categorias');
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                const data = await response.json();
+                console.log('Data received from API:', data, 'Type:', typeof data, 'IsArray:', Array.isArray(data));
+                
+                // Validación ultra robusta
+                if (Array.isArray(data)) {
+                    categorias = data;
+                    console.log('categorias set successfully:', categorias.length, 'items');
+                } else {
+                    console.error('API did not return an array:', data);
+                    categorias = [];
+                    showToast('Error: datos inválidos recibidos', 'error');
+                }
+                
+                renderTable();
+            } catch (error) {
+                console.error('Error loading categorias:', error);
+                categorias = []; // Forzar array vacío
+                showToast('Error al cargar categorías: ' + error.message, 'error');
+                renderTable(); // Mostrar tabla vacía en caso de error
+            }
+        }
+
+        function renderTable() {
+            console.log('renderTable called. categorias:', categorias, 'Type:', typeof categorias, 'IsArray:', Array.isArray(categorias));
+            
+            const tbody = document.getElementById('tableBody');
+            if (!tbody) {
+                console.error('tableBody element not found!');
+                return;
+            }
+            
+            tbody.innerHTML = '';
+            
+            // Verificación super robusta
+            if (categorias === null || categorias === undefined) {
+                console.error('categorias is null or undefined');
+                categorias = [];
+            }
+            
+            if (!Array.isArray(categorias)) {
+                console.error('categorias is not an array:', categorias, typeof categorias);
+                tbody.innerHTML = '<tr><td colspan="4" class="px-6 py-8 text-center text-red-500">Error: Datos inválidos</td></tr>';
+                return;
+            }
+            
+            if (categorias.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="4" class="px-6 py-8 text-center text-gray-500">No hay categorías registradas</td></tr>';
+                return;
+            }
+            
+            console.log('About to process', categorias.length, 'categorias');
+            
+            try {
+                categorias.forEach((categoria, index) => {
+                    console.log('Processing categoria', index, ':', categoria);
+                    tbody.innerHTML += `
+                        <tr class="hover:bg-gray-50 transition">
+                            <td class="px-6 py-4 text-sm font-semibold">${categoria.codigo || '-'}</td>
+                            <td class="px-6 py-4 text-sm">${categoria.descripcion || '-'}</td>
+                            <td class="px-6 py-4"><span class="px-3 py-1 text-xs font-semibold rounded-full ${categoria.activo ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}">${categoria.activo ? 'Activa' : 'Inactiva'}</span></td>
+                            <td class="px-6 py-4 text-center">
+                                <button onclick="editCategoria('${categoria.codigo}')" class="text-blue-600 hover:text-blue-800 mx-1"><i class="fas fa-edit"></i></button>
+                                <button onclick="deleteCategoria('${categoria.codigo}')" class="text-red-600 hover:text-red-800 mx-1"><i class="fas fa-trash"></i></button>
+                            </td>
+                        </tr>
+                    `;
+                });
+                console.log('Table rendered successfully');
+            } catch (error) {
+                console.error('Error in forEach:', error);
+                tbody.innerHTML = '<tr><td colspan="4" class="px-6 py-8 text-center text-red-500">Error al renderizar datos</td></tr>';
+            }
+        }
+
+        function filterTable() {
+            const search = document.getElementById('searchInput').value.toLowerCase();
+            document.querySelectorAll('#tableBody tr').forEach(row => {
+                const text = row.textContent.toLowerCase();
+                row.style.display = text.includes(search) ? '' : 'none';
+            });
+        }
+
+        function clearFilters() {
+            document.getElementById('searchInput').value = '';
+            filterTable();
+        }
+
+        function showCreateForm() {
+            editingCodigo = null;
+            document.getElementById('formSection').classList.remove('hidden');
+            document.getElementById('formTitle').textContent = 'Nueva Categoría';
+            document.getElementById('categoriaForm').reset();
+            document.getElementById('user_crea').value = 'Admin';
+            document.getElementById('fecha_creacion').value = new Date().toISOString().slice(0, 16);
+            document.getElementById('activo').checked = true;
+            document.getElementById('codigo').removeAttribute('readonly');
+        }
+
+        function cancelForm() {
+            document.getElementById('formSection').classList.add('hidden');
+        }
+
+        function editCategoria(codigo) {
+            const categoria = categorias.find(c => c.codigo === codigo);
+            if (!categoria) return;
+            editingCodigo = codigo;
+            document.getElementById('formSection').classList.remove('hidden');
+            document.getElementById('formTitle').textContent = 'Editar Categoría';
+            document.getElementById('codigo').value = categoria.codigo || '';
+            document.getElementById('codigo').setAttribute('readonly', true);
+            document.getElementById('descripcion').value = categoria.descripcion || '';
+            document.getElementById('activo').checked = categoria.activo || false;
+        }
+
+        async function deleteCategoria(codigo) {
+            if (!confirm('¿Eliminar esta categoría?')) return;
+            try {
+                const response = await fetch(`/api/catalogos/categorias/${codigo}`, {method: 'DELETE'});
+                if (response.ok) {
+                    showToast('Categoría eliminada', 'success');
+                    loadCategorias();
+                } else {
+                    showToast('Error al eliminar', 'error');
+                }
+            } catch (error) {
+                showToast('Error al eliminar', 'error');
+            }
+        }
+
+        document.getElementById('categoriaForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const data = {
+                codigo: document.getElementById('codigo').value.toUpperCase(),
+                descripcion: document.getElementById('descripcion').value,
+                activo: document.getElementById('activo').checked,
+                user_crea: document.getElementById('user_crea').value
+            };
+            
+            try {
+                const url = editingCodigo ? `/api/catalogos/categorias/${editingCodigo}` : '/api/catalogos/categorias';
+                const response = await fetch(url, {
+                    method: editingCodigo ? 'PUT' : 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify(data)
+                });
+                
+                if (response.ok) {
+                    showToast(editingCodigo ? 'Categoría actualizada' : 'Categoría creada', 'success');
+                    cancelForm();
+                    loadCategorias();
+                } else {
+                    const error = await response.json();
+                    showToast(error.message || 'Error al guardar', 'error');
+                }
+            } catch (error) {
+                showToast('Error al guardar', 'error');
+            }
+        });
+    </script>
+</body>
+</html>

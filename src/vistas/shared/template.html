@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{TITLE}} - HP&K ERP</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="/vistas/shared/navigation.js"></script>
+    <style>
+        /* Agregar estilos específicos de la vista aquí */
+    </style>
+</head>
+<body class="bg-gray-50">
+    <!-- Navigation Menu will be loaded here -->
+    <div id="navigation-container"></div>
+
+    <!-- Header Section -->
+    <div class="bg-gradient-to-r from-blue-600 to-blue-800 text-white shadow-lg">
+        <div class="container mx-auto px-6 py-4">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center space-x-4">
+                    <i class="fas fa-{{ICON}} text-3xl"></i>
+                    <div>
+                        <h1 class="text-2xl font-bold">{{HEADER_TITLE}}</h1>
+                        <p class="text-blue-200 text-sm">{{HEADER_SUBTITLE}}</p>
+                    </div>
+                </div>
+                <div class="flex items-center space-x-3">
+                    <a href="/index.html" class="bg-blue-700 hover:bg-blue-800 px-4 py-2 rounded-lg transition">
+                        <i class="fas fa-home"></i> Inicio
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="container mx-auto px-6 py-6">
+        <!-- Aquí va el contenido específico de la vista -->
+    </div>
+
+    <script>
+        // Las funciones de dropdown son manejadas automáticamente por NavigationManager
+        // Agregar aquí solo las funciones específicas de la vista
+    </script>
+</body>
+</html>

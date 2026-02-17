@@ -1,15 +1,16 @@
 import { Request, Response } from 'express';
-import FlotaEquipo from '../../models/FlotaEquipo';
-import Categoria from '../../models/Categoria';
-import Fabricante from '../../models/Fabricante';
+import FlotaEquipo from '../../models/catalogs/FlotaEquipo';
+import Categoria from '../../models/catalogs/Categoria';
+import Fabricante from '../../models/catalogs/Fabricante';
 
 export const getAllFlotasEquipo = async (req: Request, res: Response) => {
   try {
     const flotas = await FlotaEquipo.findAll({
       include: [
-        { model: Categoria },
-        { model: Fabricante }
-      ]
+        { model: Categoria, as: 'categoria' },
+        { model: Fabricante, as: 'fabricante' }
+      ],
+      order: [['codigo', 'ASC']]
     });
     res.json(flotas);
   } catch (error) {
@@ -22,8 +23,8 @@ export const getFlotaEquipoById = async (req: Request, res: Response) => {
     const { codigo } = req.params;
     const flota = await FlotaEquipo.findByPk(codigo as string, {
       include: [
-        { model: Categoria },
-        { model: Fabricante }
+        { model: Categoria, as: 'categoria' },
+        { model: Fabricante, as: 'fabricante' }
       ]
     });
     

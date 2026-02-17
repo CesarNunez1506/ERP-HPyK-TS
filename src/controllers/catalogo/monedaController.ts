@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import Moneda from '../../models/Moneda';
+import Moneda from '../../models/catalogs/Moneda';
 
 export const getAllMonedas = async (req: Request, res: Response) => {
   try {

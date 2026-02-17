@@ -1,0 +1,776 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inventario - HP&K ERP</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="/vistas/shared/navigation.js"></script>
+    <style>
+        .dropdown-menu { display: none; }
+        .dropdown.active .dropdown-menu { display: block; }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <!-- Navigation Menu will be loaded here -->
+    <div id="navigation-container"></div>
+    <!-- Header -->
+    <div class="bg-gradient-to-r from-green-600 to-green-800 text-white shadow-lg">
+        <div class="container mx-auto px-6 py-4">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center space-x-4">
+                    <i class="fas fa-box text-3xl"></i>
+                    <div>
+                        <h1 class="text-2xl font-bold">Inventario de Materiales</h1>
+                        <p class="text-green-200 text-sm">Control de Stock y Recursos</p>
+                    </div>
+                </div>
+                <div class="flex items-center space-x-3">
+                    <a href="/index.html" class="bg-green-700 hover:bg-green-800 px-4 py-2 rounded-lg transition">
+                        <i class="fas fa-home"></i> Inicio
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="container mx-auto px-6 py-6">
+        <!-- Header -->
+        <div class="bg-white rounded-lg shadow-lg p-6 mb-8">
+            <div class="flex justify-between items-center">
+                <div>
+                    <h1 class="text-3xl font-bold text-gray-800 flex items-center">
+                        <i class="fas fa-box text-cyan-600 mr-3"></i>
+                        Gestión de Inventario
+                    </h1>
+                    <p class="text-gray-600 mt-1">Control de Stock, Precios y Artículos</p>
+                </div>
+                <button onclick="showCreateForm()" class="bg-gradient-to-r from-cyan-500 to-cyan-600 hover:from-cyan-600 hover:to-cyan-700 text-white px-6 py-3 rounded-lg shadow-lg transition flex items-center">
+                    <i class="fas fa-plus mr-2"></i> Nuevo Item
+                </button>
+            </div>
+        </div>
+
+        <!-- Form Section (Hidden by default) -->
+        <div id="formSection" class="hidden bg-white rounded-lg shadow-lg p-6 mb-8">
+            <h3 class="text-2xl font-bold text-gray-800 mb-6" id="formTitle">Nuevo Item</h3>
+            
+            <form id="materialForm" class="space-y-6">
+                <!-- Identificación -->
+                <div class="bg-gray-50 rounded-lg p-4">
+                    <h4 class="text-lg font-semibold text-gray-700 mb-4 flex items-center">
+                        <i class="fas fa-barcode text-cyan-600 mr-2"></i>
+                        Identificación
+                    </h4>
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">ID Inventario*</label>
+                            <input type="text" id="id_material" required 
+                                class="w-full px-3 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-cyan-500 focus:border-transparent">
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Código SAP*</label>
+                            <input type="text" id="codigo_sap" required 
+                                class="w-full px-3 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-cyan-500 focus:border-transparent">
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Código Interno</label>
+                            <input type="text" id="codigo_interno" 
+                                class="w-full px-3 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-cyan-500 focus:border-transparent">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Descripción -->
+                <div class="bg-gray-50 rounded-lg p-4">
+                    <h4 class="text-lg font-semibold text-gray-700 mb-4 flex items-center">
+                        <i class="fas fa-file-alt text-blue-600 mr-2"></i>
+                        Descripción
+                    </h4>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Nombre/Descripción Corta*</label>
+                            <input type="text" id="nombre" required 
+                                class="w-full px-3 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-cyan-500 focus:border-transparent">
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Tipo de Inventario*</label>
+                            <select id="tipo_material" required
+                                class="w-full px-3 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-cyan-500 focus:border-transparent">
+                                <option value="">Seleccione...</option>
+                                <option value="ZROH">ZROH - Materia Prima</option>
+                                <option value="ZHIB">ZHIB - Insumo</option>
+                                <option value="ZERS">ZERS - Repuesto</option>
+                                <option value="ZFER">ZFER - Producto Terminado</option>
+                                <option value="ZHAW">ZHAW - Mercaderia</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Descripción Larga*</label>
+                        <textarea id="descripcion_larga" required rows="2"
+                            class="w-full px-3 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-cyan-500 focus:border-transparent"></textarea>
+                    </div>
+                </div>
+
+                <!-- Clasificación -->
+                <div class="bg-gray-50 rounded-lg p-4">
+                    <h4 class="text-lg font-semibold text-gray-700 mb-4 flex items-center">
+                        <i class="fas fa-tags text-green-600 mr-2"></i>
+                        Clasificación
+                    </h4>
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Categoría*</label>
+                            <select id="categoria" required
+                                class="w-full px-3 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-cyan-500 focus:border-transparent">
+                                <option value="">Loading...</option>
+                            </select>
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Subcategoría</label>
+                            <select id="subcategoria"
+                                class="w-full px-3 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-cyan-500 focus:border-transparent">
+                                <option value="">Loading...</option>
+                            </select>
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Grupo de Artículos</label>
+                            <input type="text" id="grupo_articulos" 
+                                class="w-full px-3 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-cyan-500 focus:border-transparent">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Unidades de Medida -->
+                <div class="bg-gray-50 rounded-lg p-4">
+                    <h4 class="text-lg font-semibold text-gray-700 mb-4 flex items-center">
+                        <i class="fas fa-ruler text-purple-600 mr-2"></i>
+                        Unidades de Medida
+                    </h4>
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">UdM Base*</label>
+                            <select id="unidad_medida_base" required
+                                class="w-full px-3 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-cyan-500 focus:border-transparent">
+                                <option value="">Seleccione...</option>
+                                <option value="KG">KG - Kilogramo</option>
+                                <option value="LT">LT - Litro</option>
+                                <option value="MT">MT - Metro</option>
+                                <option value="UN">UN - Unidad</option>
+                                <option value="CJ">CJ - Caja</option>
+                                <option value="GL">GL - Galón</option>
+                            </select>
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">UdM Compra</label>
+                            <select id="unidad_medida_compra"
+                                class="w-full px-3 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-cyan-500 focus:border-transparent">
+                                <option value="">Seleccione...</option>
+                                <option value="KG">KG - Kilogramo</option>
+                                <option value="LT">LT - Litro</option>
+                                <option value="UN">UN - Unidad</option>
+                                <option value="CJ">CJ - Caja</option>
+                            </select>
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Factor Conversión</label>
+                            <input type="number" id="factor_conversion" step="0.01" value="1"
+                                class="w-full px-3 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-cyan-500 focus:border-transparent">
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Peso Neto (kg)</label>
+                            <input type="number" id="peso_neto" step="0.001"
+                                class="w-full px-3 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-cyan-500 focus:border-transparent">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Stock e Inventario -->
+                <div class="bg-gray-50 rounded-lg p-4">
+                    <h4 class="text-lg font-semibold text-gray-700 mb-4 flex items-center">
+                        <i class="fas fa-warehouse text-orange-600 mr-2"></i>
+                        Stock e Inventario
+                    </h4>
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Stock Actual</label>
+                            <input type="number" id="stock_actual" step="0.01" value="0" readonly
+                                class="w-full px-3 py-2 border border-gray-300 rounded bg-gray-100 focus:ring-2 focus:ring-cyan-500 focus:border-transparent">
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Stock Mínimo*</label>
+                            <input type="number" id="stock_minimo" required step="0.01"
+                                class="w-full px-3 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-cyan-500 focus:border-transparent">
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Stock Máximo*</label>
+                            <input type="number" id="stock_maximo" required step="0.01"
+                                class="w-full px-3 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-cyan-500 focus:border-transparent">
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Punto de Reorden</label>
+                            <input type="number" id="punto_reorden" step="0.01"
+                                class="w-full px-3 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-cyan-500 focus:border-transparent">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Ubicación y Control -->
+                <div class="bg-gray-50 rounded-lg p-4">
+                    <h4 class="text-lg font-semibold text-gray-700 mb-4 flex items-center">
+                        <i class="fas fa-map-marker-alt text-red-600 mr-2"></i>
+                        Ubicación y Control
+                    </h4>
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Almacén Principal*</label>
+                            <select id="almacen_principal" required
+                                class="w-full px-3 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-cyan-500 focus:border-transparent">
+                                <option value="">Loading...</option>
+                            </select>
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Ubicación Almacén</label>
+                            <input type="text" id="ubicacion_almacen" 
+                                class="w-full px-3 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-cyan-500 focus:border-transparent"
+                                placeholder="Ej: Pasillo 3, Estante B">
+                        </div>
+                        
+                        <div class="flex items-center space-x-2 pt-6">
+                            <input type="checkbox" id="control_lote" class="w-4 h-4 text-cyan-600 rounded">
+                            <label for="control_lote" class="text-sm font-medium text-gray-700">Control por Lote</label>
+                        </div>
+                        
+                        <div class="flex items-center space-x-2 pt-6">
+                            <input type="checkbox" id="numero_serie" class="w-4 h-4 text-cyan-600 rounded">
+                            <label for="numero_serie" class="text-sm font-medium text-gray-700">Número de Serie</label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Precios y Costos -->
+                <div class="bg-gray-50 rounded-lg p-4">
+                    <h4 class="text-lg font-semibold text-gray-700 mb-4 flex items-center">
+                        <i class="fas fa-dollar-sign text-teal-600 mr-2"></i>
+                        Precios y Costos
+                    </h4>
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Precio Estándar*</label>
+                            <input type="number" id="precio_estandar" required step="0.01"
+                                class="w-full px-3 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-cyan-500 focus:border-transparent">
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Último Precio Compra</label>
+                            <input type="number" id="ultimo_precio_compra" step="0.01"
+                                class="w-full px-3 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-cyan-500 focus:border-transparent">
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Costo Promedio</label>
+                            <input type="number" id="costo_promedio" step="0.01" readonly
+                                class="w-full px-3 py-2 border border-gray-300 rounded bg-gray-100 focus:ring-2 focus:ring-cyan-500 focus:border-transparent">
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Moneda</label>
+                            <select id="moneda"
+                                class="w-full px-3 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-cyan-500 focus:border-transparent">
+                                <option value="USD">USD - Dólar</option>
+                                <option value="PEN">PEN - Sol</option>
+                                <option value="EUR">EUR - Euro</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Ubicación Física -->
+                <div class="bg-gray-50 rounded-lg p-4">
+                    <h4 class="text-lg font-semibold text-gray-700 mb-4 flex items-center">
+                        <i class="fas fa-map-marker-alt text-purple-600 mr-2"></i>
+                        Ubicación Física
+                    </h4>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">
+                                <i class="fas fa-location-dot text-purple-500 mr-1"></i>
+                                Ubicación
+                            </label>
+                            <input type="text" id="ubicacion" placeholder="Ej: A6, B6, C3"
+                                class="w-full px-3 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-purple-500 focus:border-transparent">
+                            <p class="text-xs text-gray-500 mt-1">Ubicación física en almacén</p>
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">
+                                <i class="fas fa-box text-purple-500 mr-1"></i>
+                                Caja
+                            </label>
+                            <input type="text" id="caja" placeholder="Ej: CAJA 3, CAJA 2"
+                                class="w-full px-3 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-purple-500 focus:border-transparent">
+                            <p class="text-xs text-gray-500 mt-1">Número o identificador de caja</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Proveedor y Estado -->
+                <div class="bg-gray-50 rounded-lg p-4">
+                    <h4 class="text-lg font-semibold text-gray-700 mb-4 flex items-center">
+                        <i class="fas fa-truck text-indigo-600 mr-2"></i>
+                        Proveedor y Estado
+                    </h4>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Proveedor Principal</label>
+                            <select id="proveedor_principal"
+                                class="w-full px-3 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-cyan-500 focus:border-transparent">
+                                <option value="">Loading...</option>
+                            </select>
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Estado*</label>
+                            <select id="estado" required
+                                class="w-full px-3 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-cyan-500 focus:border-transparent">
+                                <option value="activo">Activo</option>
+                                <option value="inactivo">Inactivo</option>
+                                <option value="descontinuado">Descontinuado</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Usuario y Fecha -->
+                <div class="bg-gray-50 rounded-lg p-4">
+                    <h4 class="text-lg font-semibold text-gray-700 mb-4 flex items-center">
+                        <i class="fas fa-user text-pink-600 mr-2"></i>
+                        Usuario y Fecha
+                    </h4>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">User_crea</label>
+                            <input type="text" id="user_crea" readonly
+                                class="w-full px-3 py-2 border border-gray-300 rounded bg-gray-100 focus:ring-2 focus:ring-cyan-500 focus:border-transparent">
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Fecha Creación</label>
+                            <input type="datetime-local" id="fecha_creacion" readonly
+                                class="w-full px-3 py-2 border border-gray-300 rounded bg-gray-100 focus:ring-2 focus:ring-cyan-500 focus:border-transparent">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Botones -->
+                <div class="flex gap-4 pt-4">
+                    <button type="submit" class="flex-1 bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white px-6 py-3 rounded-lg shadow-lg transition flex items-center justify-center">
+                        <i class="fas fa-save mr-2"></i> Guardar
+                    </button>
+                    <button type="button" onclick="cancelForm()" class="flex-1 bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white px-6 py-3 rounded-lg shadow-lg transition flex items-center justify-center">
+                        <i class="fas fa-times mr-2"></i> Cancelar
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Search and Filters -->
+        <div class="bg-white rounded-lg shadow-lg p-6 mb-8">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                <input type="text" id="searchInput" placeholder="Buscar inventario..." onkeyup="filterTable()"
+                    class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-transparent">
+                
+                <select id="filterTipo" onchange="filterTable()"
+                    class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-transparent">
+                    <option value="">Todos los Tipos</option>
+                    <option value="ZROH">ZROH - Materia Prima</option>
+                    <option value="ZHIB">ZHIB - Insumo</option>
+                    <option value="ZERS">ZERS - Repuesto</option>
+                </select>
+                
+                <select id="filterEstado" onchange="filterTable()"
+                    class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-transparent">
+                    <option value="">Todos los Estados</option>
+                    <option value="activo">Activo</option>
+                    <option value="inactivo">Inactivo</option>
+                    <option value="descontinuado">Descontinuado</option>
+                </select>
+                
+                <button onclick="clearFilters()" class="bg-gray-300 hover:bg-gray-400 text-gray-800 px-4 py-2 rounded-lg transition">
+                    <i class="fas fa-redo mr-2"></i> Limpiar
+                </button>
+            </div>
+        </div>
+
+        <!-- Table -->
+        <div class="bg-white rounded-lg shadow-lg overflow-hidden">
+            <div class="overflow-x-auto">
+                <table class="min-w-full">
+                    <thead class="bg-gradient-to-r from-gray-100 to-gray-200">
+                        <tr>
+                            <th class="px-6 py-4 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">Código SAP</th>
+                            <th class="px-6 py-4 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">Descripción</th>
+                            <th class="px-6 py-4 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">Tipo</th>
+                            <th class="px-6 py-4 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">Stock</th>
+                            <th class="px-6 py-4 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">UdM</th>
+                            <th class="px-6 py-4 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">Precio</th>
+                            <th class="px-6 py-4 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">Estado</th>
+                            <th class="px-6 py-4 text-center text-xs font-bold text-gray-700 uppercase tracking-wider">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tableBody" class="divide-y divide-gray-200">
+                        <!-- Data will be loaded here -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="hidden fixed top-4 right-4 px-6 py-4 rounded-lg shadow-lg z-50 text-white">
+        <div class="flex items-center">
+            <i class="fas fa-check-circle mr-2"></i>
+            <span id="toastMessage"></span>
+        </div>
+    </div>
+
+    <script>
+        let materiales = [];
+        let editingId = null;
+
+        // Dropdown functions are now handled by NavigationManager
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            loadMateriales();
+            loadCatalogos();
+            document.getElementById('user_crea').value = 'Admin';
+        });
+
+        // Toast notifications
+        function showToast(message, type = 'success') {
+            const toast = document.getElementById('toast');
+            const toastMessage = document.getElementById('toastMessage');
+            toast.className = `fixed top-4 right-4 px-6 py-4 rounded-lg shadow-lg z-50 text-white ${
+                type === 'success' ? 'bg-green-500' : 'bg-red-500'
+            }`;
+            toastMessage.textContent = message;
+            toast.classList.remove('hidden');
+            setTimeout(() => toast.classList.add('hidden'), 3000);
+        }
+
+        // Load catalogs
+        async function loadCatalogos() {
+            try {
+                // Load categories, warehouses, suppliers
+                const [categorias, almacenes, proveedores] = await Promise.all([
+                    fetch('/api/catalogos/categorias').then(r => r.json()),
+                    fetch('/api/logistica/almacenes').then(r => r.json()),
+                    fetch('/api/logistica/proveedores').then(r => r.json())
+                ]);
+                
+                // Populate categories
+                const catSelect = document.getElementById('categoria');
+                catSelect.innerHTML = '<option value="">Seleccione categoría...</option>';
+                categorias.forEach(c => {
+                    catSelect.innerHTML += `<option value="${c.codigo}">${c.descripcion}</option>`;
+                });
+                
+                // Populate subcategories (if endpoint exists, otherwise hide)
+                const subcatSelect = document.getElementById('subcategoria');
+                subcatSelect.innerHTML = '<option value="">Sin subcategoría</option>';
+                
+                // Populate warehouses
+                const almSelect = document.getElementById('almacen_principal');
+                almSelect.innerHTML = '<option value="">Seleccione almacén...</option>';
+                almacenes.forEach(a => {
+                    almSelect.innerHTML += `<option value="${a.id}">${a.nombre}</option>`;
+                });
+                
+                // Populate suppliers
+                const provSelect = document.getElementById('proveedor_principal');
+                provSelect.innerHTML = '<option value="">Seleccione proveedor...</option>';
+                proveedores.forEach(p => {
+                    provSelect.innerHTML += `<option value="${p.id}">${p.nombre}</option>`;
+                });
+            } catch (error) {
+                console.error('Error loading catalogs:', error);
+            }
+        }
+
+        // Load inventario
+        async function loadMateriales() {
+            try {
+                const response = await fetch('/api/materiales');
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                const data = await response.json();
+                
+                // Validar que sea un array
+                if (!Array.isArray(data)) {
+                    console.error('La respuesta no es un array:', data);
+                    throw new Error('Respuesta inválida del servidor');
+                }
+                
+                materiales = data;
+                renderTable();
+            } catch (error) {
+                console.error('Error loading inventario:', error);
+                showToast('Error al cargar inventario: ' + error.message, 'error');
+                
+                // Mostrar mensaje en la tabla
+                const tbody = document.getElementById('tableBody');
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="8" class="px-6 py-8 text-center text-red-500">
+                            <i class="fas fa-exclamation-triangle text-3xl mb-2"></i>
+                            <p class="font-semibold">Error al cargar inventario</p>
+                            <p class="text-sm">${error.message}</p>
+                        </td>
+                    </tr>
+                `;
+            }
+        }
+
+        // Render table
+        function renderTable() {
+            const tbody = document.getElementById('tableBody');
+            tbody.innerHTML = '';
+
+            // Validar que materiales sea un array
+            if (!Array.isArray(materiales)) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="8" class="px-6 py-8 text-center text-gray-500">
+                            <i class="fas fa-exclamation-circle text-3xl mb-2"></i>
+                            <p>No se pudieron cargar los inventarios</p>
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+
+            if (materiales.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="8" class="px-6 py-8 text-center text-gray-500">
+                            <i class="fas fa-inbox text-3xl mb-2"></i>
+                            <p>No hay inventarios registrados</p>
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+
+            materiales.forEach(material => {
+                const row = document.createElement('tr');
+                row.className = 'hover:bg-gray-50 transition';
+                row.innerHTML = `
+                    <td class="px-6 py-4 text-sm font-semibold text-gray-900">${material.codigo_sap || '-'}</td>
+                    <td class="px-6 py-4 text-sm text-gray-700">${material.nombre || '-'}</td>
+                    <td class="px-6 py-4 text-sm text-gray-600">${material.tipo_material || '-'}</td>
+                    <td class="px-6 py-4 text-sm text-gray-900 font-semibold">${material.stock_actual || 0}</td>
+                    <td class="px-6 py-4 text-sm text-gray-600">${material.unidad_medida_base || '-'}</td>
+                    <td class="px-6 py-4 text-sm text-gray-900">$${material.precio_estandar || 0}</td>
+                    <td class="px-6 py-4">
+                        <span class="px-3 py-1 text-xs font-semibold rounded-full ${getEstadoColor(material.estado)}">
+                            ${material.estado || 'activo'}
+                        </span>
+                    </td>
+                    <td class="px-6 py-4 text-center">
+                        <button onclick="editMaterial(${material.id})" class="text-blue-600 hover:text-blue-800 mx-1" title="Editar">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <button onclick="viewMovements(${material.id})" class="text-green-600 hover:text-green-800 mx-1" title="Ver Movimientos">
+                            <i class="fas fa-exchange-alt"></i>
+                        </button>
+                        <button onclick="deleteMaterial(${material.id})" class="text-red-600 hover:text-red-800 mx-1" title="Eliminar">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+
+        function getEstadoColor(estado) {
+            const colors = {
+                'activo': 'bg-green-100 text-green-800',
+                'inactivo': 'bg-gray-100 text-gray-800',
+                'descontinuado': 'bg-red-100 text-red-800'
+            };
+            return colors[estado] || 'bg-gray-100 text-gray-800';
+        }
+
+        // Filter table
+        function filterTable() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            const filterTipo = document.getElementById('filterTipo').value;
+            const filterEst = document.getElementById('filterEstado').value;
+            
+            const rows = document.querySelectorAll('#tableBody tr');
+            rows.forEach(row => {
+                const text = row.textContent.toLowerCase();
+                const matchesSearch = text.includes(searchTerm);
+                const matchesTipo = !filterTipo || text.includes(filterTipo.toLowerCase());
+                const matchesEst = !filterEst || text.includes(filterEst.toLowerCase());
+                
+                row.style.display = matchesSearch && matchesTipo && matchesEst ? '' : 'none';
+            });
+        }
+
+        function clearFilters() {
+            document.getElementById('searchInput').value = '';
+            document.getElementById('filterTipo').value = '';
+            document.getElementById('filterEstado').value = '';
+            filterTable();
+        }
+
+        // Form functions
+        function showCreateForm() {
+            editingId = null;
+            document.getElementById('formSection').classList.remove('hidden');
+            document.getElementById('formTitle').textContent = 'Nuevo Item';
+            document.getElementById('materialForm').reset();
+            document.getElementById('user_crea').value = 'Admin';
+            document.getElementById('fecha_creacion').value = new Date().toISOString().slice(0, 16);
+            document.getElementById('stock_actual').value = '0';
+            document.getElementById('moneda').value = 'USD';
+            document.getElementById('estado').value = 'activo';
+        }
+
+        function cancelForm() {
+            document.getElementById('formSection').classList.add('hidden');
+            document.getElementById('materialForm').reset();
+        }
+
+        function editMaterial(id) {
+            const material = materiales.find(m => m.id === id);
+            if (!material) return;
+            
+            editingId = id;
+            document.getElementById('formSection').classList.remove('hidden');
+            document.getElementById('formTitle').textContent = 'Editar Item';
+            
+            // Fill form with data
+            document.getElementById('id_material').value = material.id_material || '';
+            document.getElementById('codigo_sap').value = material.codigo_sap || '';
+            document.getElementById('codigo_interno').value = material.codigo_interno || '';
+            document.getElementById('nombre').value = material.nombre || '';
+            document.getElementById('tipo_material').value = material.tipo_material || '';
+            document.getElementById('descripcion_larga').value = material.descripcion_larga || '';
+            document.getElementById('categoria').value = material.categoria_id || '';
+            document.getElementById('unidad_medida_base').value = material.unidad_medida_base || '';
+            document.getElementById('stock_actual').value = material.stock_actual || 0;
+            document.getElementById('stock_minimo').value = material.stock_minimo || 0;
+            document.getElementById('stock_maximo').value = material.stock_maximo || 0;
+            document.getElementById('precio_estandar').value = material.precio_estandar || 0;
+            document.getElementById('almacen_principal').value = material.almacen_id || '';
+            document.getElementById('proveedor_principal').value = material.proveedor_id || '';
+            document.getElementById('ubicacion').value = material.ubicacion || '';
+            document.getElementById('caja').value = material.caja || '';
+            document.getElementById('estado').value = material.estado || 'activo';
+        }
+
+        function viewMovements(id) {
+            alert('Ver movimientos de material #' + id);
+        }
+
+        async function deleteMaterial(id) {
+            if (!confirm('¿Está seguro de eliminar este item del inventario?')) return;
+            
+            try {
+                const response = await fetch(`/api/materiales/${id}`, { method: 'DELETE' });
+                if (response.ok) {
+                    showToast('Item eliminado correctamente', 'success');
+                    loadMateriales();
+                } else {
+                    showToast('Error al eliminar item', 'error');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                showToast('Error al eliminar item', 'error');
+            }
+        }
+
+        // Form submit
+        document.getElementById('materialForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const data = {
+                id_material: document.getElementById('id_material').value,
+                codigo_sap: document.getElementById('codigo_sap').value,
+                codigo_interno: document.getElementById('codigo_interno').value || null,
+                nombre: document.getElementById('nombre').value,
+                tipo_material: document.getElementById('tipo_material').value,
+                descripcion_larga: document.getElementById('descripcion_larga').value,
+                categoria_id: parseInt(document.getElementById('categoria').value) || null,
+                subcategoria_id: parseInt(document.getElementById('subcategoria').value) || null,
+                grupo_articulos: document.getElementById('grupo_articulos').value || null,
+                unidad_medida_base: document.getElementById('unidad_medida_base').value,
+                unidad_medida_compra: document.getElementById('unidad_medida_compra').value || null,
+                factor_conversion: parseFloat(document.getElementById('factor_conversion').value) || 1,
+                peso_neto: parseFloat(document.getElementById('peso_neto').value) || null,
+                stock_actual: parseFloat(document.getElementById('stock_actual').value) || 0,
+                stock_minimo: parseFloat(document.getElementById('stock_minimo').value) || 0,
+                stock_maximo: parseFloat(document.getElementById('stock_maximo').value) || 0,
+                punto_reorden: parseFloat(document.getElementById('punto_reorden').value) || null,
+                almacen_id: parseInt(document.getElementById('almacen_principal').value) || null,
+                ubicacion_almacen: document.getElementById('ubicacion_almacen').value || null,
+                control_lote: document.getElementById('control_lote').checked,
+                numero_serie: document.getElementById('numero_serie').checked,
+                precio_estandar: parseFloat(document.getElementById('precio_estandar').value) || 0,
+                ultimo_precio_compra: parseFloat(document.getElementById('ultimo_precio_compra').value) || null,
+                costo_promedio: parseFloat(document.getElementById('costo_promedio').value) || null,
+                moneda: document.getElementById('moneda').value,
+                proveedor_id: parseInt(document.getElementById('proveedor_principal').value) || null,
+                ubicacion: document.getElementById('ubicacion').value || null,
+                caja: document.getElementById('caja').value || null,
+                estado: document.getElementById('estado').value,
+                user_crea: document.getElementById('user_crea').value
+            };
+            
+            try {
+                const url = editingId ? `/api/materiales/${editingId}` : '/api/materiales';
+                const method = editingId ? 'PUT' : 'POST';
+                
+                const response = await fetch(url, {
+                    method: method,
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+                
+                if (response.ok) {
+                    showToast(editingId ? 'Item actualizado correctamente' : 'Item creado correctamente', 'success');
+                    cancelForm();
+                    loadMateriales();
+                } else {
+                    showToast('Error al guardar el item', 'error');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                showToast('Error al guardar el item', 'error');
+            }
+        });
+    </script>
+</body>
+</html>

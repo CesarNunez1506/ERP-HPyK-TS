@@ -1,0 +1,533 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Estrategias de Mantenimiento - HP&K ERP</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="/vistas/shared/navigation.js"></script>
+    <style>
+        .dropdown-menu { display: none; }
+        .dropdown.active .dropdown-menu { display: block; }
+        .modal { display: none; }
+        .modal.active { display: flex; }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <!-- Navigation Menu will be loaded here -->
+    <div id="navigation-container"></div>
+
+    <!-- Header -->
+    <div class="bg-gradient-to-r from-green-600 to-green-800 text-white shadow-lg">
+        <div class="container mx-auto px-6 py-4">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center space-x-4">
+                    <i class="fas fa-lightbulb text-3xl"></i>
+                    <div>
+                        <h1 class="text-2xl font-bold">Estrategias de Mantenimiento</h1>
+                        <p class="text-green-200 text-sm">Planificación y Metodologías</p>
+                    </div>
+                </div>
+                <div class="flex items-center space-x-3">
+                    <a href="/index.html" class="bg-green-700 hover:bg-green-800 px-4 py-2 rounded-lg transition">
+                        <i class="fas fa-home"></i> Inicio
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Contenido Principal -->
+    <div class="container mx-auto px-4 py-8">
+        <div class="bg-white rounded-lg shadow-lg p-6">
+            <div class="flex justify-between items-center mb-6">
+                <div>
+                    <h1 class="text-3xl font-bold text-gray-800 flex items-center">
+                        <i class="fas fa-lightbulb text-cyan-600 mr-3"></i>
+                        Estrategias de Mantenimiento
+                    </h1>
+                    <p class="text-gray-500 mt-1">Administración de estrategias y planes de mantenimiento</p>
+                </div>
+                <button onclick="showCreateForm()" class="bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white px-6 py-3 rounded-lg font-semibold shadow-md transition">
+                    <i class="fas fa-plus mr-2"></i> Nueva Estrategia
+                </button>
+            </div>
+
+            <!-- Filtro -->
+            <div class="mb-4">
+                <input type="text" id="searchInput" onkeyup="filterTable()" placeholder="Buscar estrategias..." class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-transparent">
+            </div>
+
+            <!-- Tabla -->
+            <div class="overflow-x-auto">
+                <table class="min-w-full bg-white border border-gray-200 rounded-lg">
+                    <thead class="bg-gradient-to-r from-gray-100 to-gray-200">
+                        <tr>
+                            <th class="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Código</th>
+                            <th class="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Nombre</th>
+                            <th class="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Tipo</th>
+                            <th class="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Frecuencia</th>
+                            <th class="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Estado</th>
+                            <th class="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tableBody" class="divide-y divide-gray-200"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Formulario -->
+    <div id="modal" class="modal fixed inset-0 bg-gray-900 bg-opacity-50 overflow-y-auto h-full w-full z-50 items-center justify-center">
+        <div class="relative mx-auto p-8 border w-11/12 max-w-5xl shadow-2xl rounded-xl bg-white my-8">
+            <div class="flex justify-between items-center mb-6 pb-4 border-b border-gray-200">
+                <h3 class="text-3xl font-bold text-gray-800" id="modalTitle">
+                    <i class="fas fa-lightbulb text-cyan-600 mr-2"></i>
+                    Nueva Estrategia
+                </h3>
+                <button onclick="closeModal()" class="text-gray-400 hover:text-gray-600 text-3xl font-bold transition">
+                    &times;
+                </button>
+            </div>
+
+            <form id="estrategiaForm" onsubmit="saveEstrategia(event)" class="space-y-6">
+                <input type="hidden" id="estrategiaId">
+                
+                <!-- Sección 1: Identificación -->
+                <div class="bg-gray-50 rounded-lg p-4">
+                    <h4 class="text-lg font-semibold text-cyan-700 mb-4 flex items-center">
+                        <i class="fas fa-id-card text-cyan-600 mr-2"></i>
+                        Identificación
+                    </h4>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Código *</label>
+                            <input type="text" id="codigo" required class="w-full px-3 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-cyan-500 focus:border-transparent">
+                        </div>
+                        <div class="md:col-span-2">
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Nombre *</label>
+                            <input type="text" id="nombre" required class="w-full px-3 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-cyan-500 focus:border-transparent">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Sección 2: Tipo y Descripción -->
+                <div class="bg-gray-50 rounded-lg p-4">
+                    <h4 class="text-lg font-semibold text-blue-700 mb-4 flex items-center">
+                        <i class="fas fa-info-circle text-blue-600 mr-2"></i>
+                        Tipo y Descripción
+                    </h4>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Tipo de Mantenimiento *</label>
+                            <select id="tipo_mantenimiento" required class="w-full px-3 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-cyan-500 focus:border-transparent">
+                                <option value="">Seleccione...</option>
+                                <option value="Preventivo">Preventivo</option>
+                                <option value="Predictivo">Predictivo</option>
+                                <option value="Correctivo">Correctivo</option>
+                                <option value="Detectivo">Detectivo</option>
+                                <option value="Basado en Condición">Basado en Condición</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Prioridad *</label>
+                            <select id="prioridad" required class="w-full px-3 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-cyan-500 focus:border-transparent">
+                                <option value="">Seleccione...</option>
+                                <option value="Baja">Baja</option>
+                                <option value="Media">Media</option>
+                                <option value="Alta">Alta</option>
+                                <option value="Crítica">Crítica</option>
+                            </select>
+                        </div>
+                        <div class="md:col-span-2">
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Descripción</label>
+                            <textarea id="descripcion" rows="3" class="w-full px-3 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-cyan-500 focus:border-transparent"></textarea>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Sección 3: Frecuencia -->
+                <div class="bg-gray-50 rounded-lg p-4">
+                    <h4 class="text-lg font-semibold text-green-700 mb-4 flex items-center">
+                        <i class="fas fa-calendar-alt text-green-600 mr-2"></i>
+                        Frecuencia y Periodicidad
+                    </h4>
+                    <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Frecuencia *</label>
+                            <select id="frecuencia" required class="w-full px-3 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-cyan-500 focus:border-transparent">
+                                <option value="">Seleccione...</option>
+                                <option value="Diaria">Diaria</option>
+                                <option value="Semanal">Semanal</option>
+                                <option value="Quincenal">Quincenal</option>
+                                <option value="Mensual">Mensual</option>
+                                <option value="Bimestral">Bimestral</option>
+                                <option value="Trimestral">Trimestral</option>
+                                <option value="Semestral">Semestral</option>
+                                <option value="Anual">Anual</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Días entre Mto.</label>
+                            <input type="number" id="dias_entre_mantenimiento" min="1" class="w-full px-3 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-cyan-500 focus:border-transparent">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Horas Operación</label>
+                            <input type="number" id="horas_operacion" min="0" step="0.1" class="w-full px-3 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-cyan-500 focus:border-transparent">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Duración Est. (hrs)</label>
+                            <input type="number" id="duracion_estimada" min="0" step="0.5" class="w-full px-3 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-cyan-500 focus:border-transparent">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Sección 4: Recursos -->
+                <div class="bg-gray-50 rounded-lg p-4">
+                    <h4 class="text-lg font-semibold text-purple-700 mb-4 flex items-center">
+                        <i class="fas fa-users text-purple-600 mr-2"></i>
+                        Recursos Requeridos
+                    </h4>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Personal Requerido</label>
+                            <input type="number" id="personal_requerido" min="1" class="w-full px-3 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-cyan-500 focus:border-transparent">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Especialidad Requerida</label>
+                            <input type="text" id="especialidad_requerida" placeholder="ej. Mecánico, Eléctrico" class="w-full px-3 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-cyan-500 focus:border-transparent">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Herramientas Especiales</label>
+                            <input type="text" id="herramientas_especiales" class="w-full px-3 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-cyan-500 focus:border-transparent">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Sección 5: Costos Estimados -->
+                <div class="bg-gray-50 rounded-lg p-4">
+                    <h4 class="text-lg font-semibold text-orange-700 mb-4 flex items-center">
+                        <i class="fas fa-dollar-sign text-orange-600 mr-2"></i>
+                        Costos Estimados
+                    </h4>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Costo Inventario</label>
+                            <input type="number" id="costo_materiales" step="0.01" class="w-full px-3 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-cyan-500 focus:border-transparent">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Costo Mano de Obra</label>
+                            <input type="number" id="costo_mano_obra" step="0.01" class="w-full px-3 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-cyan-500 focus:border-transparent">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Costo Total Est.</label>
+                            <input type="number" id="costo_total_estimado" step="0.01" readonly class="w-full px-3 py-2 border border-gray-300 rounded bg-gray-100">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Sección 6: Criticidad y Estado -->
+                <div class="bg-gray-50 rounded-lg p-4">
+                    <h4 class="text-lg font-semibold text-teal-700 mb-4 flex items-center">
+                        <i class="fas fa-exclamation-triangle text-teal-600 mr-2"></i>
+                        Criticidad y Estado
+                    </h4>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Nivel de Criticidad *</label>
+                            <select id="nivel_criticidad" required class="w-full px-3 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-cyan-500 focus:border-transparent">
+                                <option value="">Seleccione...</option>
+                                <option value="Baja">Baja</option>
+                                <option value="Media">Media</option>
+                                <option value="Alta">Alta</option>
+                                <option value="Crítica">Crítica</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Estado *</label>
+                            <select id="estado" required class="w-full px-3 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-cyan-500 focus:border-transparent">
+                                <option value="">Seleccione...</option>
+                                <option value="Activa">Activa</option>
+                                <option value="Inactiva">Inactiva</option>
+                                <option value="En Revisión">En Revisión</option>
+                                <option value="Obsoleta">Obsoleta</option>
+                            </select>
+                        </div>
+                        <div class="flex items-center">
+                            <input type="checkbox" id="requiere_parada_equipo" class="w-4 h-4 text-cyan-600 border-gray-300 rounded focus:ring-cyan-500">
+                            <label for="requiere_parada_equipo" class="ml-2 text-sm font-medium text-gray-700">¿Requiere Parada de Equipo?</label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Sección 7: Observaciones -->
+                <div class="bg-gray-50 rounded-lg p-4">
+                    <h4 class="text-lg font-semibold text-pink-700 mb-4 flex items-center">
+                        <i class="fas fa-comment-alt text-pink-600 mr-2"></i>
+                        Observaciones y Notas
+                    </h4>
+                    <div>
+                        <textarea id="observaciones" rows="3" placeholder="Notas adicionales..." class="w-full px-3 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-cyan-500 focus:border-transparent"></textarea>
+                    </div>
+                </div>
+
+                <!-- Sección 8: Usuario -->
+                <div class="bg-gray-50 rounded-lg p-4">
+                    <h4 class="text-lg font-semibold text-gray-700 mb-4 flex items-center">
+                        <i class="fas fa-user text-gray-600 mr-2"></i>
+                        Información del Usuario
+                    </h4>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Creado por</label>
+                            <input type="text" id="user_crea" readonly class="w-full px-3 py-2 border border-gray-300 rounded bg-gray-100">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Fecha de creación</label>
+                            <input type="datetime-local" id="fecha_creacion" readonly class="w-full px-3 py-2 border border-gray-300 rounded bg-gray-100">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Botones -->
+                <div class="flex justify-end space-x-3 pt-4 border-t border-gray-200">
+                    <button type="button" onclick="closeModal()" class="bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white px-6 py-3 rounded-lg font-semibold shadow-md transition">
+                        <i class="fas fa-times mr-2"></i> Cancelar
+                    </button>
+                    <button type="submit" class="bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white px-6 py-3 rounded-lg font-semibold shadow-md transition">
+                        <i class="fas fa-save mr-2"></i> Guardar
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="fixed top-4 right-4 px-6 py-3 rounded-lg shadow-lg text-white transform transition-transform duration-300 translate-x-full z-50"></div>
+
+    <script>
+        let estrategias = [];
+
+        // Dropdown functions
+        function toggleDropdown(event, button) {
+            event.stopPropagation();
+            const dropdown = button.parentElement;
+            const isActive = dropdown.classList.contains('active');
+            closeAllDropdowns();
+            if (!isActive) dropdown.classList.add('active');
+        }
+
+        function closeAllDropdowns(event) {
+            if (event && event.target.closest('.dropdown')) return;
+            document.querySelectorAll('.dropdown').forEach(d => d.classList.remove('active'));
+        }
+
+        // Calcular costo total
+        function calcularCostoTotal() {
+            const materiales = parseFloat(document.getElementById('costo_materiales').value) || 0;
+            const manoObra = parseFloat(document.getElementById('costo_mano_obra').value) || 0;
+            document.getElementById('costo_total_estimado').value = (materiales + manoObra).toFixed(2);
+        }
+
+        document.getElementById('costo_materiales').addEventListener('input', calcularCostoTotal);
+        document.getElementById('costo_mano_obra').addEventListener('input', calcularCostoTotal);
+
+        // Modal functions
+        function showCreateForm() {
+            document.getElementById('estrategiaForm').reset();
+            document.getElementById('modalTitle').innerHTML = '<i class="fas fa-lightbulb text-cyan-600 mr-2"></i>Nueva Estrategia';
+            document.getElementById('estrategiaId').value = '';
+            document.getElementById('user_crea').value = localStorage.getItem('username') || 'Admin';
+            document.getElementById('fecha_creacion').value = new Date().toISOString().slice(0, 16);
+            document.getElementById('modal').classList.add('active');
+        }
+
+        function closeModal() {
+            document.getElementById('modal').classList.remove('active');
+        }
+
+        // Toast notification
+        function showToast(message, type = 'success') {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.className = `fixed top-4 right-4 px-6 py-3 rounded-lg shadow-lg text-white transform transition-transform duration-300 z-50 ${
+                type === 'success' ? 'bg-gradient-to-r from-green-500 to-green-600' : 'bg-gradient-to-r from-red-500 to-red-600'
+            }`;
+            toast.style.transform = 'translateX(0)';
+            setTimeout(() => { toast.style.transform = 'translateX(150%)'; }, 3000);
+        }
+
+        // Cargar estrategias
+        async function loadEstrategias() {
+            try {
+                const response = await fetch('/api/estrategias');
+                estrategias = await response.json();
+                renderTable();
+            } catch (error) {
+                console.error('Error cargando estrategias:', error);
+                showToast('Error al cargar estrategias', 'error');
+            }
+        }
+
+        // Renderizar tabla
+        function renderTable() {
+            const tbody = document.getElementById('tableBody');
+            tbody.innerHTML = '';
+            
+            estrategias.forEach(estrategia => {
+                const estadoBadge = {
+                    'Activa': 'bg-green-100 text-green-800',
+                    'Inactiva': 'bg-gray-100 text-gray-800',
+                    'En Revisión': 'bg-yellow-100 text-yellow-800',
+                    'Obsoleta': 'bg-red-100 text-red-800'
+                }[estrategia.estado] || 'bg-gray-100 text-gray-800';
+
+                tbody.innerHTML += `
+                    <tr class="hover:bg-gray-50">
+                        <td class="px-4 py-3 text-sm font-medium text-gray-900">${estrategia.codigo}</td>
+                        <td class="px-4 py-3 text-sm text-gray-700">${estrategia.nombre}</td>
+                        <td class="px-4 py-3 text-sm text-gray-600">${estrategia.tipo_mantenimiento}</td>
+                        <td class="px-4 py-3 text-sm text-gray-600">${estrategia.frecuencia}</td>
+                        <td class="px-4 py-3">
+                            <span class="px-2 py-1 text-xs font-semibold rounded-full ${estadoBadge}">
+                                ${estrategia.estado}
+                            </span>
+                        </td>
+                        <td class="px-4 py-3 text-sm">
+                            <button onclick="editEstrategia(${estrategia.id})" class="text-blue-600 hover:text-blue-800 mr-3" title="Editar">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button onclick="deleteEstrategia(${estrategia.id})" class="text-red-600 hover:text-red-800" title="Eliminar">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </td>
+                    </tr>
+                `;
+            });
+        }
+
+        // Filtrar tabla
+        function filterTable() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            const rows = document.querySelectorAll('#tableBody tr');
+            
+            rows.forEach(row => {
+                const text = row.textContent.toLowerCase();
+                row.style.display = text.includes(searchTerm) ? '' : 'none';
+            });
+        }
+
+        // Guardar estrategia
+        async function saveEstrategia(event) {
+            event.preventDefault();
+            
+            const formData = {
+                codigo: document.getElementById('codigo').value,
+                nombre: document.getElementById('nombre').value,
+                tipo_mantenimiento: document.getElementById('tipo_mantenimiento').value,
+                prioridad: document.getElementById('prioridad').value,
+                descripcion: document.getElementById('descripcion').value,
+                frecuencia: document.getElementById('frecuencia').value,
+                dias_entre_mantenimiento: document.getElementById('dias_entre_mantenimiento').value,
+                horas_operacion: document.getElementById('horas_operacion').value,
+                duracion_estimada: document.getElementById('duracion_estimada').value,
+                personal_requerido: document.getElementById('personal_requerido').value,
+                especialidad_requerida: document.getElementById('especialidad_requerida').value,
+                herramientas_especiales: document.getElementById('herramientas_especiales').value,
+                costo_materiales: document.getElementById('costo_materiales').value,
+                costo_mano_obra: document.getElementById('costo_mano_obra').value,
+                costo_total_estimado: document.getElementById('costo_total_estimado').value,
+                nivel_criticidad: document.getElementById('nivel_criticidad').value,
+                estado: document.getElementById('estado').value,
+                requiere_parada_equipo: document.getElementById('requiere_parada_equipo').checked,
+                observaciones: document.getElementById('observaciones').value,
+                user_crea: document.getElementById('user_crea').value
+            };
+
+            try {
+                const id = document.getElementById('estrategiaId').value;
+                const url = id ? `/api/estrategias/${id}` : '/api/estrategias';
+                const method = id ? 'PUT' : 'POST';
+
+                const response = await fetch(url, {
+                    method: method,
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(formData)
+                });
+
+                if (response.ok) {
+                    showToast(id ? 'Estrategia actualizada exitosamente' : 'Estrategia creada exitosamente', 'success');
+                    closeModal();
+                    loadEstrategias();
+                } else {
+                    showToast('Error al guardar estrategia', 'error');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                showToast('Error al guardar estrategia', 'error');
+            }
+        }
+
+        // Editar estrategia
+        async function editEstrategia(id) {
+            try {
+                const response = await fetch(`/api/estrategias/${id}`);
+                const estrategia = await response.json();
+
+                document.getElementById('modalTitle').innerHTML = '<i class="fas fa-edit text-cyan-600 mr-2"></i>Editar Estrategia';
+                document.getElementById('estrategiaId').value = estrategia.id;
+                document.getElementById('codigo').value = estrategia.codigo;
+                document.getElementById('nombre').value = estrategia.nombre;
+                document.getElementById('tipo_mantenimiento').value = estrategia.tipo_mantenimiento || '';
+                document.getElementById('prioridad').value = estrategia.prioridad || '';
+                document.getElementById('descripcion').value = estrategia.descripcion || '';
+                document.getElementById('frecuencia').value = estrategia.frecuencia || '';
+                document.getElementById('dias_entre_mantenimiento').value = estrategia.dias_entre_mantenimiento || '';
+                document.getElementById('horas_operacion').value = estrategia.horas_operacion || '';
+                document.getElementById('duracion_estimada').value = estrategia.duracion_estimada || '';
+                document.getElementById('personal_requerido').value = estrategia.personal_requerido || '';
+                document.getElementById('especialidad_requerida').value = estrategia.especialidad_requerida || '';
+                document.getElementById('herramientas_especiales').value = estrategia.herramientas_especiales || '';
+                document.getElementById('costo_materiales').value = estrategia.costo_materiales || '';
+                document.getElementById('costo_mano_obra').value = estrategia.costo_mano_obra || '';
+                document.getElementById('costo_total_estimado').value = estrategia.costo_total_estimado || '';
+                document.getElementById('nivel_criticidad').value = estrategia.nivel_criticidad || '';
+                document.getElementById('estado').value = estrategia.estado || '';
+                document.getElementById('requiere_parada_equipo').checked = estrategia.requiere_parada_equipo || false;
+                document.getElementById('observaciones').value = estrategia.observaciones || '';
+                document.getElementById('user_crea').value = estrategia.user_crea || '';
+                document.getElementById('fecha_creacion').value = estrategia.fecha_creacion ? new Date(estrategia.fecha_creacion).toISOString().slice(0, 16) : '';
+
+                document.getElementById('modal').classList.add('active');
+            } catch (error) {
+                console.error('Error:', error);
+                showToast('Error al cargar estrategia', 'error');
+            }
+        }
+
+        // Eliminar estrategia
+        async function deleteEstrategia(id) {
+            if (!confirm('¿Está seguro de eliminar esta estrategia?')) return;
+
+            try {
+                const response = await fetch(`/api/estrategias/${id}`, { method: 'DELETE' });
+                if (response.ok) {
+                    showToast('Estrategia eliminada exitosamente', 'success');
+                    loadEstrategias();
+                } else {
+                    showToast('Error al eliminar estrategia', 'error');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                showToast('Error al eliminar estrategia', 'error');
+            }
+        }
+
+        // Inicialización
+        document.addEventListener('DOMContentLoaded', () => {
+            loadEstrategias();
+        });
+    </script>
+</body>
+</html>

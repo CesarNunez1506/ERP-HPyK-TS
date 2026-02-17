@@ -1,21 +1,22 @@
 import { Request, Response } from 'express';
 import Estrategia from '../../models/Estrategia';
-import Area from '../../models/Area';
+import Area from '../../models/catalogs/Area';
 import Equipo from '../../models/Equipo';
-import UnidadMedida from '../../models/UnidadMedida';
-import TipoEstrategia from '../../models/TipoEstrategia';
-import StatusEstrategia from '../../models/StatusEstrategia';
+import UnidadMedida from '../../models/catalogs/UnidadMedida';
+import TipoEstrategia from '../../models/catalogs/TipoEstrategia';
+import StatusEstrategia from '../../models/catalogs/StatusEstrategia';
 
 export const getAllEstrategias = async (req: Request, res: Response) => {
   try {
     const estrategias = await Estrategia.findAll({
       include: [
-        { model: Area },
-        { model: Equipo },
-        { model: UnidadMedida },
-        { model: TipoEstrategia },
-        { model: StatusEstrategia }
-      ]
+        { model: Area, as: 'area' },
+        { model: Equipo, as: 'equipo' },
+        { model: UnidadMedida, as: 'unidad_medida' },
+        { model: TipoEstrategia, as: 'tipo' },
+        { model: StatusEstrategia, as: 'status' }
+      ],
+      order: [['estrategia_id', 'ASC']]
     });
     res.json(estrategias);
   } catch (error) {
@@ -28,11 +29,11 @@ export const getEstrategiaById = async (req: Request, res: Response) => {
     const { id } = req.params;
     const estrategia = await Estrategia.findByPk(parseInt(id as string), {
       include: [
-        { model: Area },
-        { model: Equipo },
-        { model: UnidadMedida },
-        { model: TipoEstrategia },
-        { model: StatusEstrategia }
+        { model: Area, as: 'area' },
+        { model: Equipo, as: 'equipo' },
+        { model: UnidadMedida, as: 'unidad_medida' },
+        { model: TipoEstrategia, as: 'tipo' },
+        { model: StatusEstrategia, as: 'status' }
       ]
     });
     

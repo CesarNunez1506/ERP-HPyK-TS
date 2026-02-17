@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Herramientas - HP&K ERP</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="/vistas/shared/navigation.js"></script>
+    <style>
+        .dropdown-menu { display: none; }
+        .dropdown.active .dropdown-menu { display: block; }
+        .modal { display: none; }
+        .modal.active { display: flex; }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <!-- Navigation Menu will be loaded here -->
+    <div id="navigation-container"></div>
+
+    <!-- Header -->
+    <div class="bg-gradient-to-r from-green-600 to-green-800 text-white shadow-lg">
+        <div class="container mx-auto px-6 py-4">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center space-x-4">
+                    <i class="fas fa-wrench text-3xl"></i>
+                    <div>
+                        <h1 class="text-2xl font-bold">Gestión de Herramientas</h1>
+                        <p class="text-green-200 text-sm">Administración de Herramientas de Mantenimiento</p>
+                    </div>
+                </div>
+                <div class="flex items-center space-x-3">
+                    <a href="/index.html" class="bg-green-700 hover:bg-green-800 px-4 py-2 rounded-lg transition">
+                        <i class="fas fa-home"></i> Inicio
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Contenido Principal -->
+    <div class="container mx-auto px-4 py-8">
+        <div class="bg-white rounded-lg shadow-lg p-6">
+            <div class="flex justify-between items-center mb-6">
+                <div>
+                    <h1 class="text-3xl font-bold text-gray-800 flex items-center">
+                        <i class="fas fa-wrench text-cyan-600 mr-3"></i>
+                        Gestión de Herramientas
+                    </h1>
+                    <p class="text-gray-500 mt-1">Administración de herramientas de mantenimiento</p>
+                </div>
+                <button onclick="showCreateForm()" class="bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white px-6 py-3 rounded-lg font-semibold shadow-md transition">
+                    <i class="fas fa-plus mr-2"></i> Nueva Herramienta
+                </button>
+            </div>
+
+            <!-- Filtro -->
+            <div class="mb-4">
+                <input type="text" id="searchInput" onkeyup="filterTable()" placeholder="Buscar herramientas..." class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-transparent">
+            </div>
+
+            <!-- Tabla -->
+            <div class="overflow-x-auto">
+                <table class="min-w-full bg-white border border-gray-200 rounded-lg">
+                    <thead class="bg-gradient-to-r from-gray-100 to-gray-200">
+                        <tr>
+                            <th class="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Código</th>
+                            <th class="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Nombre</th>
+                            <th class="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Tipo</th>
+                            <th class="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Ubicación</th>
+                            <th class="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Estado</th>
+                            <th class="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tableBody" class="divide-y divide-gray-200"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Formulario -->
+    <div id="modal" class="modal fixed inset-0 bg-gray-900 bg-opacity-50 overflow-y-auto h-full w-full z-50 items-center justify-center">
+        <div class="relative mx-auto p-8 border w-11/12 max-w-4xl shadow-2xl rounded-xl bg-white my-8">
+            <div class="flex justify-between items-center mb-6 pb-4 border-b border-gray-200">
+                <h3 class="text-3xl font-bold text-gray-800" id="modalTitle">
+                    <i class="fas fa-wrench text-cyan-600 mr-2"></i>
+                    Nueva Herramienta
+                </h3>
+                <button onclick="closeModal()" class="text-gray-400 hover:text-gray-600 text-3xl font-bold transition">
+                    &times;
+                </button>
+            </div>
+
+            <form id="herramientaForm" onsubmit="saveHerramienta(event)" class="space-y-6">
+                <input type="hidden" id="herramientaId">
+                
+                <!-- Sección 1: Identificación -->
+                <div class="bg-gray-50 rounded-lg p-4">
+                    <h4 class="text-lg font-semibold text-cyan-700 mb-4 flex items-center">
+                        <i class="fas fa-id-card text-cyan-600 mr-2"></i>
+                        Identificación
+                    </h4>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Código *</label>
+                            <input type="text" id="codigo" required class="w-full px-3 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-cyan-500 focus:border-transparent">
+                        </div>
+                        <div class="md:col-span-2">
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Nombre *</label>
+                            <input type="text" id="nombre" required class="w-full px-3 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-cyan-500 focus:border-transparent">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Sección 2: Especificaciones -->
+                <div class="bg-gray-50 rounded-lg p-4">
+                    <h4 class="text-lg font-semibold text-blue-700 mb-4 flex items-center">
+                        <i class="fas fa-info-circle text-blue-600 mr-2"></i>
+                        Especificaciones
+                    </h4>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Tipo *</label>
+                            <select id="tipo" required class="w-full px-3 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-cyan-500 focus:border-transparent">
+                                <option value="">Seleccione...</option>
+                                <option value="Manual">Manual</option>
+                                <option value="Eléctrica">Eléctrica</option>
+                                <option value="Neumática">Neumática</option>
+                                <option value="Hidráulica">Hidráulica</option>
+                                <option value="Medición">Medición</option>
+                                <option value="Corte">Corte</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Marca</label>
+                            <input type="text" id="marca" class="w-full px-3 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-cyan-500 focus:border-transparent">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Modelo</label>
+                            <input type="text" id="modelo" class="w-full px-3 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-cyan-500 focus:border-transparent">
+                        </div>
+                        <div class="md:col-span-3">
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Especificaciones</label>
+                            <textarea id="especificaciones" rows="2" class="w-full px-3 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-cyan-500 focus:border-transparent"></textarea>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Sección 3: Ubicación y Control -->
+                <div class="bg-gray-50 rounded-lg p-4">
+                    <h4 class="text-lg font-semibold text-green-700 mb-4 flex items-center">
+                        <i class="fas fa-map-marker-alt text-green-600 mr-2"></i>
+                        Ubicación y Control
+                    </h4>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Almacén</label>
+                            <select id="almacen_id" class="w-full px-3 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-cyan-500 focus:border-transparent">
+                                <option value="">Seleccione...</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Ubicación</label>
+                            <input type="text" id="ubicacion" placeholder="ej. Estante A-3" class="w-full px-3 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-cyan-500 focus:border-transparent">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">N° Serie</label>
+                            <input type="text" id="numero_serie" class="w-full px-3 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-cyan-500 focus:border-transparent">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Sección 4: Estado y Condición -->
+                <div class="bg-gray-50 rounded-lg p-4">
+                    <h4 class="text-lg font-semibold text-purple-700 mb-4 flex items-center">
+                        <i class="fas fa-heartbeat text-purple-600 mr-2"></i>
+                        Estado y Condición
+                    </h4>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Estado *</label>
+                            <select id="estado" required class="w-full px-3 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-cyan-500 focus:border-transparent">
+                                <option value="">Seleccione...</option>
+                                <option value="Disponible">Disponible</option>
+                                <option value="En Uso">En Uso</option>
+                                <option value="En Mantenimiento">En Mantenimiento</option>
+                                <option value="Averiada">Averiada</option>
+                                <option value="Fuera de Servicio">Fuera de Servicio</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Condición</label>
+                            <select id="condicion" class="w-full px-3 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-cyan-500 focus:border-transparent">
+                                <option value="">Seleccione...</option>
+                                <option value="Excelente">Excelente</option>
+                                <option value="Buena">Buena</option>
+                                <option value="Regular">Regular</option>
+                                <option value="Mala">Mala</option>
+                            </select>
+                        </div>
+                        <div class="flex items-center">
+                            <input type="checkbox" id="activo" checked class="w-4 h-4 text-cyan-600 border-gray-300 rounded focus:ring-cyan-500">
+                            <label for="activo" class="ml-2 text-sm font-medium text-gray-700">Activo</label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Sección 5: Usuario -->
+                <div class="bg-gray-50 rounded-lg p-4">
+                    <h4 class="text-lg font-semibold text-gray-700 mb-4 flex items-center">
+                        <i class="fas fa-user text-gray-600 mr-2"></i>
+                        Información del Usuario
+                    </h4>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Creado por</label>
+                            <input type="text" id="user_crea" readonly class="w-full px-3 py-2 border border-gray-300 rounded bg-gray-100">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Fecha de creación</label>
+                            <input type="datetime-local" id="fecha_creacion" readonly class="w-full px-3 py-2 border border-gray-300 rounded bg-gray-100">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Botones -->
+                <div class="flex justify-end space-x-3 pt-4 border-t border-gray-200">
+                    <button type="button" onclick="closeModal()" class="bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white px-6 py-3 rounded-lg font-semibold shadow-md transition">
+                        <i class="fas fa-times mr-2"></i> Cancelar
+                    </button>
+                    <button type="submit" class="bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white px-6 py-3 rounded-lg font-semibold shadow-md transition">
+                        <i class="fas fa-save mr-2"></i> Guardar
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="fixed top-4 right-4 px-6 py-3 rounded-lg shadow-lg text-white transform transition-transform duration-300 translate-x-full z-50"></div>
+
+    <script>
+        let herramientas = [];
+
+        // Dropdown functions
+        function toggleDropdown(event, button) {
+            event.stopPropagation();
+            const dropdown = button.parentElement;
+            const isActive = dropdown.classList.contains('active');
+            closeAllDropdowns();
+            if (!isActive) dropdown.classList.add('active');
+        }
+
+        function closeAllDropdowns(event) {
+            if (event && event.target.closest('.dropdown')) return;
+            document.querySelectorAll('.dropdown').forEach(d => d.classList.remove('active'));
+        }
+
+        // Modal functions
+        function showCreateForm() {
+            document.getElementById('herramientaForm').reset();
+            document.getElementById('modalTitle').innerHTML = '<i class="fas fa-wrench text-cyan-600 mr-2"></i>Nueva Herramienta';
+            document.getElementById('herramientaId').value = '';
+            document.getElementById('user_crea').value = localStorage.getItem('username') || 'Admin';
+            document.getElementById('fecha_creacion').value = new Date().toISOString().slice(0, 16);
+            document.getElementById('modal').classList.add('active');
+        }
+
+        function closeModal() {
+            document.getElementById('modal').classList.remove('active');
+        }
+
+        // Toast notification
+        function showToast(message, type = 'success') {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.className = `fixed top-4 right-4 px-6 py-3 rounded-lg shadow-lg text-white transform transition-transform duration-300 z-50 ${
+                type === 'success' ? 'bg-gradient-to-r from-green-500 to-green-600' : 'bg-gradient-to-r from-red-500 to-red-600'
+            }`;
+            toast.style.transform = 'translateX(0)';
+            setTimeout(() => { toast.style.transform = 'translateX(150%)'; }, 3000);
+        }
+
+        // Cargar almacenes
+        async function loadAlmacenes() {
+            try {
+                const response = await fetch('/api/logistica/almacenes');
+                const almacenes = await response.json();
+                const select = document.getElementById('almacen_id');
+                select.innerHTML = '<option value="">Seleccione...</option>';
+                almacenes.forEach(a => {
+                    select.innerHTML += `<option value="${a.id}">${a.nombre}</option>`;
+                });
+            } catch (error) {
+                console.error('Error cargando almacenes:', error);
+            }
+        }
+
+        // Cargar herramientas
+        async function loadHerramientas() {
+            try {
+                const response = await fetch('/api/mantenimiento/herramientas');
+                herramientas = await response.json();
+                renderTable();
+            } catch (error) {
+                console.error('Error cargando herramientas:', error);
+                showToast('Error al cargar herramientas', 'error');
+            }
+        }
+
+        // Renderizar tabla
+        function renderTable() {
+            const tbody = document.getElementById('tableBody');
+            tbody.innerHTML = '';
+            
+            herramientas.forEach(herramienta => {
+                const estadoBadge = {
+                    'Disponible': 'bg-green-100 text-green-800',
+                    'En Uso': 'bg-blue-100 text-blue-800',
+                    'En Mantenimiento': 'bg-yellow-100 text-yellow-800',
+                    'Averiada': 'bg-red-100 text-red-800',
+                    'Fuera de Servicio': 'bg-gray-100 text-gray-800'
+                }[herramienta.estado] || 'bg-gray-100 text-gray-800';
+
+                tbody.innerHTML += `
+                    <tr class="hover:bg-gray-50">
+                        <td class="px-4 py-3 text-sm font-medium text-gray-900">${herramienta.codigo}</td>
+                        <td class="px-4 py-3 text-sm text-gray-700">${herramienta.nombre}</td>
+                        <td class="px-4 py-3 text-sm text-gray-600">${herramienta.tipo}</td>
+                        <td class="px-4 py-3 text-sm text-gray-600">${herramienta.ubicacion || '-'}</td>
+                        <td class="px-4 py-3">
+                            <span class="px-2 py-1 text-xs font-semibold rounded-full ${estadoBadge}">
+                                ${herramienta.estado}
+                            </span>
+                        </td>
+                        <td class="px-4 py-3 text-sm">
+                            <button onclick="editHerramienta(${herramienta.id})" class="text-blue-600 hover:text-blue-800 mr-3" title="Editar">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button onclick="deleteHerramienta(${herramienta.id})" class="text-red-600 hover:text-red-800" title="Eliminar">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </td>
+                    </tr>
+                `;
+            });
+        }
+
+        // Filtrar tabla
+        function filterTable() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            const rows = document.querySelectorAll('#tableBody tr');
+            
+            rows.forEach(row => {
+                const text = row.textContent.toLowerCase();
+                row.style.display = text.includes(searchTerm) ? '' : 'none';
+            });
+        }
+
+        // Guardar herramienta
+        async function saveHerramienta(event) {
+            event.preventDefault();
+            
+            const formData = {
+                codigo: document.getElementById('codigo').value,
+                nombre: document.getElementById('nombre').value,
+                tipo: document.getElementById('tipo').value,
+                marca: document.getElementById('marca').value,
+                modelo: document.getElementById('modelo').value,
+                especificaciones: document.getElementById('especificaciones').value,
+                almacen_id: document.getElementById('almacen_id').value || null,
+                ubicacion: document.getElementById('ubicacion').value,
+                numero_serie: document.getElementById('numero_serie').value,
+                estado: document.getElementById('estado').value,
+                condicion: document.getElementById('condicion').value,
+                activo: document.getElementById('activo').checked,
+                user_crea: document.getElementById('user_crea').value
+            };
+
+            try {
+                const id = document.getElementById('herramientaId').value;
+                const url = id ? `/api/mantenimiento/herramientas/${id}` : '/api/mantenimiento/herramientas';
+                const method = id ? 'PUT' : 'POST';
+
+                const response = await fetch(url, {
+                    method: method,
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(formData)
+                });
+
+                if (response.ok) {
+                    showToast(id ? 'Herramienta actualizada exitosamente' : 'Herramienta creada exitosamente', 'success');
+                    closeModal();
+                    loadHerramientas();
+                } else {
+                    showToast('Error al guardar herramienta', 'error');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                showToast('Error al guardar herramienta', 'error');
+            }
+        }
+
+        // Editar herramienta
+        async function editHerramienta(id) {
+            try {
+                const response = await fetch(`/api/mantenimiento/herramientas/${id}`);
+                const herramienta = await response.json();
+
+                document.getElementById('modalTitle').innerHTML = '<i class="fas fa-edit text-cyan-600 mr-2"></i>Editar Herramienta';
+                document.getElementById('herramientaId').value = herramienta.id;
+                document.getElementById('codigo').value = herramienta.codigo;
+                document.getElementById('nombre').value = herramienta.nombre;
+                document.getElementById('tipo').value = herramienta.tipo || '';
+                document.getElementById('marca').value = herramienta.marca || '';
+                document.getElementById('modelo').value = herramienta.modelo || '';
+                document.getElementById('especificaciones').value = herramienta.especificaciones || '';
+                document.getElementById('almacen_id').value = herramienta.almacen_id || '';
+                document.getElementById('ubicacion').value = herramienta.ubicacion || '';
+                document.getElementById('numero_serie').value = herramienta.numero_serie || '';
+                document.getElementById('estado').value = herramienta.estado || '';
+                document.getElementById('condicion').value = herramienta.condicion || '';
+                document.getElementById('activo').checked = herramienta.activo !== false;
+                document.getElementById('user_crea').value = herramienta.user_crea || '';
+                document.getElementById('fecha_creacion').value = herramienta.fecha_creacion ? new Date(herramienta.fecha_creacion).toISOString().slice(0, 16) : '';
+
+                document.getElementById('modal').classList.add('active');
+            } catch (error) {
+                console.error('Error:', error);
+                showToast('Error al cargar herramienta', 'error');
+            }
+        }
+
+        // Eliminar herramienta
+        async function deleteHerramienta(id) {
+            if (!confirm('¿Está seguro de eliminar esta herramienta?')) return;
+
+            try {
+                const response = await fetch(`/api/mantenimiento/herramientas/${id}`, { method: 'DELETE' });
+                if (response.ok) {
+                    showToast('Herramienta eliminada exitosamente', 'success');
+                    loadHerramientas();
+                } else {
+                    showToast('Error al eliminar herramienta', 'error');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                showToast('Error al eliminar herramienta', 'error');
+            }
+        }
+
+        // Inicialización
+        document.addEventListener('DOMContentLoaded', () => {
+            loadHerramientas();
+            loadAlmacenes();
+        });
+    </script>
+</body>
+</html>

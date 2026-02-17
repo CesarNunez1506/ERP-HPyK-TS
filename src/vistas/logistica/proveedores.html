@@ -1,0 +1,532 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Proveedores - HP&K ERP</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="/vistas/shared/navigation.js"></script>
+    <style>
+        .dropdown-menu { display: none; }
+        .dropdown.active .dropdown-menu { display: block; }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <!-- Navigation Menu will be loaded here -->
+    <div id="navigation-container"></div>
+
+    <!-- Header -->
+    <div class="bg-gradient-to-r from-blue-600 to-blue-800 text-white shadow-lg">
+        <div class="container mx-auto px-6 py-4">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center space-x-4">
+                    <i class="fas fa-truck text-3xl"></i>
+                    <div>
+                        <h1 class="text-2xl font-bold">Gestión de Proveedores</h1>
+                        <p class="text-blue-200 text-sm">Control de Proveedores y Contactos</p>
+                    </div>
+                </div>
+                <div class="flex items-center space-x-3">
+                    <a href="/index.html" class="bg-blue-700 hover:bg-blue-800 px-4 py-2 rounded-lg transition">
+                        <i class="fas fa-home"></i> Inicio
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="container mx-auto px-6 py-6">
+        <div class="bg-white rounded-lg shadow-lg p-6 mb-8">
+            <div class="flex justify-between items-center">
+                <div>
+                    <h1 class="text-3xl font-bold text-gray-800 flex items-center">
+                        <i class="fas fa-truck text-cyan-600 mr-3"></i>
+                        Gestión de Proveedores
+                    </h1>
+                    <p class="text-gray-600 mt-1">Control de Proveedores y Tiempos de Entrega</p>
+                </div>
+                <button onclick="showCreateForm()" class="bg-gradient-to-r from-cyan-500 to-cyan-600 hover:from-cyan-600 hover:to-cyan-700 text-white px-6 py-3 rounded-lg shadow-lg transition flex items-center">
+                    <i class="fas fa-plus mr-2"></i> Nuevo Proveedor
+                </button>
+            </div>
+        </div>
+
+        <div id="formSection" class="hidden bg-white rounded-lg shadow-lg p-6 mb-8">
+            <h3 class="text-2xl font-bold text-gray-800 mb-6" id="formTitle">Nuevo Proveedor</h3>
+            <form id="proveedorForm" class="space-y-6">
+                <div class="bg-gray-50 rounded-lg p-4">
+                    <h4 class="text-lg font-semibold text-gray-700 mb-4 flex items-center">
+                        <i class="fas fa-id-card text-cyan-600 mr-2"></i>
+                        Identificación
+                    </h4>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Código Proveedor*</label>
+                            <input type="text" id="codigo" required class="w-full px-3 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-cyan-500 focus:border-transparent">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">RUC/NIT*</label>
+                            <input type="text" id="ruc" required 
+                                pattern="[0-9]{11}" 
+                                minlength="11" 
+                                maxlength="11" 
+                                title="Ingrese exactamente 11 dígitos numéricos"
+                                placeholder="Ej: 20123456789"
+                                class="w-full px-3 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-cyan-500 focus:border-transparent">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Razón Social*</label>
+                            <input type="text" id="razon_social" required class="w-full px-3 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-cyan-500 focus:border-transparent">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-gray-50 rounded-lg p-4">
+                    <h4 class="text-lg font-semibold text-gray-700 mb-4 flex items-center">
+                        <i class="fas fa-building text-blue-600 mr-2"></i>
+                        Datos Generales
+                    </h4>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Nombre Comercial</label>
+                            <input type="text" id="nombre_comercial" class="w-full px-3 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-cyan-500 focus:border-transparent">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Tipo de Proveedor*</label>
+                            <select id="tipo_proveedor" required class="w-full px-3 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-cyan-500 focus:border-transparent">
+                                <option value="">Seleccione...</option>
+                                <option value="nacional">Nacional</option>
+                                <option value="internacional">Internacional</option>
+                                <option value="local">Local</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Categoría*</label>
+                            <select id="categoria" required class="w-full px-3 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-cyan-500 focus:border-transparent">
+                                <option value="">Loading...</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">País*</label>
+                            <select id="pais" required class="w-full px-3 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-cyan-500 focus:border-transparent">
+                                <option value="">Seleccione...</option>
+                                <option value="PE">Perú</option>
+                                <option value="US">Estados Unidos</option>
+                                <option value="CN">China</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-gray-50 rounded-lg p-4">
+                    <h4 class="text-lg font-semibold text-gray-700 mb-4 flex items-center">
+                        <i class="fas fa-map-marker-alt text-green-600 mr-2"></i>
+                        Ubicación
+                    </h4>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div class="md:col-span-2">
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Dirección*</label>
+                            <input type="text" id="direccion" required class="w-full px-3 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-cyan-500 focus:border-transparent">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Ciudad*</label>
+                            <input type="text" id="ciudad" required class="w-full px-3 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-cyan-500 focus:border-transparent">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Región/Departamento</label>
+                            <input type="text" id="region" class="w-full px-3 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-cyan-500 focus:border-transparent">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-gray-50 rounded-lg p-4">
+                    <h4 class="text-lg font-semibold text-gray-700 mb-4 flex items-center">
+                        <i class="fas fa-phone text-purple-600 mr-2"></i>
+                        Información de Contacto
+                    </h4>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Teléfono Principal*</label>
+                            <input type="tel" id="telefono" required 
+                                pattern="[0-9]{1,9}" 
+                                maxlength="9" 
+                                title="Ingrese solo números, máximo 9 dígitos"
+                                placeholder="Ej: 987654321"
+                                class="w-full px-3 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-cyan-500 focus:border-transparent">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Email*</label>
+                            <input type="email" id="email" required 
+                                placeholder="Ej: proveedor@empresa.com"
+                                class="w-full px-3 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-cyan-500 focus:border-transparent">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Contacto Principal</label>
+                            <input type="text" id="contacto_principal" class="w-full px-3 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-cyan-500 focus:border-transparent">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-gray-50 rounded-lg p-4">
+                    <h4 class="text-lg font-semibold text-gray-700 mb-4 flex items-center">
+                        <i class="fas fa-handshake text-orange-600 mr-2"></i>
+                        Condiciones Comerciales
+                    </h4>
+                    <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Tiempo Entrega (días)*</label>
+                            <input type="number" id="tiempo_entrega" required min="0" class="w-full px-3 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-cyan-500 focus:border-transparent">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Plazo de Pago (días)*</label>
+                            <input type="number" id="plazo_pago" required min="0" class="w-full px-3 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-cyan-500 focus:border-transparent">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Forma de Pago*</label>
+                            <select id="forma_pago" required class="w-full px-3 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-cyan-500 focus:border-transparent">
+                                <option value="">Seleccione...</option>
+                                <option value="contado">Contado</option>
+                                <option value="credito">Crédito</option>
+                                <option value="anticipado">Anticipado</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Moneda*</label>
+                            <select id="moneda" required class="w-full px-3 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-cyan-500 focus:border-transparent">
+                                <option value="USD">USD - Dólar</option>
+                                <option value="PEN">PEN - Sol</option>
+                                <option value="EUR">EUR - Euro</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-gray-50 rounded-lg p-4">
+                    <h4 class="text-lg font-semibold text-gray-700 mb-4 flex items-center">
+                        <i class="fas fa-star text-yellow-600 mr-2"></i>
+                        Evaluación y Certificación
+                    </h4>
+                    <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Calificación*</label>
+                            <select id="calificacion" required class="w-full px-3 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-cyan-500 focus:border-transparent">
+                                <option value="">Seleccione...</option>
+                                <option value="A">A - Excelente</option>
+                                <option value="B">B - Bueno</option>
+                                <option value="C">C - Regular</option>
+                                <option value="D">D - Por Evaluar</option>
+                            </select>
+                        </div>
+                        <div class="flex items-center space-x-2 pt-6">
+                            <input type="checkbox" id="certificado_iso" class="w-4 h-4 text-cyan-600 rounded">
+                            <label for="certificado_iso" class="text-sm font-medium text-gray-700">ISO 9001</label>
+                        </div>
+                        <div class="flex items-center space-x-2 pt-6">
+                            <input type="checkbox" id="homologado" class="w-4 h-4 text-cyan-600 rounded">
+                            <label for="homologado" class="text-sm font-medium text-gray-700">Homologado</label>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Estado*</label>
+                            <select id="estado" required class="w-full px-3 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-cyan-500 focus:border-transparent">
+                                <option value="Activo">Activo</option>
+                                <option value="Inactivo">Inactivo</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-gray-50 rounded-lg p-4">
+                    <h4 class="text-lg font-semibold text-gray-700 mb-4 flex items-center">
+                        <i class="fas fa-comment text-indigo-600 mr-2"></i>
+                        Observaciones
+                    </h4>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Notas Adicionales</label>
+                        <textarea id="observaciones" rows="2" class="w-full px-3 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-cyan-500 focus:border-transparent"></textarea>
+                    </div>
+                </div>
+
+                <div class="bg-gray-50 rounded-lg p-4">
+                    <h4 class="text-lg font-semibold text-gray-700 mb-4 flex items-center">
+                        <i class="fas fa-user text-pink-600 mr-2"></i>
+                        Usuario
+                    </h4>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">User_crea</label>
+                            <input type="text" id="user_crea" readonly class="w-full px-3 py-2 border border-gray-300 rounded bg-gray-100">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Fecha Creación</label>
+                            <input type="datetime-local" id="fecha_creacion" readonly class="w-full px-3 py-2 border border-gray-300 rounded bg-gray-100">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flex gap-4 pt-4">
+                    <button type="submit" class="flex-1 bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white px-6 py-3 rounded-lg shadow-lg transition flex items-center justify-center">
+                        <i class="fas fa-save mr-2"></i> Guardar
+                    </button>
+                    <button type="button" onclick="cancelForm()" class="flex-1 bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white px-6 py-3 rounded-lg shadow-lg transition flex items-center justify-center">
+                        <i class="fas fa-times mr-2"></i> Cancelar
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <div class="bg-white rounded-lg shadow-lg p-6 mb-8">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                <input type="text" id="searchInput" placeholder="Buscar proveedor..." onkeyup="filterTable()" class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-500">
+                <select id="filterTipo" onchange="filterTable()" class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-500">
+                    <option value="">Todos los Tipos</option>
+                    <option value="nacional">Nacional</option>
+                    <option value="internacional">Internacional</option>
+                </select>
+                <select id="filterEstado" onchange="filterTable()" class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-500">
+                    <option value="">Todos los Estados</option>
+                    <option value="activo">Activo</option>
+                    <option value="inactivo">Inactivo</option>
+                </select>
+                <button onclick="clearFilters()" class="bg-gray-300 hover:bg-gray-400 text-gray-800 px-4 py-2 rounded-lg transition">
+                    <i class="fas fa-redo mr-2"></i> Limpiar
+                </button>
+            </div>
+        </div>
+
+        <div class="bg-white rounded-lg shadow-lg overflow-hidden">
+            <div class="overflow-x-auto">
+                <table class="min-w-full">
+                    <thead class="bg-gradient-to-r from-gray-100 to-gray-200">
+                        <tr>
+                            <th class="px-6 py-4 text-left text-xs font-bold text-gray-700 uppercase">Código</th>
+                            <th class="px-6 py-4 text-left text-xs font-bold text-gray-700 uppercase">RUC</th>
+                            <th class="px-6 py-4 text-left text-xs font-bold text-gray-700 uppercase">Razón Social</th>
+                            <th class="px-6 py-4 text-left text-xs font-bold text-gray-700 uppercase">Tipo</th>
+                            <th class="px-6 py-4 text-left text-xs font-bold text-gray-700 uppercase">Contacto</th>
+                            <th class="px-6 py-4 text-left text-xs font-bold text-gray-700 uppercase">Calificación</th>
+                            <th class="px-6 py-4 text-left text-xs font-bold text-gray-700 uppercase">Estado</th>
+                            <th class="px-6 py-4 text-center text-xs font-bold text-gray-700 uppercase">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tableBody" class="divide-y divide-gray-200"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div id="toast" class="hidden fixed top-4 right-4 px-6 py-4 rounded-lg shadow-lg z-50 text-white">
+        <div class="flex items-center">
+            <i class="fas fa-check-circle mr-2"></i>
+            <span id="toastMessage"></span>
+        </div>
+    </div>
+
+    <script>
+        let proveedores = [];
+        let editingId = null;
+
+        // Dropdown functions are now handled by NavigationManager
+
+        document.addEventListener('DOMContentLoaded', () => {
+            loadProveedores();
+            loadCatalogos();
+            document.getElementById('user_crea').value = 'Admin';
+        });
+
+        function showToast(message, type = 'success') {
+            const toast = document.getElementById('toast');
+            toast.className = `fixed top-4 right-4 px-6 py-4 rounded-lg shadow-lg z-50 text-white ${type === 'success' ? 'bg-green-500' : 'bg-red-500'}`;
+            document.getElementById('toastMessage').textContent = message;
+            toast.classList.remove('hidden');
+            setTimeout(() => toast.classList.add('hidden'), 3000);
+        }
+
+        async function loadCatalogos() {
+            try {
+                const categorias = await fetch('/api/catalogos/categorias').then(r => r.json());
+                const catSelect = document.getElementById('categoria');
+                catSelect.innerHTML = '<option value="">Seleccione categoría...</option>';
+                categorias.forEach(c => {
+                    catSelect.innerHTML += `<option value="${c.codigo}">${c.descripcion}</option>`;
+                });
+            } catch (error) {
+                console.error('Error loading catalogs:', error);
+            }
+        }
+
+        async function loadProveedores() {
+            try {
+                const response = await fetch('/api/logistica/proveedores');
+                proveedores = await response.json();
+                renderTable();
+            } catch (error) {
+                console.error('Error:', error);
+                showToast('Error al cargar proveedores', 'error');
+            }
+        }
+
+        function renderTable() {
+            const tbody = document.getElementById('tableBody');
+            tbody.innerHTML = '';
+            proveedores.forEach(prov => {
+                tbody.innerHTML += `
+                    <tr class="hover:bg-gray-50 transition">
+                        <td class="px-6 py-4 text-sm font-semibold">${prov.codigo || '-'}</td>
+                        <td class="px-6 py-4 text-sm">${prov.ruc || '-'}</td>
+                        <td class="px-6 py-4 text-sm">${prov.razon_social || '-'}</td>
+                        <td class="px-6 py-4 text-sm">${prov.tipo_proveedor || '-'}</td>
+                        <td class="px-6 py-4 text-sm">${prov.email || '-'}</td>
+                        <td class="px-6 py-4"><span class="px-2 py-1 text-xs font-bold rounded ${getCalifColor(prov.calificacion)}">${prov.calificacion || 'D'}</span></td>
+                        <td class="px-6 py-4"><span class="px-3 py-1 text-xs font-semibold rounded-full ${getEstadoColor(prov.estado)}">${prov.estado || 'activo'}</span></td>
+                        <td class="px-6 py-4 text-center">
+                            <button onclick="editProveedor(${prov.id})" class="text-blue-600 hover:text-blue-800 mx-1"><i class="fas fa-edit"></i></button>
+                            <button onclick="deleteProveedor(${prov.id})" class="text-red-600 hover:text-red-800 mx-1"><i class="fas fa-trash"></i></button>
+                        </td>
+                    </tr>
+                `;
+            });
+        }
+
+        function getCalifColor(calif) {
+            const colors = {'A': 'bg-green-100 text-green-800', 'B': 'bg-blue-100 text-blue-800', 'C': 'bg-yellow-100 text-yellow-800', 'D': 'bg-gray-100 text-gray-800'};
+            return colors[calif] || 'bg-gray-100 text-gray-800';
+        }
+
+        function getEstadoColor(estado) {
+            const colors = {'activo': 'bg-green-100 text-green-800', 'inactivo': 'bg-gray-100 text-gray-800', 'bloqueado': 'bg-red-100 text-red-800'};
+            return colors[estado] || 'bg-gray-100 text-gray-800';
+        }
+
+        function filterTable() {
+            const search = document.getElementById('searchInput').value.toLowerCase();
+            const tipo = document.getElementById('filterTipo').value;
+            const estado = document.getElementById('filterEstado').value;
+            document.querySelectorAll('#tableBody tr').forEach(row => {
+                const text = row.textContent.toLowerCase();
+                const match = text.includes(search) && (!tipo || text.includes(tipo)) && (!estado || text.includes(estado));
+                row.style.display = match ? '' : 'none';
+            });
+        }
+
+        function clearFilters() {
+            document.getElementById('searchInput').value = '';
+            document.getElementById('filterTipo').value = '';
+            document.getElementById('filterEstado').value = '';
+            filterTable();
+        }
+
+        function showCreateForm() {
+            editingId = null;
+            document.getElementById('formSection').classList.remove('hidden');
+            document.getElementById('formTitle').textContent = 'Nuevo Proveedor';
+            document.getElementById('proveedorForm').reset();
+            document.getElementById('user_crea').value = 'Admin';
+            document.getElementById('fecha_creacion').value = new Date().toISOString().slice(0, 16);
+            document.getElementById('estado').value = 'activo';
+            document.getElementById('moneda').value = 'USD';
+        }
+
+        function cancelForm() {
+            document.getElementById('formSection').classList.add('hidden');
+        }
+
+        function editProveedor(id) {
+            const prov = proveedores.find(p => p.id === id);
+            if (!prov) return;
+            editingId = id;
+            document.getElementById('formSection').classList.remove('hidden');
+            document.getElementById('formTitle').textContent = 'Editar Proveedor';
+            document.getElementById('codigo').value = prov.codigo || '';
+            document.getElementById('ruc').value = prov.ruc || '';
+            document.getElementById('razon_social').value = prov.razon_social || '';
+            document.getElementById('tipo_proveedor').value = prov.tipo_proveedor || '';
+            document.getElementById('direccion').value = prov.direccion || '';
+            document.getElementById('ciudad').value = prov.ciudad || '';
+            document.getElementById('telefono').value = prov.telefono || '';
+            document.getElementById('email').value = prov.email || '';
+            document.getElementById('tiempo_entrega').value = prov.tiempo_entrega || '';
+            document.getElementById('plazo_pago').value = prov.plazo_pago || '';
+            document.getElementById('forma_pago').value = prov.forma_pago || '';
+            document.getElementById('calificacion').value = prov.calificacion || '';
+            document.getElementById('estado').value = prov.estado || 'activo';
+        }
+
+        async function deleteProveedor(id) {
+            if (!confirm('¿Eliminar este proveedor?')) return;
+            try {
+                const response = await fetch(`/api/logistica/proveedores/${id}`, {method: 'DELETE'});
+                if (response.ok) {
+                    showToast('Proveedor eliminado', 'success');
+                    loadProveedores();
+                } else {
+                    showToast('Error al eliminar', 'error');
+                }
+            } catch (error) {
+                showToast('Error al eliminar', 'error');
+            }
+        }
+
+        document.getElementById('proveedorForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            // Only send fields that match the Proveedor model (camelCase)
+            const data = {
+                ruc: document.getElementById('ruc').value,
+                razonSocial: document.getElementById('razon_social').value,
+                contacto: document.getElementById('contacto_principal').value || 'No especificado',
+                telefono: document.getElementById('telefono').value,
+                email: document.getElementById('email').value,
+                direccion: document.getElementById('direccion').value || null,
+                estado: document.getElementById('estado').value
+            };
+            
+            console.log('Sending data:', data);
+            
+            try {
+                const url = editingId ? `/api/logistica/proveedores/${editingId}` : '/api/logistica/proveedores';
+                const response = await fetch(url, {
+                    method: editingId ? 'PUT' : 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify(data)
+                });
+                
+                if (response.ok) {
+                    showToast(editingId ? 'Proveedor actualizado' : 'Proveedor creado', 'success');
+                    cancelForm();
+                    loadProveedores();
+                } else {
+                    const errorData = await response.json();
+                    console.error('Backend error:', errorData);
+                    console.error('Error details:', JSON.stringify(errorData.details, null, 2));
+                    
+                    let errorMessage = 'Error al guardar';
+                    
+                    // Check for duplicate RUC error
+                    if (errorData.details?.name === 'SequelizeUniqueConstraintError' || 
+                        errorData.details?.errors?.[0]?.type === 'unique violation') {
+                        errorMessage = 'El RUC ya existe en el sistema';
+                    } 
+                    // Check for ENUM error
+                    else if (errorData.details?.name === 'SequelizeDatabaseError' && 
+                             errorData.details?.parent?.code === '22P02') {
+                        errorMessage = 'Error de validación: Valor inválido en campo de estado';
+                    }
+                    // Other validation errors
+                    else if (errorData.details?.errors?.[0]?.message) {
+                        errorMessage = errorData.details.errors[0].message;
+                    } else if (errorData.error) {
+                        errorMessage = errorData.error;
+                    }
+                    
+                    showToast(errorMessage, 'error');
+                }
+            } catch (error) {
+                console.error('Request error:', error);
+                showToast('Error al guardar', 'error');
+            }
+        });
+    </script>
+</body>
+</html>

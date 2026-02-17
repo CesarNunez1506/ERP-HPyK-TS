@@ -3,353 +3,1198 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Órdenes de Trabajo - ERP HPyK</title>
+    <title>Órdenes de Trabajo - HP&K ERP</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="/vistas/shared/navigation.js"></script>
     <style>
-        @keyframes slideIn {
-            from { opacity: 0; transform: translateY(-20px); }
+        .dropdown-menu { display: none; }
+        .dropdown.active .dropdown-menu { display: block; }
+        
+        /* Tab Styles */
+        .tab-button {
+            transition: all 0.3s ease;
+            border-bottom: 3px solid transparent;
+        }
+        .tab-button.active {
+            border-bottom-color: #0891b2;
+            background-color: #ecfeff;
+            color: #0e7490;
+            font-weight: 600;
+        }
+        .tab-button:hover:not(.active) {
+            background-color: #f0f9ff;
+        }
+        .tab-content {
+            display: none;
+        }
+        .tab-content.active {
+            display: block;
+            animation: fadeIn 0.3s ease-in;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
             to { opacity: 1; transform: translateY(0); }
         }
-        .slide-in { animation: slideIn 0.3s ease-out; }
-        .hover-scale { transition: transform 0.2s; }
-        .hover-scale:hover { transform: scale(1.05); }
     </style>
 </head>
-<body class="bg-gradient-to-br from-gray-50 to-gray-100 min-h-screen">
-    <nav class="bg-gradient-to-r from-blue-900 to-blue-700 text-white shadow-lg sticky top-0 z-50">
-        <div class="max-w-7xl mx-auto px-4">
-            <div class="flex items-center justify-between h-16">
+<body class="bg-gray-50">
+    <!-- Navigation Menu will be loaded here -->
+    <div id="navigation-container"></div>
+
+    <!-- Header -->
+    <div class="bg-gradient-to-r from-orange-600 to-orange-800 text-white shadow-lg">
+        <div class="container mx-auto px-6 py-4">
+            <div class="flex items-center justify-between">
                 <div class="flex items-center space-x-4">
-                    <i class="fas fa-industry text-2xl"></i>
-                    <span class="text-xl font-bold">ERP HPyK</span>
+                    <i class="fas fa-clipboard-list text-3xl"></i>
+                    <div>
+                        <h1 class="text-2xl font-bold">Órdenes de Trabajo</h1>
+                        <p class="text-orange-200 text-sm">Gestión y Seguimiento de OTs</p>
+                    </div>
                 </div>
-                <div class="flex space-x-4">
-                    <a href="/" class="hover:bg-blue-800 px-3 py-2 rounded transition">
-                        <i class="fas fa-home mr-2"></i>Inicio
-                    </a>
-                    <a href="/catalogo/plantas" class="hover:bg-blue-800 px-3 py-2 rounded transition">
-                        <i class="fas fa-clipboard-list mr-2"></i>Catálogo
-                    </a>
-                    <a href="/maestros/equipos" class="hover:bg-blue-800 px-3 py-2 rounded transition">
-                        <i class="fas fa-cogs mr-2"></i>Maestros
-                    </a>
-                    <a href="/operativos/ordenes-trabajo" class="bg-blue-800 px-3 py-2 rounded">
-                        <i class="fas fa-tasks mr-2"></i>Operativos
+                <div class="flex items-center space-x-3">
+                    <a href="/index.html" class="bg-orange-700 hover:bg-orange-800 px-4 py-2 rounded-lg transition">
+                        <i class="fas fa-home"></i> Inicio
                     </a>
                 </div>
             </div>
         </div>
-    </nav>
+    </div>
 
-    <div class="max-w-7xl mx-auto px-4 py-8">
-        <div class="bg-white rounded-lg shadow-lg p-6 mb-6 slide-in">
-            <div class="flex items-center justify-between mb-6">
+    <!-- Main Content -->
+    <div class="container mx-auto px-6 py-8">
+        <!-- Header -->
+        <div class="bg-white rounded-lg shadow-lg p-6 mb-8">
+            <div class="flex justify-between items-center">
                 <div>
                     <h1 class="text-3xl font-bold text-gray-800 flex items-center">
-                        <i class="fas fa-tasks text-blue-600 mr-3"></i>
-                        Gestión de Órdenes de Trabajo
+                        <i class="fas fa-clipboard-list text-orange-600 mr-3"></i>
+                        Órdenes de Trabajo
                     </h1>
-                    <p class="text-gray-600 mt-2">Administra y rastrea las órdenes de trabajo</p>
+                    <p class="text-gray-600 mt-1">Gestión de Maintenance Items</p>
                 </div>
-                <div class="flex space-x-3">
-                    <button onclick="showCreateForm()" class="bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white px-6 py-3 rounded-lg shadow-md hover:shadow-lg transition hover-scale flex items-center space-x-2">
-                        <i class="fas fa-plus"></i>
-                        <span>Nueva OT</span>
+                <button onclick="showCreateForm()" class="bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white px-6 py-3 rounded-lg shadow-lg transition flex items-center">
+                    <i class="fas fa-plus mr-2"></i> Nueva OT
+                </button>
+            </div>
+        </div>
+
+        <!-- Form Section (Hidden by default) -->
+        <div id="formSection" class="hidden bg-white rounded-lg shadow-lg p-6 mb-8">
+            <h3 class="text-2xl font-bold text-gray-800 mb-6" id="formTitle">Nueva Orden de Trabajo</h3>
+            
+            <form id="ordenForm" class="space-y-6">
+                <!-- Información General -->
+                <div class="bg-gray-50 rounded-lg p-4">
+                    <h4 class="text-lg font-semibold text-gray-700 mb-4 flex items-center">
+                        <i class="fas fa-info-circle text-cyan-600 mr-2"></i>
+                        Información General
+                    </h4>
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">ID Maintenance Item*</label>
+                            <input type="text" id="numero_ot" required 
+                                class="w-full px-3 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-cyan-500 focus:border-transparent">
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Operation*</label>
+                            <select id="operacion" required
+                                class="w-full px-3 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-cyan-500 focus:border-transparent">
+                                <option value="">Seleccione...</option>
+                                <option value="Mina">Mina</option>
+                                <option value="Planta">Planta</option>
+                                <option value="Taller">Taller</option>
+                            </select>
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Process*</label>
+                            <input type="text" id="proceso" required 
+                                class="w-full px-3 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-cyan-500 focus:border-transparent"
+                                placeholder="Ej: Molienda, Chancado, Flotación...">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Ubicación y Equipo -->
+                <div class="bg-gray-50 rounded-lg p-4">
+                    <h4 class="text-lg font-semibold text-gray-700 mb-4 flex items-center">
+                        <i class="fas fa-map-marker-alt text-green-600 mr-2"></i>
+                        Ubicación y Equipo
+                    </h4>
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Flota o Área*</label>
+                            <select id="flota_area" required
+                                class="w-full px-3 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-cyan-500 focus:border-transparent">
+                                <option value="">Seleccione flota o área...</option>
+                            </select>
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Modelo*</label>
+                            <input type="text" id="modelo" required 
+                                class="w-full px-3 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-cyan-500 focus:border-transparent">
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Equipo*</label>
+                            <select id="equipo_id" required
+                                class="w-full px-3 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-cyan-500 focus:border-transparent">
+                                <option value="">Seleccione...</option>
+                            </select>
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Componente*</label>
+                            <input type="text" id="componente" required 
+                                class="w-full px-3 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-cyan-500 focus:border-transparent">
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">ID Maintenance Plan</label>
+                            <input type="text" id="id_maintenance_plan" 
+                                class="w-full px-3 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-cyan-500 focus:border-transparent">
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">ID TaskList</label>
+                            <input type="text" id="id_tasklist" 
+                                class="w-full px-3 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-cyan-500 focus:border-transparent">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Functional Location -->
+                <div class="bg-gray-50 rounded-lg p-4">
+                    <h4 class="text-lg font-semibold text-gray-700 mb-4 flex items-center">
+                        <i class="fas fa-location-dot text-blue-600 mr-2"></i>
+                        Functional Location
+                    </h4>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">ID Functional Location</label>
+                            <input type="text" id="id_functional_location" 
+                                class="w-full px-3 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-cyan-500 focus:border-transparent">
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Functional Location*</label>
+                            <input type="text" id="functional_location" required 
+                                class="w-full px-3 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-cyan-500 focus:border-transparent">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Actividad y Descripción -->
+                <div class="bg-gray-50 rounded-lg p-4">
+                    <h4 class="text-lg font-semibold text-gray-700 mb-4 flex items-center">
+                        <i class="fas fa-clipboard text-purple-600 mr-2"></i>
+                        Actividad y Descripción
+                    </h4>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Tipo Actividad*</label>
+                            <select id="tipo_actividad" required
+                                class="w-full px-3 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-cyan-500 focus:border-transparent">
+                                <option value="">Seleccione...</option>
+                                <option value="012">012 - Mantenimiento Preventivo</option>
+                                <option value="013">013 - Mantenimiento Correctivo</option>
+                                <option value="014">014 - Inspección</option>
+                                <option value="015">015 - Reparación</option>
+                            </select>
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Description*</label>
+                            <input type="text" id="descripcion" required 
+                                class="w-full px-3 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-cyan-500 focus:border-transparent">
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Description Text*</label>
+                        <textarea id="descripcion_texto" required rows="3"
+                            class="w-full px-3 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-cyan-500 focus:border-transparent"></textarea>
+                    </div>
+                </div>
+
+                <!-- Indicadores y Control -->
+                <div class="bg-gray-50 rounded-lg p-4">
+                    <h4 class="text-lg font-semibold text-gray-700 mb-4 flex items-center">
+                        <i class="fas fa-check-square text-teal-600 mr-2"></i>
+                        Indicadores y Control
+                    </h4>
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                        <div class="flex items-center space-x-2">
+                            <input type="checkbox" id="fl_regcbo" class="w-4 h-4 text-cyan-600 rounded">
+                            <label for="fl_regcbo" class="text-sm font-medium text-gray-700">fl_regcbo</label>
+                        </div>
+                        
+                        <div class="flex items-center space-x-2">
+                            <input type="checkbox" id="fl_insp" class="w-4 h-4 text-cyan-600 rounded">
+                            <label for="fl_insp" class="text-sm font-medium text-gray-700">fl_insp</label>
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Modifier Code</label>
+                            <input type="text" id="modifier_code" 
+                                class="w-full px-3 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-cyan-500 focus:border-transparent">
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Storag</label>
+                            <select id="storag"
+                                class="w-full px-3 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-cyan-500 focus:border-transparent">
+                                <option value="">Seleccione...</option>
+                                <option value="activo">Activo</option>
+                                <option value="inactivo">Inactivo</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Usuario -->
+                <div class="bg-gray-50 rounded-lg p-4">
+                    <h4 class="text-lg font-semibold text-gray-700 mb-4 flex items-center">
+                        <i class="fas fa-user text-indigo-600 mr-2"></i>
+                        Usuario
+                    </h4>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">User_crea</label>
+                            <input type="text" id="user_crea" readonly
+                                class="w-full px-3 py-2 border border-gray-300 rounded bg-gray-100 focus:ring-2 focus:ring-cyan-500 focus:border-transparent">
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Fecha Creación</label>
+                            <input type="datetime-local" id="fecha_creacion" readonly
+                                class="w-full px-3 py-2 border border-gray-300 rounded bg-gray-100 focus:ring-2 focus:ring-cyan-500 focus:border-transparent">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Botones -->
+                <div class="flex gap-4 pt-4">
+                    <button type="submit" class="flex-1 bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white px-6 py-3 rounded-lg shadow-lg transition flex items-center justify-center">
+                        <i class="fas fa-save mr-2"></i> Guardar
                     </button>
-                    <button onclick="loadOrdenes()" class="bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white px-6 py-3 rounded-lg shadow-md hover:shadow-lg transition hover-scale flex items-center space-x-2">
-                        <i class="fas fa-sync-alt"></i>
-                        <span>Actualizar</span>
+                    <button type="button" onclick="cancelForm()" class="flex-1 bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white px-6 py-3 rounded-lg shadow-lg transition flex items-center justify-center">
+                        <i class="fas fa-times mr-2"></i> Cancelar
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Sección de Detalles de OT con Pestañas (Hidden by default) -->
+        <div id="detailsSection" class="hidden bg-white rounded-lg shadow-lg mb-8">
+            <!-- Header con Número de OT -->
+            <div class="bg-gradient-to-r from-cyan-500 to-cyan-600 text-white p-6 rounded-t-lg">
+                <div class="flex justify-between items-center">
+                    <div>
+                        <h3 class="text-2xl font-bold mb-1">Orden de Trabajo: <span id="detailOTNumber">-</span></h3>
+                        <p class="text-cyan-100">Equipo: <span id="detailEquipo">-</span> | Estado: <span id="detailEstado">-</span></p>
+                    </div>
+                    <button onclick="closeDetails()" class="bg-white/20 hover:bg-white/30 px-4 py-2 rounded-lg transition">
+                        <i class="fas fa-times mr-2"></i> Cerrar
                     </button>
                 </div>
             </div>
 
-            <!-- Filtros -->
-            <div class="bg-gradient-to-r from-gray-50 to-blue-50 p-4 rounded-lg border border-gray-200 mb-6">
-                <h4 class="font-bold text-gray-700 mb-3 flex items-center">
-                    <i class="fas fa-filter mr-2 text-blue-600"></i>Filtros
-                </h4>
-                <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
-                    <div>
-                        <label class="block text-sm font-semibold text-gray-700 mb-1">Cliente:</label>
-                        <select id="filterCliente" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm">
-                            <option value="">Todos</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label class="block text-sm font-semibold text-gray-700 mb-1">Status:</label>
-                        <select id="filterStatus" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm">
-                            <option value="">Todos</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label class="block text-sm font-semibold text-gray-700 mb-1">Desde:</label>
-                        <input type="date" id="filterFechaDesde" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm">
-                    </div>
-                    <div class="flex items-end">
-                        <button onclick="applyFilters()" class="w-full bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg transition">
-                            <i class="fas fa-search mr-2"></i>Buscar
-                        </button>
-                    </div>
-                </div>
+            <!-- Tabs Navigation -->
+            <div class="flex border-b border-gray-200 bg-gray-50">
+                <button onclick="switchTab('resumen')" id="tab-resumen" class="tab-button active flex-1 py-4 px-6 text-center">
+                    <i class="fas fa-info-circle mr-2"></i> Resumen
+                </button>
+                <button onclick="switchTab('repuestos')" id="tab-repuestos" class="tab-button flex-1 py-4 px-6 text-center">
+                    <i class="fas fa-box-open mr-2"></i> Solicitar Repuestos
+                </button>
+                <button onclick="switchTab('historial')" id="tab-historial" class="tab-button flex-1 py-4 px-6 text-center">
+                    <i class="fas fa-history mr-2"></i> Historial de Operaciones
+                </button>
             </div>
 
-            <div id="formSection" class="hidden">
-                <div class="bg-gradient-to-r from-blue-50 to-indigo-50 p-6 rounded-lg border-2 border-blue-200 mb-6 slide-in">
-                    <h3 class="text-xl font-bold text-gray-800 mb-4 flex items-center">
-                        <i class="fas fa-edit text-blue-600 mr-2"></i>
-                        <span id="formTitle">Formulario de Orden de Trabajo</span>
-                    </h3>
-                    <form id="ordenForm">
-                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                            <div>
-                                <label class="block text-sm font-semibold text-gray-700 mb-2">
-                                    <i class="fas fa-hashtag mr-1"></i> Número OT:
-                                </label>
-                                <input type="text" id="numero_ot" required
-                                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 transition">
+            <!-- Tab Content Container -->
+            <div class="p-6">
+                <!-- Tab 1: Resumen de la OT -->
+                <div id="content-resumen" class="tab-content active">
+                    <h4 class="text-xl font-bold text-gray-800 mb-4">Información General</h4>
+                    <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
+                        <div class="bg-gray-50 p-4 rounded-lg">
+                            <p class="text-sm text-gray-600">Operación</p>
+                            <p class="font-semibold text-gray-800" id="detail-operacion">-</p>
+                        </div>
+                        <div class="bg-gray-50 p-4 rounded-lg">
+                            <p class="text-sm text-gray-600">Proceso</p>
+                            <p class="font-semibold text-gray-800" id="detail-proceso">-</p>
+                        </div>
+                        <div class="bg-gray-50 p-4 rounded-lg">
+                            <p class="text-sm text-gray-600">Componente</p>
+                            <p class="font-semibold text-gray-800" id="detail-componente">-</p>
+                        </div>
+                        <div class="bg-gray-50 p-4 rounded-lg">
+                            <p class="text-sm text-gray-600">Fecha Inicio</p>
+                            <p class="font-semibold text-gray-800" id="detail-fecha-inicio">-</p>
+                        </div>
+                        <div class="bg-gray-50 p-4 rounded-lg">
+                            <p class="text-sm text-gray-600">Fecha Fin</p>
+                            <p class="font-semibold text-gray-800" id="detail-fecha-fin">-</p>
+                        </div>
+                        <div class="bg-gray-50 p-4 rounded-lg">
+                            <p class="text-sm text-gray-600">Prioridad</p>
+                            <p class="font-semibold text-gray-800" id="detail-prioridad">-</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tab 2: Solicitud de Repuestos -->
+                <div id="content-repuestos" class="tab-content">
+                    <div class="mb-6">
+                        <h4 class="text-xl font-bold text-gray-800 mb-4">Solicitar Repuestos para esta OT</h4>
+                        
+                        <!-- Form para agregar repuestos -->
+                        <form id="repuestoForm" class="bg-gray-50 p-4 rounded-lg mb-6">
+                            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 mb-4">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Inventario/Repuesto*</label>
+                                    <select id="repuesto-material" required class="w-full px-3 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-cyan-500">
+                                        <option value="">Seleccione inventario...</option>
+                                        <!-- Se llenará dinámicamente desde /api/materiales -->
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Cantidad*</label>
+                                    <input type="number" id="repuesto-cantidad" min="1" required 
+                                        class="w-full px-3 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-cyan-500">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Proveedor</label>
+                                    <select id="repuesto-proveedor" class="w-full px-3 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-cyan-500">
+                                        <option value="">Seleccione proveedor...</option>
+                                        <!-- Se llenará dinámicamente desde /api/logistica/proveedores -->
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Precio Unit. (USD)</label>
+                                    <input type="number" id="repuesto-precio" min="0" step="0.01" 
+                                        placeholder="0.00"
+                                        class="w-full px-3 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-cyan-500">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Fecha Entrega</label>
+                                    <input type="date" id="repuesto-fecha-entrega" 
+                                        class="w-full px-3 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-cyan-500">
+                                </div>
                             </div>
-                            <div>
-                                <label class="block text-sm font-semibold text-gray-700 mb-2">Cliente:</label>
-                                <select id="cliente_codigo" required
-                                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 transition">
-                                    <option value="">Seleccione...</option>
-                                </select>
+                            <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                                <div class="md:col-span-3">
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Observaciones</label>
+                                    <textarea id="repuesto-observaciones" rows="2" 
+                                        class="w-full px-3 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-cyan-500"></textarea>
+                                </div>
+                                <div class="flex items-end">
+                                    <button type="submit" class="w-full bg-cyan-500 hover:bg-cyan-600 text-white px-4 py-2 rounded-lg transition">
+                                        <i class="fas fa-plus mr-2"></i> Agregar
+                                    </button>
+                                </div>
                             </div>
-                            <div>
-                                <label class="block text-sm font-semibold text-gray-700 mb-2">Equipo:</label>
-                                <select id="equipo_id"
-                                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 transition">
-                                    <option value="">Seleccione...</option>
-                                </select>
-                            </div>
-                            <div>
-                                <label class="block text-sm font-semibold text-gray-700 mb-2">Tipo Reparación:</label>
-                                <select id="tipo_reparacion_codigo"
-                                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 transition">
-                                    <option value="">Seleccione...</option>
-                                </select>
-                            </div>
-                            <div>
-                                <label class="block text-sm font-semibold text-gray-700 mb-2">Prioridad:</label>
-                                <select id="prioridad_atencion_codigo"
-                                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 transition">
-                                    <option value="">Seleccione...</option>
-                                </select>
-                            </div>
-                            <div>
-                                <label class="block text-sm font-semibold text-gray-700 mb-2">Fecha Requerimiento:</label>
-                                <input type="datetime-local" id="fecha_requerimiento_cliente"
-                                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 transition">
-                            </div>
-                            <div class="md:col-span-2">
-                                <label class="block text-sm font-semibold text-gray-700 mb-2">Descripción:</label>
-                                <textarea id="descripcion" rows="2"
-                                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 transition"></textarea>
+                        </form>
+
+                        <!-- Lista de repuestos agregados -->
+                        <h5 class="font-semibold text-gray-700 mb-3">Repuestos Solicitados</h5>
+                        
+                        <!-- Resumen de Gastos -->
+                        <div id="resumenGastos" class="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-4 hidden">
+                            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                                <div>
+                                    <p class="text-xs text-gray-600">Total Items</p>
+                                    <p class="text-lg font-bold text-blue-700" id="totalItems">0</p>
+                                </div>
+                                <div>
+                                    <p class="text-xs text-gray-600">Subtotal</p>
+                                    <p class="text-lg font-bold text-blue-700" id="subtotalGasto">$0.00</p>
+                                </div>
+                                <div>
+                                    <p class="text-xs text-gray-600">IGV (18%)</p>
+                                    <p class="text-lg font-bold text-blue-700" id="igvGasto">$0.00</p>
+                                </div>
+                                <div>
+                                    <p class="text-xs text-gray-600">Total Estimado</p>
+                                    <p class="text-xl font-bold text-green-700" id="totalGasto">$0.00</p>
+                                </div>
                             </div>
                         </div>
-                        <div class="flex space-x-3 mt-6">
-                            <button type="submit" class="flex-1 bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white px-6 py-3 rounded-lg shadow-md hover:shadow-lg transition">
-                                <i class="fas fa-save mr-2"></i>Guardar
-                            </button>
-                            <button type="button" onclick="cancelForm()" class="flex-1 bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white px-6 py-3 rounded-lg shadow-md hover:shadow-lg transition">
-                                <i class="fas fa-times mr-2"></i>Cancelar
+                        
+                        <div class="overflow-x-auto">
+                            <table class="min-w-full bg-white border border-gray-200">
+                                <thead class="bg-gray-100">
+                                    <tr>
+                                        <th class="px-4 py-2 text-left text-xs font-semibold text-gray-700">Inventario</th>
+                                        <th class="px-4 py-2 text-left text-xs font-semibold text-gray-700">Cantidad</th>
+                                        <th class="px-4 py-2 text-left text-xs font-semibold text-gray-700">Proveedor</th>
+                                        <th class="px-4 py-2 text-right text-xs font-semibold text-gray-700">Precio Unit.</th>
+                                        <th class="px-4 py-2 text-right text-xs font-semibold text-gray-700">Subtotal</th>
+                                        <th class="px-4 py-2 text-left text-xs font-semibold text-gray-700">Fecha Entrega</th>
+                                        <th class="px-4 py-2 text-left text-xs font-semibold text-gray-700">Estado</th>
+                                        <th class="px-4 py-2 text-center text-xs font-semibold text-gray-700">Acciones</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="repuestosTableBody">
+                                    <tr>
+                                        <td colspan="8" class="px-4 py-6 text-center text-gray-500">
+                                            No hay repuestos solicitados aún
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <!-- Botón para generar PO -->
+                        <div class="mt-6 flex justify-end">
+                            <button onclick="generarOrdenCompra()" class="bg-green-500 hover:bg-green-600 text-white px-6 py-3 rounded-lg transition font-semibold">
+                                <i class="fas fa-file-invoice-dollar mr-2"></i> Generar Orden de Compra (PO)
                             </button>
                         </div>
-                    </form>
+                    </div>
+                </div>
+
+                <!-- Tab 3: Historial de Operaciones -->
+                <div id="content-historial" class="tab-content">
+                    <h4 class="text-xl font-bold text-gray-800 mb-4">Historial de Pedidos y Operaciones</h4>
+                    
+                    <!-- Timeline de operaciones -->
+                    <div id="historialTimeline" class="space-y-4">
+                        <!-- Item de timeline -->
+                        <div class="flex gap-4 border-l-4 border-cyan-500 pl-4 pb-4">
+                            <div class="flex-shrink-0 w-12 h-12 bg-cyan-100 rounded-full flex items-center justify-center">
+                                <i class="fas fa-box text-cyan-600"></i>
+                            </div>
+                            <div class="flex-1">
+                                <div class="flex justify-between items-start">
+                                    <div>
+                                        <h5 class="font-semibold text-gray-800">1er Pedido - Repuestos Principales</h5>
+                                        <p class="text-sm text-gray-600">10/02/2026 14:30</p>
+                                    </div>
+                                    <span class="px-3 py-1 bg-yellow-100 text-yellow-800 text-xs font-semibold rounded-full">Pendiente</span>
+                                </div>
+                                <div class="mt-2 bg-gray-50 p-3 rounded">
+                                    <p class="text-sm text-gray-700">• Rodamiento SKF x2</p>
+                                    <p class="text-sm text-gray-700">• Filtro hidráulico x1</p>
+                                    <p class="text-sm text-gray-700 mt-2"><strong>PO:</strong> PO-2026-001</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="text-center text-gray-500 py-4">
+                            <i class="fas fa-inbox text-3xl mb-2"></i>
+                            <p>No hay más operaciones registradas</p>
+                        </div>
+                    </div>
                 </div>
             </div>
+        </div>
 
-            <div class="overflow-x-auto bg-white rounded-lg shadow">
-                <table class="w-full">
-                    <thead class="bg-gradient-to-r from-gray-50 to-gray-100 border-b-2 border-gray-200">
+        <!-- Search and Filters -->
+        <div class="bg-white rounded-lg shadow-lg p-6 mb-8">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                <input type="text" id="searchInput" placeholder="Buscar OT..." onkeyup="filterTable()"
+                    class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-transparent">
+                
+                <select id="filterOperacion" onchange="filterTable()"
+                    class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-transparent">
+                    <option value="">Todas las Operaciones</option>
+                    <option value="Mina">Mina</option>
+                    <option value="Planta">Planta</option>
+                    <option value="Taller">Taller</option>
+                </select>
+                
+                <select id="filterEstado" onchange="filterTable()"
+                    class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-transparent">
+                    <option value="">Todos los Estados</option>
+                    <option value="Pendiente">Pendiente</option>
+                    <option value="En Proceso">En Proceso</option>
+                    <option value="Completado">Completado</option>
+                </select>
+                
+                <button onclick="clearFilters()" class="bg-gray-300 hover:bg-gray-400 text-gray-800 px-4 py-2 rounded-lg transition">
+                    <i class="fas fa-redo mr-2"></i> Limpiar
+                </button>
+            </div>
+        </div>
+
+        <!-- Table -->
+        <div class="bg-white rounded-lg shadow-lg overflow-hidden">
+            <div class="overflow-x-auto">
+                <table class="min-w-full">
+                    <thead class="bg-gradient-to-r from-gray-100 to-gray-200">
                         <tr>
-                            <th class="px-6 py-4 text-left text-sm font-bold text-gray-700 uppercase">Número OT</th>
-                            <th class="px-6 py-4 text-left text-sm font-bold text-gray-700 uppercase">Cliente</th>
-                            <th class="px-6 py-4 text-left text-sm font-bold text-gray-700 uppercase">Tipo</th>
-                            <th class="px-6 py-4 text-left text-sm font-bold text-gray-700 uppercase">Prioridad</th>
-                            <th class="px-6 py-4 text-left text-sm font-bold text-gray-700 uppercase">Status</th>
-                            <th class="px-6 py-4 text-left text-sm font-bold text-gray-700 uppercase">Fecha</th>
-                            <th class="px-6 py-4 text-center text-sm font-bold text-gray-700 uppercase">Acciones</th>
+                            <th class="px-6 py-4 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">ID Maintenance</th>
+                            <th class="px-6 py-4 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">Operación</th>
+                            <th class="px-6 py-4 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">Equipo</th>
+                            <th class="px-6 py-4 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">Tipo Actividad</th>
+                            <th class="px-6 py-4 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">Descripción</th>
+                            <th class="px-6 py-4 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">Estado</th>
+                            <th class="px-6 py-4 text-center text-xs font-bold text-gray-700 uppercase tracking-wider">Acciones</th>
                         </tr>
                     </thead>
-                    <tbody id="ordenesTableBody" class="divide-y divide-gray-200">
-                        <tr>
-                            <td colspan="7" class="px-6 py-12 text-center">
-                                <i class="fas fa-spinner fa-spin text-4xl text-blue-600 mb-4"></i>
-                                <p class="text-gray-600">Cargando datos...</p>
-                            </td>
-                        </tr>
+                    <tbody id="tableBody" class="divide-y divide-gray-200">
+                        <!-- Data will be loaded here -->
                     </tbody>
                 </table>
             </div>
         </div>
     </div>
 
-    <div id="toast" class="hidden fixed top-4 right-4 bg-green-500 text-white px-6 py-4 rounded-lg shadow-lg slide-in z-50">
-        <div class="flex items-center space-x-2">
-            <i class="fas fa-check-circle"></i>
-            <span id="toastMessage">Operación exitosa</span>
+    <!-- Toast Notification -->
+    <div id="toast" class="hidden fixed top-4 right-4 px-6 py-4 rounded-lg shadow-lg z-50 text-white">
+        <div class="flex items-center">
+            <i class="fas fa-check-circle mr-2"></i>
+            <span id="toastMessage"></span>
         </div>
     </div>
 
     <script>
-        let editMode = false;
-        let currentId = null;
+        let ordenes = [];
+        let editingId = null;
 
-        document.addEventListener('DOMContentLoaded', () => {
-            loadOrdenes();
-            loadCatalogos();
-        });
-
-        function showToast(message, type = 'success') {
-            const toast = document.getElementById('toast');
-            const toastMessage = document.getElementById('toastMessage');
-            toastMessage.textContent = message;
-            toast.classList.remove('hidden', 'bg-green-500', 'bg-red-500');
-            toast.classList.add(type === 'success' ? 'bg-green-500' : 'bg-red-500');
-            setTimeout(() => toast.classList.add('hidden'), 3000);
+        // Dropdown functionality
+        function toggleDropdown(event, button) {
+            event.stopPropagation();
+            const dropdown = button.closest('.dropdown');
+            const isActive = dropdown.classList.contains('active');
+            document.querySelectorAll('.dropdown').forEach(d => d.classList.remove('active'));
+            if (!isActive) dropdown.classList.add('active');
         }
 
-        async function loadCatalogos() {
-            try {
-                const [clientes, equipos, tiposRep, prioridades] = await Promise.all([
-                    fetch('/api/catalogo/clientes').then(r => r.json()).catch(() => []),
-                    fetch('/api/maestros/equipos').then(r => r.json()).catch(() => []),
-                    fetch('/api/catalogo/tipos-reparacion').then(r => r.json()).catch(() => []),
-                    fetch('/api/catalogo/prioridades-atencion').then(r => r.json()).catch(() => [])
-                ]);
-
-                ['cliente_codigo', 'filterCliente'].forEach(id => {
-                    document.getElementById(id).innerHTML += clientes.map(c => `<option value="${c.codigo}">${c.descripcion}</option>`).join('');
-                });
-                
-                document.getElementById('equipo_id').innerHTML += equipos.map(e => `<option value="${e.equipo_id}">${e.codigo} - ${e.descripcion}</option>`).join('');
-                document.getElementById('tipo_reparacion_codigo').innerHTML += tiposRep.map(t => `<option value="${t.codigo}">${t.descripcion}</option>`).join('');
-                document.getElementById('prioridad_atencion_codigo').innerHTML += prioridades.map(p => `<option value="${p.codigo}">${p.descripcion}</option>`).join('');
-            } catch (error) {
-                console.error('Error al cargar catálogos:', error);
+        function closeAllDropdowns(event) {
+            if (!event.target.closest('.dropdown')) {
+                document.querySelectorAll('.dropdown').forEach(d => d.classList.remove('active'));
             }
         }
 
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            loadOrdenes();
+            loadCatalogos();
+            document.getElementById('user_crea').value = 'Admin'; // Placeholder
+        });
+
+        // Toast notifications
+        function showToast(message, type = 'success') {
+            const toast = document.getElementById('toast');
+            const toastMessage = document.getElementById('toastMessage');
+            toast.className = `fixed top-4 right-4 px-6 py-4 rounded-lg shadow-lg z-50 text-white ${
+                type === 'success' ? 'bg-green-500' : 'bg-red-500'
+            }`;
+            toastMessage.textContent = message;
+            toast.classList.remove('hidden');
+            setTimeout(() => toast.classList.add('hidden'), 3000);
+        }
+
+        // Load catalogs
+        async function loadCatalogos() {
+            try {
+                const [equipos, flotas] = await Promise.all([
+                    fetch('/api/equipos').then(r => r.json()),
+                    fetch('/api/catalogos/flotas-equipo').then(r => r.json())
+                ]);
+                
+                const equipoSelect = document.getElementById('equipo_id');
+                equipoSelect.innerHTML = '<option value="">Seleccione equipo...</option>';
+                equipos.forEach(e => {
+                    equipoSelect.innerHTML += `<option value="${e.id}">${e.codigo} - ${e.nombre}</option>`;
+                });
+                
+                const flotaSelect = document.getElementById('flota_area');
+                flotaSelect.innerHTML = '<option value="">Seleccione flota o área...</option>';
+                flotas.forEach(f => {
+                    flotaSelect.innerHTML += `<option value="${f.codigo}">${f.descripcion}</option>`;
+                });
+            } catch (error) {
+                console.error('Error loading catalogs:', error);
+            }
+        }
+
+        // Load orders
         async function loadOrdenes() {
             try {
-                const response = await fetch('/api/operativos/ordenes-trabajo');
-                const ordenes = await response.json();
-                const tbody = document.getElementById('ordenesTableBody');
-                
-                if (ordenes.length === 0) {
-                    tbody.innerHTML = '<tr><td colspan="7" class="px-6 py-12 text-center text-gray-600">No hay órdenes registradas</td></tr>';
-                    return;
-                }
-                
-                tbody.innerHTML = ordenes.map(orden => `
-                    <tr class="hover:bg-gray-50 transition">
-                        <td class="px-6 py-4"><span class="font-bold text-blue-600">${orden.numero_ot}</span></td>
-                        <td class="px-6 py-4 text-gray-700">${orden.Cliente?.descripcion || '-'}</td>
-                        <td class="px-6 py-4 text-gray-600 text-sm">${orden.TipoReparacion?.descripcion || '-'}</td>
-                        <td class="px-6 py-4"><span class="px-2 py-1 bg-orange-100 text-orange-800 rounded-full text-xs">${orden.PrioridadAtencion?.descripcion || '-'}</span></td>
-                        <td class="px-6 py-4"><span class="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-xs font-semibold">${orden.OtStatus?.descripcion || 'N/A'}</span></td>
-                        <td class="px-6 py-4 text-gray-600 text-sm">${new Date(orden.fecha_creacion).toLocaleDateString()}</td>
-                        <td class="px-6 py-4">
-                            <div class="flex items-center justify-center space-x-1">
-                                <button onclick="editOrden(${orden.ot_id})" title="Editar"
-                                    class="bg-yellow-500 hover:bg-yellow-600 text-white px-2 py-1 rounded transition text-sm">
-                                    <i class="fas fa-edit"></i>
-                                </button>
-                                <button onclick="viewTareas(${orden.ot_id})" title="Ver Tareas"
-                                    class="bg-blue-500 hover:bg-blue-600 text-white px-2 py-1 rounded transition text-sm">
-                                    <i class="fas fa-list"></i>
-                                </button>
-                                <button onclick="deleteOrden(${orden.ot_id})" title="Eliminar"
-                                    class="bg-red-500 hover:bg-red-600 text-white px-2 py-1 rounded transition text-sm">
-                                    <i class="fas fa-trash"></i>
-                                </button>
-                            </div>
-                        </td>
-                    </tr>
-                `).join('');
+                const response = await fetch('/api/ot');
+                ordenes = await response.json();
+                renderTable();
             } catch (error) {
+                console.error('Error loading orders:', error);
                 showToast('Error al cargar órdenes', 'error');
             }
         }
 
+        // Render table
+        function renderTable() {
+            const tbody = document.getElementById('tableBody');
+            tbody.innerHTML = '';
+
+            ordenes.forEach(orden => {
+                const row = document.createElement('tr');
+                row.className = 'hover:bg-gray-50 transition';
+                row.innerHTML = `
+                    <td class="px-6 py-4 text-sm font-semibold text-gray-900">${orden.numero_ot || '-'}</td>
+                    <td class="px-6 py-4 text-sm text-gray-700">${orden.operacion || '-'}</td>
+                    <td class="px-6 py-4 text-sm text-gray-700">${orden.equipo_nombre || '-'}</td>
+                    <td class="px-6 py-4 text-sm text-gray-700">${orden.tipo_actividad || '-'}</td>
+                    <td class="px-6 py-4 text-sm text-gray-600">${(orden.descripcion || '').substring(0, 40)}...</td>
+                    <td class="px-6 py-4">
+                        <span class="px-3 py-1 text-xs font-semibold rounded-full ${getEstadoColor(orden.estado)}">
+                            ${orden.estado || 'Pendiente'}
+                        </span>
+                    </td>
+                    <td class="px-6 py-4 text-center">
+                        <button onclick="editOrden(${orden.id})" class="text-blue-600 hover:text-blue-800 mx-1" title="Editar">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <button onclick="viewDetails(${orden.id})" class="text-green-600 hover:text-green-800 mx-1" title="Ver Detalles">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                        <button onclick="deleteOrden(${orden.id})" class="text-red-600 hover:text-red-800 mx-1" title="Eliminar">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+
+        function getEstadoColor(estado) {
+            const colors = {
+                'Pendiente': 'bg-yellow-100 text-yellow-800',
+                'En Proceso': 'bg-blue-100 text-blue-800',
+                'Completado': 'bg-green-100 text-green-800',
+                'Cancelado': 'bg-red-100 text-red-800'
+            };
+            return colors[estado] || 'bg-gray-100 text-gray-800';
+        }
+
+        // Filter table
+        function filterTable() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            const filterOp = document.getElementById('filterOperacion').value;
+            const filterEst = document.getElementById('filterEstado').value;
+            
+            const rows = document.querySelectorAll('#tableBody tr');
+            rows.forEach(row => {
+                const text = row.textContent.toLowerCase();
+                const matchesSearch = text.includes(searchTerm);
+                const matchesOp = !filterOp || text.includes(filterOp.toLowerCase());
+                const matchesEst = !filterEst || text.includes(filterEst.toLowerCase());
+                
+                row.style.display = matchesSearch && matchesOp && matchesEst ? '' : 'none';
+            });
+        }
+
+        function clearFilters() {
+            document.getElementById('searchInput').value = '';
+            document.getElementById('filterOperacion').value = '';
+            document.getElementById('filterEstado').value = '';
+            filterTable();
+        }
+
+        // Form functions
         function showCreateForm() {
-            editMode = false;
+            editingId = null;
             document.getElementById('formSection').classList.remove('hidden');
             document.getElementById('formTitle').textContent = 'Nueva Orden de Trabajo';
             document.getElementById('ordenForm').reset();
+            document.getElementById('user_crea').value = 'Admin';
+            document.getElementById('fecha_creacion').value = new Date().toISOString().slice(0, 16);
         }
 
         function cancelForm() {
             document.getElementById('formSection').classList.add('hidden');
+            document.getElementById('ordenForm').reset();
         }
 
-        async function editOrden(id) {
-            try {
-                const response = await fetch(`/api/operativos/ordenes-trabajo/${id}`);
-                const orden = await response.json();
-                
-                editMode = true;
-                currentId = id;
-                
-                document.getElementById('formSection').classList.remove('hidden');
-                document.getElementById('formTitle').textContent = 'Editar Orden de Trabajo';
-                document.getElementById('numero_ot').value = orden.numero_ot;
-                document.getElementById('cliente_codigo').value = orden.cliente_codigo;
-                document.getElementById('equipo_id').value = orden.equipo_id || '';
-                document.getElementById('tipo_reparacion_codigo').value = orden.tipo_reparacion_codigo || '';
-                document.getElementById('prioridad_atencion_codigo').value = orden.prioridad_atencion_codigo || '';
-                document.getElementById('descripcion').value = orden.descripcion || '';
-            } catch (error) {
-                showToast('Error al cargar orden', 'error');
+        function editOrden(id) {
+            const orden = ordenes.find(o => o.id === id);
+            if (!orden) return;
+            
+            editingId = id;
+            document.getElementById('formSection').classList.remove('hidden');
+            document.getElementById('formTitle').textContent = 'Editar Orden de Trabajo';
+            
+            // Fill form with data
+            document.getElementById('numero_ot').value = orden.numero_ot || '';
+            document.getElementById('operacion').value = orden.operacion || '';
+            document.getElementById('proceso').value = orden.proceso || '';
+            document.getElementById('flota_area').value = orden.flota_area || '';
+            document.getElementById('modelo').value = orden.modelo || '';
+            document.getElementById('equipo_id').value = orden.equipo_id || '';
+            document.getElementById('componente').value = orden.componente || '';
+            document.getElementById('tipo_actividad').value = orden.tipo_actividad || '';
+            document.getElementById('descripcion').value = orden.descripcion || '';
+            document.getElementById('descripcion_texto').value = orden.descripcion_texto || '';
+            document.getElementById('functional_location').value = orden.functional_location || '';
+        }
+
+        function viewDetails(id) {
+            const orden = ordenes.find(o => o.id === id);
+            if (!orden) {
+                showToast('Orden no encontrada', 'error');
+                return;
             }
-        }
-
-        function viewTareas(otId) {
-            window.location.href = `/operativos/tareas?ot_id=${otId}`;
+            openDetails(orden);
         }
 
         async function deleteOrden(id) {
-            if (!confirm('¿Eliminar orden de trabajo?')) return;
+            if (!confirm('¿Está seguro de eliminar esta orden de trabajo?')) return;
+            
             try {
-                await fetch(`/api/operativos/ordenes-trabajo/${id}`, { method: 'DELETE' });
-                showToast('Orden eliminada', 'success');
-                loadOrdenes();
+                const response = await fetch(`/api/ot/${id}`, { method: 'DELETE' });
+                if (response.ok) {
+                    showToast('Orden eliminada correctamente', 'success');
+                    loadOrdenes();
+                } else {
+                    showToast('Error al eliminar orden', 'error');
+                }
             } catch (error) {
-                showToast('Error al eliminar', 'error');
+                console.error('Error:', error);
+                showToast('Error al eliminar orden', 'error');
             }
         }
 
-        function applyFilters() {
-            loadOrdenes();
-        }
-
+        // Form submit
         document.getElementById('ordenForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             
             const data = {
                 numero_ot: document.getElementById('numero_ot').value,
-                cliente_codigo: document.getElementById('cliente_codigo').value,
-                equipo_id: document.getElementById('equipo_id').value || null,
-                tipo_reparacion_codigo: document.getElementById('tipo_reparacion_codigo').value || null,
-                prioridad_atencion_codigo: document.getElementById('prioridad_atencion_codigo').value || null,
-                fecha_requerimiento_cliente: document.getElementById('fecha_requerimiento_cliente').value || null,
-                descripcion: document.getElementById('descripcion').value || null
+                operacion: document.getElementById('operacion').value,
+                proceso: document.getElementById('proceso').value,
+                flota_area: document.getElementById('flota_area').value,
+                modelo: document.getElementById('modelo').value,
+                equipo_id: parseInt(document.getElementById('equipo_id').value) || null,
+                componente: document.getElementById('componente').value,
+                id_maintenance_plan: document.getElementById('id_maintenance_plan').value || null,
+                id_tasklist: document.getElementById('id_tasklist').value || null,
+                id_functional_location: document.getElementById('id_functional_location').value || null,
+                functional_location: document.getElementById('functional_location').value,
+                tipo_actividad: document.getElementById('tipo_actividad').value,
+                descripcion: document.getElementById('descripcion').value,
+                descripcion_texto: document.getElementById('descripcion_texto').value,
+                fl_regcbo: document.getElementById('fl_regcbo').checked,
+                fl_insp: document.getElementById('fl_insp').checked,
+                modifier_code: document.getElementById('modifier_code').value || null,
+                storag: document.getElementById('storag').value || null,
+                user_crea: document.getElementById('user_crea').value
             };
             
-            const url = editMode ? `/api/operativos/ordenes-trabajo/${currentId}` : '/api/operativos/ordenes-trabajo';
-            const method = editMode ? 'PUT' : 'POST';
-            
             try {
-                await fetch(url, { method, headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) });
-                showToast(editMode ? 'OT actualizada' : 'OT creada', 'success');
-                cancelForm();
-                loadOrdenes();
+                const url = editingId ? `/api/ot/${editingId}` : '/api/ot';
+                const method = editingId ? 'PUT' : 'POST';
+                
+                const response = await fetch(url, {
+                    method: method,
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+                
+                if (response.ok) {
+                    const savedOrden = await response.json();
+                    showToast(editingId ? 'Orden actualizada correctamente' : 'Orden creada correctamente', 'success');
+                    cancelForm();
+                    loadOrdenes();
+                    // Abrir la sección de detalles con la OT guardada
+                    if (savedOrden) {
+                        openDetails(savedOrden);
+                    }
+                } else {
+                    showToast('Error al guardar la orden', 'error');
+                }
             } catch (error) {
-                showToast('Error al guardar', 'error');
+                console.error('Error:', error);
+                showToast('Error al guardar la orden', 'error');
             }
         });
+
+        // ==================== FUNCIONES PARA TABS Y DETALLES DE OT ====================
+        
+        let currentOTId = null;
+        let repuestosSolicitados = [];
+
+        // Cambiar entre pestañas
+        function switchTab(tabName) {
+            // Ocultar todos los tabs
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.remove('active');
+            });
+            document.querySelectorAll('.tab-button').forEach(button => {
+                button.classList.remove('active');
+            });
+            
+            // Mostrar el tab seleccionado
+            document.getElementById(`content-${tabName}`).classList.add('active');
+            document.getElementById(`tab-${tabName}`).classList.add('active');
+        }
+
+        // Abrir sección de detalles
+        function openDetails(orden) {
+            currentOTId = orden.id;
+            
+            // Llenar información del header
+            document.getElementById('detailOTNumber').textContent = orden.numero_ot || '-';
+            document.getElementById('detailEquipo').textContent = orden.equipo_id || '-';
+            document.getElementById('detailEstado').textContent = orden.estado || 'Activo';
+            
+            // Llenar tab de resumen
+            document.getElementById('detail-operacion').textContent = orden.operacion || '-';
+            document.getElementById('detail-proceso').textContent = orden.proceso || '-';
+            document.getElementById('detail-componente').textContent = orden.componente || '-';
+            document.getElementById('detail-fecha-inicio').textContent = orden.fecha_inicio ? new Date(orden.fecha_inicio).toLocaleString('es-ES') : '-';
+            document.getElementById('detail-fecha-fin').textContent = orden.fecha_fin ? new Date(orden.fecha_fin).toLocaleString('es-ES') : '-';
+            document.getElementById('detail-prioridad').textContent = orden.prioridad || '-';
+            
+            // Cargar catálogos para repuestos
+            loadMaterialesRepuestos();
+            loadProveedoresRepuestos();
+            
+            // Cargar datos relacionados
+            loadRepuestosSolicitados();
+            loadHistorial();
+            
+            // Mostrar la sección
+            document.getElementById('detailsSection').classList.remove('hidden');
+            document.getElementById('formSection').classList.add('hidden');
+            
+            // Activar el primer tab por defecto
+            switchTab('resumen');
+            
+            // Scroll hacia la sección de detalles
+            document.getElementById('detailsSection').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // Cerrar sección de detalles
+        function closeDetails() {
+            document.getElementById('detailsSection').classList.add('hidden');
+            currentOTId = null;
+            repuestosSolicitados = [];
+        }
+
+        // Cargar inventario para el select de repuestos
+        async function loadMaterialesRepuestos() {
+            try {
+                const materiales = await fetch('/api/materiales').then(r => r.json());
+                const select = document.getElementById('repuesto-material');
+                select.innerHTML = '<option value="">Seleccione inventario...</option>';
+                materiales.forEach(m => {
+                    select.innerHTML += `<option value="${m.id}" data-nombre="${m.nombre}">${m.codigo_sap || m.codigo_interno} - ${m.nombre}</option>`;
+                });
+            } catch (error) {
+                console.error('Error loading inventario:', error);
+            }
+        }
+
+        // Cargar proveedores para el select de repuestos
+        async function loadProveedoresRepuestos() {
+            try {
+                const proveedores = await fetch('/api/logistica/proveedores').then(r => r.json());
+                const select = document.getElementById('repuesto-proveedor');
+                select.innerHTML = '<option value="">Seleccione proveedor...</option>';
+                proveedores.forEach(p => {
+                    select.innerHTML += `<option value="${p.id}">${p.razonSocial}</option>`;
+                });
+            } catch (error) {
+                console.error('Error loading proveedores:', error);
+            }
+        }
+
+        // Cargar repuestos ya solicitados para esta OT
+        async function loadRepuestosSolicitados() {
+            if (!currentOTId) return;
+            
+            try {
+                const repuestos = await fetch(`/api/ot/${currentOTId}/repuestos`).then(r => r.json());
+                
+                // Guardar en el array temporal
+                repuestosSolicitados = repuestos;
+                
+                // Renderizar tabla
+                renderRepuestosTable();
+            } catch (error) {
+                console.error('Error loading repuestos:', error);
+            }
+        }
+
+        // Cargar historial de operaciones de la OT
+        async function loadHistorial() {
+            if (!currentOTId) return;
+            
+            try {
+                const historial = await fetch(`/api/ot/${currentOTId}/historial/detailed`).then(r => r.json());
+                
+                const historialList = document.getElementById('historialList');
+                if (historial.length === 0) {
+                    historialList.innerHTML = '<p class="text-gray-500 text-center py-8">No hay operaciones registradas</p>';
+                    return;
+                }
+                
+                historialList.innerHTML = historial.map((h, index) => {
+                    const fecha = new Date(h.fecha).toLocaleString('es-ES');
+                    const tipoIcon = h.tipo_operacion === 'Generación PO' ? '📦' : 
+                                   h.tipo_operacion === 'Solicitud Repuestos' ? '🔧' :
+                                   h.tipo_operacion === 'Cambio Estado' ? '🔄' :
+                                   h.tipo_operacion === 'Asignación' ? '👤' : '📝';
+                    
+                    return `
+                        <div class="border-l-4 border-blue-500 pl-4 pb-4 relative">
+                            <div class="absolute -left-3 top-0 w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center text-white text-xs font-bold">
+                                ${index + 1}
+                            </div>
+                            <div class="bg-gray-50 rounded-lg p-4">
+                                <div class="flex items-center justify-between mb-2">
+                                    <span class="text-lg">${tipoIcon}</span>
+                                    <span class="text-sm text-gray-500">${fecha}</span>
+                                </div>
+                                <h4 class="font-semibold text-gray-800">${h.tipo_operacion}</h4>
+                                <p class="text-gray-600 text-sm mt-1">${h.descripcion}</p>
+                                ${h.usuario ? `<p class="text-gray-500 text-xs mt-2">Usuario: ${h.usuario}</p>` : ''}
+                                ${h.po_numero ? `<p class="text-blue-600 text-sm mt-1 font-semibold">PO: ${h.po_numero}</p>` : ''}
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+                
+            } catch (error) {
+                console.error('Error loading historial:', error);
+                document.getElementById('historialList').innerHTML = 
+                    '<p class="text-red-500 text-center py-8">Error al cargar el historial</p>';
+            }
+            }
+
+        // Manejar formulario de repuestos
+        document.getElementById('repuestoForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const materialSelect = document.getElementById('repuesto-material');
+            const materialId = materialSelect.value;
+            const materialNombre = materialSelect.options[materialSelect.selectedIndex].dataset.nombre;
+            const cantidad = document.getElementById('repuesto-cantidad').value;
+            const proveedorSelect = document.getElementById('repuesto-proveedor');
+            const proveedorId = proveedorSelect.value;
+            const proveedorNombre = proveedorSelect.options[proveedorSelect.selectedIndex].text;
+            const precioUnitario = document.getElementById('repuesto-precio').value;
+            const fechaEntrega = document.getElementById('repuesto-fecha-entrega').value;
+            const observaciones = document.getElementById('repuesto-observaciones').value;
+            
+            if (!materialId || !cantidad) {
+                showToast('Complete los campos requeridos', 'error');
+                return;
+            }
+            
+            try {
+                // Preparar datos del repuesto
+                const repuestoData = {
+                    material_id: materialId,
+                    cantidad: parseInt(cantidad),
+                    proveedor_id: proveedorId || null,
+                    precio_unitario: precioUnitario ? parseFloat(precioUnitario) : null,
+                    fecha_entrega_esperada: fechaEntrega || null,
+                    observaciones: observaciones,
+                    usuario_solicita: 'Admin' // TODO: Obtener del usuario logueado
+                };
+                
+                // Guardar en el backend
+                const response = await fetch(`/api/ot/${currentOTId}/repuestos`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        repuestos: [repuestoData],
+                        usuario: 'Admin' // TODO: Obtener del usuario logueado
+                    })
+                });
+                
+                if (response.ok) {
+                    const result = await response.json();
+                    showToast('Repuesto agregado exitosamente', 'success');
+                    
+                    // Recargar la lista de repuestos desde el backend
+                    await loadRepuestosSolicitados();
+                    
+                    // Limpiar formulario
+                    document.getElementById('repuestoForm').reset();
+                } else {
+                    const error = await response.json();
+                    showToast(`Error al agregar repuesto: ${error.message || 'Error desconocido'}`, 'error');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                showToast('Error al agregar el repuesto', 'error');
+            }
+        });
+
+        // Renderizar tabla de repuestos
+        function renderRepuestosTable() {
+            const tbody = document.getElementById('repuestosTableBody');
+            
+            if (repuestosSolicitados.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="8" class="px-4 py-6 text-center text-gray-500">
+                            No hay repuestos solicitados aún
+                        </td>
+                    </tr>
+                `;
+                document.getElementById('resumenGastos').classList.add('hidden');
+                return;
+            }
+            
+            let subtotal = 0;
+            let totalItems = 0;
+            
+            tbody.innerHTML = '';
+            repuestosSolicitados.forEach(rep => {
+                const precio = parseFloat(rep.precio_unitario) || 0;
+                const itemSubtotal = precio * rep.cantidad;
+                subtotal += itemSubtotal;
+                totalItems++;
+                
+                const fechaEntrega = rep.fecha_entrega_esperada ? 
+                    new Date(rep.fecha_entrega_esperada).toLocaleDateString('es-ES') : '-';
+                
+                const row = `
+                    <tr class="border-t border-gray-200 hover:bg-gray-50">
+                        <td class="px-4 py-3 text-sm">${rep.material_nombre || '-'}</td>
+                        <td class="px-4 py-3 text-sm text-center">${rep.cantidad}</td>
+                        <td class="px-4 py-3 text-sm">${rep.proveedor_nombre || '-'}</td>
+                        <td class="px-4 py-3 text-sm text-right font-mono">${precio > 0 ? '$' + precio.toFixed(2) : '-'}</td>
+                        <td class="px-4 py-3 text-sm text-right font-mono font-semibold">${itemSubtotal > 0 ? '$' + itemSubtotal.toFixed(2) : '-'}</td>
+                        <td class="px-4 py-3 text-sm">${fechaEntrega}</td>
+                        <td class="px-4 py-3">
+                            <span class="px-2 py-1 text-xs font-semibold rounded-full ${
+                                rep.estado === 'Pendiente' ? 'bg-yellow-100 text-yellow-800' :
+                                rep.estado === 'Aprobado' ? 'bg-green-100 text-green-800' :
+                                rep.estado === 'En PO' ? 'bg-blue-100 text-blue-800' :
+                                rep.estado === 'Recibido' ? 'bg-purple-100 text-purple-800' :
+                                'bg-gray-100 text-gray-800'
+                            }">${rep.estado}</span>
+                        </td>
+                        <td class="px-4 py-3 text-center">
+                            <button onclick="eliminarRepuesto(${rep.id})" class="text-red-600 hover:text-red-800" 
+                                ${rep.estado !== 'Pendiente' ? 'disabled' : ''}>
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </td>
+                    </tr>
+                `;
+                tbody.innerHTML += row;
+            });
+            
+            // Actualizar resumen de gastos
+            const igv = subtotal * 0.18;
+            const total = subtotal + igv;
+            
+            document.getElementById('totalItems').textContent = totalItems;
+            document.getElementById('subtotalGasto').textContent = '$' + subtotal.toFixed(2);
+            document.getElementById('igvGasto').textContent = '$' + igv.toFixed(2);
+            document.getElementById('totalGasto').textContent = '$' + total.toFixed(2);
+            document.getElementById('resumenGastos').classList.remove('hidden');
+        }
+
+        // Eliminar repuesto de la lista
+        async function eliminarRepuesto(repuestoId) {
+            if (!confirm('¿Eliminar este repuesto de la lista?')) return;
+            
+            try {
+                // Verificar que el repuesto esté en estado Pendiente
+                const repuesto = repuestosSolicitados.find(r => r.id === repuestoId);
+                
+                if (!repuesto) {
+                    showToast('Repuesto no encontrado', 'error');
+                    return;
+                }
+                
+                if (repuesto.estado !== 'Pendiente') {
+                    showToast('Solo se pueden eliminar repuestos en estado Pendiente', 'error');
+                    return;
+                }
+                
+                // Eliminar del backend
+                const response = await fetch(`/api/ot/repuestos/${repuestoId}`, {
+                    method: 'DELETE'
+                });
+                
+                if (response.ok) {
+                    showToast('Repuesto eliminado exitosamente', 'success');
+                    
+                    // Recargar la lista de repuestos
+                    await loadRepuestosSolicitados();
+                } else {
+                    const error = await response.json();
+                    showToast(`Error al eliminar: ${error.message || 'Error desconocido'}`, 'error');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                showToast('Error al eliminar el repuesto', 'error');
+            }
+        }
+
+        // Generar Orden de Compra
+        async function generarOrdenCompra() {
+            if (repuestosSolicitados.length === 0) {
+                showToast('Agregue al menos un repuesto para generar la PO', 'error');
+                return;
+            }
+            
+            if (!confirm(`¿Generar Orden de Compra con ${repuestosSolicitados.length} repuestos?`)) return;
+            
+            try {
+                // Obtener IDs de repuestos que están en estado Pendiente
+                const repuestosPendientes = repuestosSolicitados.filter(r => r.estado === 'Pendiente');
+                
+                if (repuestosPendientes.length === 0) {
+                    showToast('No hay repuestos pendientes para incluir en la PO', 'error');
+                    return;
+                }
+                
+                // Datos para la creación de la PO
+                const poData = {
+                    ot_id: currentOTId,
+                    proveedor_id: repuestosPendientes[0].proveedor_id, // Usar el proveedor del primer repuesto
+                    almacen_id: 1, // Por defecto, puede mejorarse con un selector
+                    repuestos_ids: repuestosPendientes.map(r => r.id),
+                    fecha_entrega_esperada: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(), // +7 días
+                    moneda: 'USD',
+                    usuario: 'Admin' // TODO: Obtener del usuario logueado
+                };
+                
+                // Llamar al endpoint para crear la PO desde la OT
+                const response = await fetch('/api/logistica/compras/from-ot', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(poData)
+                });
+                
+                if (response.ok) {
+                    const result = await response.json();
+                    showToast(`Orden de Compra ${result.compra.numero_po} generada exitosamente`, 'success');
+                    
+                    // Recargar los repuestos (ahora tendrán estado "En PO")
+                    await loadRepuestosSolicitados();
+                    
+                    // Recargar el historial para ver la nueva entrada
+                    await loadHistorial();
+                    
+                    // Cambiar al tab de historial
+                    switchTab('historial');
+                } else {
+                    const error = await response.json();
+                    showToast(`Error al generar PO: ${error.message || 'Error desconocido'}`, 'error');
+                }
+                
+            } catch (error) {
+                console.error('Error:', error);
+                showToast('Error al generar la Orden de Compra', 'error');
+            }
+        }
     </script>
 </body>
 </html>

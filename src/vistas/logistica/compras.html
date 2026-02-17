@@ -1,0 +1,596 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Compras - HP&K ERP</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="/vistas/shared/navigation.js"></script>
+    <style>
+        .dropdown-menu { display: none; }
+        .dropdown.active .dropdown-menu { display: block; }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <!-- Navigation Menu will be loaded here -->
+    <div id="navigation-container"></div>
+
+    <!-- Header -->
+    <div class="bg-gradient-to-r from-blue-600 to-blue-800 text-white shadow-lg">
+        <div class="container mx-auto px-6 py-4">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center space-x-4">
+                    <i class="fas fa-shopping-cart text-3xl"></i>
+                    <div>
+                        <h1 class="text-2xl font-bold">Gestión de Compras</h1>
+                        <p class="text-blue-200 text-sm">Control de Compras y Proveedores</p>
+                    </div>
+                </div>
+                <div class="flex items-center space-x-3">
+                    <a href="/index.html" class="bg-blue-700 hover:bg-blue-800 px-4 py-2 rounded-lg transition">
+                        <i class="fas fa-home"></i> Inicio
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="container mx-auto px-6 py-6">
+        <div class="bg-white rounded-lg shadow-lg p-6 mb-8">
+            <div class="flex justify-between items-center">
+                <div>
+                    <h1 class="text-3xl font-bold text-gray-800 flex items-center">
+                        <i class="fas fa-shopping-cart text-cyan-600 mr-3"></i>
+                        Gestión de Compras
+                    </h1>
+                    <p class="text-gray-600 mt-1">Órdenes de Compra y Adquisiciones</p>
+                </div>
+                <button onclick="showCreateForm()" class="bg-gradient-to-r from-cyan-500 to-cyan-600 hover:from-cyan-600 hover:to-cyan-700 text-white px-6 py-3 rounded-lg shadow-lg transition flex items-center">
+                    <i class="fas fa-plus mr-2"></i> Nueva Compra
+                </button>
+            </div>
+        </div>
+
+        <div id="formSection" class="hidden bg-white rounded-lg shadow-lg p-6 mb-8">
+            <h3 class="text-2xl font-bold text-gray-800 mb-6" id="formTitle">Nueva Orden de Compra</h3>
+            <form id="compraForm" class="space-y-6">
+                <div class="bg-gray-50 rounded-lg p-4">
+                    <h4 class="text-lg font-semibold text-gray-700 mb-4 flex items-center">
+                        <i class="fas fa-file-invoice text-cyan-600 mr-2"></i>
+                        Datos de la Orden
+                    </h4>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Número OC*</label>
+                            <input type="text" id="numero_oc" required class="w-full px-3 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-cyan-500 focus:border-transparent">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Fecha Orden*</label>
+                            <input type="date" id="fecha_orden" required class="w-full px-3 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-cyan-500 focus:border-transparent">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Fecha Entrega Requerida*</label>
+                            <input type="date" id="fecha_entrega_requerida" required class="w-full px-3 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-cyan-500 focus:border-transparent">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-gray-50 rounded-lg p-4">
+                    <h4 class="text-lg font-semibold text-gray-700 mb-4 flex items-center">
+                        <i class="fas fa-truck text-blue-600 mr-2"></i>
+                        Proveedor
+                    </h4>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Proveedor*</label>
+                            <select id="proveedor_id" required class="w-full px-3 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-cyan-500 focus:border-transparent">
+                                <option value="">Loading...</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Contacto Proveedor</label>
+                            <input type="text" id="contacto_proveedor" class="w-full px-3 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-cyan-500 focus:border-transparent">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-gray-50 rounded-lg p-4">
+                    <h4 class="text-lg font-semibold text-gray-700 mb-4 flex items-center">
+                        <i class="fas fa-box text-green-600 mr-2"></i>
+                        Inventario/Producto
+                    </h4>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Inventario*</label>
+                            <select id="material_id" required class="w-full px-3 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-cyan-500 focus:border-transparent">
+                                <option value="">Loading...</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Descripción</label>
+                            <input type="text" id="descripcion" class="w-full px-3 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-cyan-500 focus:border-transparent">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-gray-50 rounded-lg p-4">
+                    <h4 class="text-lg font-semibold text-gray-700 mb-4 flex items-center">
+                        <i class="fas fa-calculator text-purple-600 mr-2"></i>
+                        Cantidades y Precios
+                    </h4>
+                    <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Cantidad*</label>
+                            <input type="number" id="cantidad" required step="0.01" min="0" class="w-full px-3 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-cyan-500 focus:border-transparent">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Unidad de Medida*</label>
+                            <select id="unidad_medida" required class="w-full px-3 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-cyan-500 focus:border-transparent">
+                                <option value="">Seleccione...</option>
+                                <option value="KG">KG</option>
+                                <option value="LT">LT</option>
+                                <option value="UN">UN</option>
+                                <option value="CJ">CJ</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Precio Unitario*</label>
+                            <input type="number" id="precio_unitario" required step="0.01" min="0" class="w-full px-3 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-cyan-500 focus:border-transparent">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Total</label>
+                            <input type="number" id="total" step="0.01" readonly class="w-full px-3 py-2 border border-gray-300 rounded bg-gray-100 focus:ring-2 focus:ring-cyan-500 focus:border-transparent">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-gray-50 rounded-lg p-4">
+                    <h4 class="text-lg font-semibold text-gray-700 mb-4 flex items-center">
+                        <i class="fas fa-money-bill text-orange-600 mr-2"></i>
+                        Impuestos y Descuentos
+                    </h4>
+                    <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Subtotal</label>
+                            <input type="number" id="subtotal" step="0.01" readonly class="w-full px-3 py-2 border border-gray-300 rounded bg-gray-100">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">IGV (%)</label>
+                            <input type="number" id="igv_porcentaje" step="0.01" value="18" class="w-full px-3 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-cyan-500 focus:border-transparent">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Descuento (%)</label>
+                            <input type="number" id="descuento_porcentaje" step="0.01" min="0" max="100" class="w-full px-3 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-cyan-500 focus:border-transparent">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Total Final</label>
+                            <input type="number" id="total_final" step="0.01" readonly class="w-full px-3 py-2 border border-gray-300 rounded bg-gray-100 font-bold">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-gray-50 rounded-lg p-4">
+                    <h4 class="text-lg font-semibold text-gray-700 mb-4 flex items-center">
+                        <i class="fas fa-credit-card text-teal-600 mr-2"></i>
+                        Condiciones de Pago
+                    </h4>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Forma de Pago*</label>
+                            <select id="forma_pago" required class="w-full px-3 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-cyan-500 focus:border-transparent">
+                                <option value="">Seleccione...</option>
+                                <option value="contado">Contado</option>
+                                <option value="credito">Crédito</option>
+                                <option value="anticipado">Anticipado</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Plazo de Pago (días)</label>
+                            <input type="number" id="plazo_pago" min="0" class="w-full px-3 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-cyan-500 focus:border-transparent">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Moneda*</label>
+                            <select id="moneda" required class="w-full px-3 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-cyan-500 focus:border-transparent">
+                                <option value="USD">USD - Dólar</option>
+                                <option value="PEN">PEN - Sol</option>
+                                <option value="EUR">EUR - Euro</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-gray-50 rounded-lg p-4">
+                    <h4 class="text-lg font-semibold text-gray-700 mb-4 flex items-center">
+                        <i class="fas fa-warehouse text-indigo-600 mr-2"></i>
+                        Destino y Entrega
+                    </h4>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Almacén Destino*</label>
+                            <select id="almacen_id" required class="w-full px-3 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-cyan-500 focus:border-transparent">
+                                <option value="">Loading...</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Dirección de Entrega</label>
+                            <input type="text" id="direccion_entrega" class="w-full px-3 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-cyan-500 focus:border-transparent">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Incoterm</label>
+                            <select id="incoterm" class="w-full px-3 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-cyan-500 focus:border-transparent">
+                                <option value="">Seleccione...</option>
+                                <option value="EXW">EXW - Ex Works</option>
+                                <option value="FOB">FOB - Free On Board</option>
+                                <option value="CIF">CIF - Cost, Insurance & Freight</option>
+                                <option value="DDP">DDP - Delivered Duty Paid</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-gray-50 rounded-lg p-4">
+                    <h4 class="text-lg font-semibold text-gray-700 mb-4 flex items-center">
+                        <i class="fas fa-tasks text-rose-600 mr-2"></i>
+                        Estado y Seguimiento
+                    </h4>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Estado*</label>
+                            <select id="estado" required class="w-full px-3 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-cyan-500 focus:border-transparent">
+                                <option value="borrador">Borrador</option>
+                                <option value="enviada">Enviada</option>
+                                <option value="confirmada">Confirmada</option>
+                                <option value="recibida">Recibida</option>
+                                <option value="cancelada">Cancelada</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Prioridad*</label>
+                            <select id="prioridad" required class="w-full px-3 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-cyan-500 focus:border-transparent">
+                                <option value="baja">Baja</option>
+                                <option value="media">Media</option>
+                                <option value="alta">Alta</option>
+                                <option value="urgente">Urgente</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Tipo de Compra*</label>
+                            <select id="tipo_compra" required class="w-full px-3 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-cyan-500 focus:border-transparent">
+                                <option value="normal">Normal</option>
+                                <option value="urgente">Urgente</option>
+                                <option value="consignacion">Consignación</option>
+                                <option value="importacion">Importación</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-gray-50 rounded-lg p-4">
+                    <h4 class="text-lg font-semibold text-gray-700 mb-4 flex items-center">
+                        <i class="fas fa-comment text-amber-600 mr-2"></i>
+                        Observaciones
+                    </h4>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Notas y Comentarios</label>
+                        <textarea id="observaciones" rows="2" class="w-full px-3 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-cyan-500 focus:border-transparent"></textarea>
+                    </div>
+                </div>
+
+                <div class="bg-gray-50 rounded-lg p-4">
+                    <h4 class="text-lg font-semibold text-gray-700 mb-4 flex items-center">
+                        <i class="fas fa-user text-pink-600 mr-2"></i>
+                        Usuario
+                    </h4>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">User_crea</label>
+                            <input type="text" id="user_crea" readonly class="w-full px-3 py-2 border border-gray-300 rounded bg-gray-100">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Fecha Creación</label>
+                            <input type="datetime-local" id="fecha_creacion" readonly class="w-full px-3 py-2 border border-gray-300 rounded bg-gray-100">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flex gap-4 pt-4">
+                    <button type="submit" class="flex-1 bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white px-6 py-3 rounded-lg shadow-lg transition flex items-center justify-center">
+                        <i class="fas fa-save mr-2"></i> Guardar
+                    </button>
+                    <button type="button" onclick="cancelForm()" class="flex-1 bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white px-6 py-3 rounded-lg shadow-lg transition flex items-center justify-center">
+                        <i class="fas fa-times mr-2"></i> Cancelar
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <div class="bg-white rounded-lg shadow-lg p-6 mb-8">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                <input type="text" id="searchInput" placeholder="Buscar compra..." onkeyup="filterTable()" class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-500">
+                <select id="filterEstado" onchange="filterTable()" class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-500">
+                    <option value="">Todos los Estados</option>
+                    <option value="borrador">Borrador</option>
+                    <option value="enviada">Enviada</option>
+                    <option value="confirmada">Confirmada</option>
+                    <option value="recibida">Recibida</option>
+                </select>
+                <select id="filterPrioridad" onchange="filterTable()" class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-500">
+                    <option value="">Todas las Prioridades</option>
+                    <option value="baja">Baja</option>
+                    <option value="media">Media</option>
+                    <option value="alta">Alta</option>
+                </select>
+                <button onclick="clearFilters()" class="bg-gray-300 hover:bg-gray-400 text-gray-800 px-4 py-2 rounded-lg transition">
+                    <i class="fas fa-redo mr-2"></i> Limpiar
+                </button>
+            </div>
+        </div>
+
+        <div class="bg-white rounded-lg shadow-lg overflow-hidden">
+            <div class="overflow-x-auto">
+                <table class="min-w-full">
+                    <thead class="bg-gradient-to-r from-gray-100 to-gray-200">
+                        <tr>
+                            <th class="px-6 py-4 text-left text-xs font-bold text-gray-700 uppercase">Número OC</th>
+                            <th class="px-6 py-4 text-left text-xs font-bold text-gray-700 uppercase">Fecha</th>
+                            <th class="px-6 py-4 text-left text-xs font-bold text-gray-700 uppercase">Proveedor</th>
+                            <th class="px-6 py-4 text-left text-xs font-bold text-gray-700 uppercase">Inventario</th>
+                            <th class="px-6 py-4 text-left text-xs font-bold text-gray-700 uppercase">Total</th>
+                            <th class="px-6 py-4 text-left text-xs font-bold text-gray-700 uppercase">Prioridad</th>
+                            <th class="px-6 py-4 text-left text-xs font-bold text-gray-700 uppercase">Estado</th>
+                            <th class="px-6 py-4 text-center text-xs font-bold text-gray-700 uppercase">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tableBody" class="divide-y divide-gray-200"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div id="toast" class="hidden fixed top-4 right-4 px-6 py-4 rounded-lg shadow-lg z-50 text-white">
+        <div class="flex items-center">
+            <i class="fas fa-check-circle mr-2"></i>
+            <span id="toastMessage"></span>
+        </div>
+    </div>
+
+    <script>
+        let compras = [];
+        let editingId = null;
+
+        // Dropdown functions are now handled by NavigationManager
+
+        document.addEventListener('DOMContentLoaded', () => {
+            loadCompras();
+            loadCatalogos();
+            document.getElementById('user_crea').value = 'Admin';
+            document.getElementById('cantidad').addEventListener('input', calcularTotal);
+            document.getElementById('precio_unitario').addEventListener('input', calcularTotal);
+            document.getElementById('igv_porcentaje').addEventListener('input', calcularTotal);
+            document.getElementById('descuento_porcentaje').addEventListener('input', calcularTotal);
+        });
+
+        function calcularTotal() {
+            const cantidad = parseFloat(document.getElementById('cantidad').value) || 0;
+            const precioUnitario = parseFloat(document.getElementById('precio_unitario').value) || 0;
+            const igvPct = parseFloat(document.getElementById('igv_porcentaje').value) || 0;
+            const descPct = parseFloat(document.getElementById('descuento_porcentaje').value) || 0;
+            
+            const subtotal = cantidad * precioUnitario;
+            const descuento = subtotal * (descPct / 100);
+            const base = subtotal - descuento;
+            const igv = base * (igvPct / 100);
+            const total = base + igv;
+            
+            document.getElementById('total').value = subtotal.toFixed(2);
+            document.getElementById('subtotal').value = base.toFixed(2);
+            document.getElementById('total_final').value = total.toFixed(2);
+        }
+
+        function showToast(message, type = 'success') {
+            const toast = document.getElementById('toast');
+            toast.className = `fixed top-4 right-4 px-6 py-4 rounded-lg shadow-lg z-50 text-white ${type === 'success' ? 'bg-green-500' : 'bg-red-500'}`;
+            document.getElementById('toastMessage').textContent = message;
+            toast.classList.remove('hidden');
+            setTimeout(() => toast.classList.add('hidden'), 3000);
+        }
+
+        async function loadCatalogos() {
+            try {
+                const [proveedores, almacenes] = await Promise.all([
+                    fetch('/api/logistica/proveedores').then(r => r.json()),
+                    fetch('/api/logistica/almacenes').then(r => r.json())
+                ]);
+                
+                const provSelect = document.getElementById('proveedor_id');
+                provSelect.innerHTML = '<option value="">Seleccione proveedor...</option>';
+                proveedores.forEach(p => {
+                    provSelect.innerHTML += `<option value="${p.id}">${p.razon_social}</option>`;
+                });
+                
+                const matSelect = document.getElementById('material_id');
+                matSelect.innerHTML = '<option value="">Seleccione inventario...</option>';
+                // Materials will be loaded from a different endpoint when available
+                
+                const almSelect = document.getElementById('almacen_id');
+                almSelect.innerHTML = '<option value="">Seleccione almacén...</option>';
+                almacenes.forEach(a => {
+                    almSelect.innerHTML += `<option value="${a.id}">${a.nombre}</option>`;
+                });
+            } catch (error) {
+                console.error('Error:', error);
+            }
+        }
+
+        async function loadCompras() {
+            try {
+                const response = await fetch('/api/logistica/compras');
+                compras = await response.json();
+                renderTable();
+            } catch (error) {
+                console.error('Error:', error);
+                showToast('Error al cargar compras', 'error');
+            }
+        }
+
+        function renderTable() {
+            const tbody = document.getElementById('tableBody');
+            tbody.innerHTML = '';
+            compras.forEach(comp => {
+                tbody.innerHTML += `
+                    <tr class="hover:bg-gray-50 transition">
+                        <td class="px-6 py-4 text-sm font-semibold">${comp.numero_oc || '-'}</td>
+                        <td class="px-6 py-4 text-sm">${comp.fecha_orden || '-'}</td>
+                        <td class="px-6 py-4 text-sm">${comp.proveedor_nombre || '-'}</td>
+                        <td class="px-6 py-4 text-sm">${comp.material_nombre || '-'}</td>
+                        <td class="px-6 py-4 text-sm font-bold">${comp.moneda} ${comp.total_final || 0}</td>
+                        <td class="px-6 py-4"><span class="px-2 py-1 text-xs font-bold rounded ${getPrioridadColor(comp.prioridad)}">${comp.prioridad || 'media'}</span></td>
+                        <td class="px-6 py-4"><span class="px-3 py-1 text-xs font-semibold rounded-full ${getEstadoColor(comp.estado)}">${comp.estado || 'borrador'}</span></td>
+                        <td class="px-6 py-4 text-center">
+                            <button onclick="editCompra(${comp.id})" class="text-blue-600 hover:text-blue-800 mx-1"><i class="fas fa-edit"></i></button>
+                            <button onclick="viewPDF(${comp.id})" class="text-purple-600 hover:text-purple-800 mx-1" title="Ver PDF"><i class="fas fa-file-pdf"></i></button>
+                            <button onclick="deleteCompra(${comp.id})" class="text-red-600 hover:text-red-800 mx-1"><i class="fas fa-trash"></i></button>
+                        </td>
+                    </tr>
+                `;
+            });
+        }
+
+        function getPrioridadColor(prioridad) {
+            const colors = {'baja': 'bg-gray-100 text-gray-800', 'media': 'bg-blue-100 text-blue-800', 'alta': 'bg-orange-100 text-orange-800', 'urgente': 'bg-red-100 text-red-800'};
+            return colors[prioridad] || 'bg-gray-100 text-gray-800';
+        }
+
+        function getEstadoColor(estado) {
+            const colors = {'borrador': 'bg-gray-100 text-gray-800', 'enviada': 'bg-blue-100 text-blue-800', 'confirmada': 'bg-green-100 text-green-800', 'recibida': 'bg-teal-100 text-teal-800', 'cancelada': 'bg-red-100 text-red-800'};
+            return colors[estado] || 'bg-gray-100 text-gray-800';
+        }
+
+        function filterTable() {
+            const search = document.getElementById('searchInput').value.toLowerCase();
+            const estado = document.getElementById('filterEstado').value;
+            const prioridad = document.getElementById('filterPrioridad').value;
+            document.querySelectorAll('#tableBody tr').forEach(row => {
+                const text = row.textContent.toLowerCase();
+                const match = text.includes(search) && (!estado || text.includes(estado)) && (!prioridad || text.includes(prioridad));
+                row.style.display = match ? '' : 'none';
+            });
+        }
+
+        function clearFilters() {
+            document.getElementById('searchInput').value = '';
+            document.getElementById('filterEstado').value = '';
+            document.getElementById('filterPrioridad').value = '';
+            filterTable();
+        }
+
+        function showCreateForm() {
+            editingId = null;
+            document.getElementById('formSection').classList.remove('hidden');
+            document.getElementById('formTitle').textContent = 'Nueva Orden de Compra';
+            document.getElementById('compraForm').reset();
+            document.getElementById('user_crea').value = 'Admin';
+            document.getElementById('fecha_creacion').value = new Date().toISOString().slice(0, 16);
+            document.getElementById('fecha_orden').value = new Date().toISOString().slice(0, 10);
+            document.getElementById('estado').value = 'borrador';
+            document.getElementById('prioridad').value = 'media';
+            document.getElementById('moneda').value = 'USD';
+            document.getElementById('igv_porcentaje').value = '18';
+        }
+
+        function cancelForm() {
+            document.getElementById('formSection').classList.add('hidden');
+        }
+
+        function editCompra(id) {
+            const comp = compras.find(c => c.id === id);
+            if (!comp) return;
+            editingId = id;
+            document.getElementById('formSection').classList.remove('hidden');
+            document.getElementById('formTitle').textContent = 'Editar Orden de Compra';
+            document.getElementById('numero_oc').value = comp.numero_oc || '';
+            document.getElementById('fecha_orden').value = comp.fecha_orden || '';
+            document.getElementById('fecha_entrega_requerida').value = comp.fecha_entrega_requerida || '';
+            document.getElementById('proveedor_id').value = comp.proveedor_id || '';
+            document.getElementById('material_id').value = comp.material_id || '';
+            document.getElementById('cantidad').value = comp.cantidad || '';
+            document.getElementById('precio_unitario').value = comp.precio_unitario || '';
+            document.getElementById('forma_pago').value = comp.forma_pago || '';
+            document.getElementById('estado').value = comp.estado || '';
+            document.getElementById('prioridad').value = comp.prioridad || '';
+            calcularTotal();
+        }
+
+        function viewPDF(id) {
+            alert('Ver PDF de la OC #' + id);
+        }
+
+        async function deleteCompra(id) {
+            if (!confirm('¿Eliminar esta orden de compra?')) return;
+            try {
+                const response = await fetch(`/api/logistica/compras/${id}`, {method: 'DELETE'});
+                if (response.ok) {
+                    showToast('Compra eliminada', 'success');
+                    loadCompras();
+                } else {
+                    showToast('Error al eliminar', 'error');
+                }
+            } catch (error) {
+                showToast('Error al eliminar', 'error');
+            }
+        }
+
+        document.getElementById('compraForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const data = {
+                numero_oc: document.getElementById('numero_oc').value,
+                fecha_orden: document.getElementById('fecha_orden').value,
+                fecha_entrega_requerida: document.getElementById('fecha_entrega_requerida').value,
+                proveedor_id: parseInt(document.getElementById('proveedor_id').value),
+                contacto_proveedor: document.getElementById('contacto_proveedor').value || null,
+                material_id: parseInt(document.getElementById('material_id').value),
+                descripcion: document.getElementById('descripcion').value || null,
+                cantidad: parseFloat(document.getElementById('cantidad').value),
+                unidad_medida: document.getElementById('unidad_medida').value,
+                precio_unitario: parseFloat(document.getElementById('precio_unitario').value),
+                subtotal: parseFloat(document.getElementById('subtotal').value),
+                igv_porcentaje: parseFloat(document.getElementById('igv_porcentaje').value),
+                descuento_porcentaje: parseFloat(document.getElementById('descuento_porcentaje').value) || 0,
+                total_final: parseFloat(document.getElementById('total_final').value),
+                forma_pago: document.getElementById('forma_pago').value,
+                plazo_pago: parseInt(document.getElementById('plazo_pago').value) || null,
+                moneda: document.getElementById('moneda').value,
+                almacen_id: parseInt(document.getElementById('almacen_id').value),
+                direccion_entrega: document.getElementById('direccion_entrega').value || null,
+                incoterm: document.getElementById('incoterm').value || null,
+                estado: document.getElementById('estado').value,
+                prioridad: document.getElementById('prioridad').value,
+                tipo_compra: document.getElementById('tipo_compra').value,
+                observaciones: document.getElementById('observaciones').value || null,
+                user_crea: document.getElementById('user_crea').value
+            };
+            
+            try {
+                const url = editingId ? `/api/logistica/compras/${editingId}` : '/api/logistica/compras';
+                const response = await fetch(url, {
+                    method: editingId ? 'PUT' : 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify(data)
+                });
+                
+                if (response.ok) {
+                    showToast(editingId ? 'Compra actualizada' : 'Compra creada', 'success');
+                    cancelForm();
+                    loadCompras();
+                } else {
+                    showToast('Error al guardar', 'error');
+                }
+            } catch (error) {
+                showToast('Error al guardar', 'error');
+            }
+        });
+    </script>
+</body>
+</html>

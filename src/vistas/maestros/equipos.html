@@ -237,8 +237,8 @@
                     <tr class="hover:bg-gray-50 transition">
                         <td class="px-6 py-4"><span class="font-semibold text-gray-800">${equipo.codigo}</span></td>
                         <td class="px-6 py-4 text-gray-700">${equipo.descripcion}</td>
-                        <td class="px-6 py-4 text-gray-600">${equipo.Area?.descripcion || '-'}</td>
-                        <td class="px-6 py-4"><span class="px-3 py-1 bg-yellow-100 text-yellow-800 rounded-full text-xs font-semibold">${equipo.Criticidad?.descripcion || '-'}</span></td>
+                        <td class="px-6 py-4 text-gray-600">${equipo.area?.descripcion || '-'}</td>
+                        <td class="px-6 py-4"><span class="px-3 py-1 bg-yellow-100 text-yellow-800 rounded-full text-xs font-semibold">${equipo.criticidad?.descripcion || '-'}</span></td>
                         <td class="px-6 py-4">
                             <div class="flex items-center justify-center space-x-2">
                                 <button onclick="editEquipo(${equipo.equipo_id})" 

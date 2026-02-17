@@ -1,164 +1,258 @@
-// Importar modelos en orden de dependencias
-import Planta from './Planta';
-import Area from './Area';
-import SubArea from './SubArea';
-import Categoria from './Categoria';
-import Clasificacion from './Clasificacion';
-import UnidadMedida from './UnidadMedida';
-import Moneda from './Moneda';
-import Fabricante from './Fabricante';
-import Criticidad from './Criticidad';
-import TipoComponente from './TipoComponente';
-import Posicion from './Posicion';
-import StatusEquipo from './StatusEquipo';
-import StatusEstrategia from './StatusEstrategia';
-import TipoEstrategia from './TipoEstrategia';
-import OtStatus from './OtStatus';
-import RecursosStatus from './RecursosStatus';
-import TallerStatus from './TallerStatus';
-import PrioridadAtencion from './PrioridadAtencion';
-import AtencionReparacion from './AtencionReparacion';
-import TipoReparacion from './TipoReparacion';
-import Garantia from './Garantia';
-import TipoGarantia from './TipoGarantia';
-import BaseMetalica from './BaseMetalica';
-import Cliente from './Cliente';
-import EstrategiaOt from './EstrategiaOt';
-import TipoEquipo from './TipoEquipo';
+// ============================================
+// NUEVO SISTEMA DE MODELOS - ESTRUCTURA EXCEL
+// ============================================
+
+// Importar Configuración
+import sequelize from '../config/database';
+
+// ============================================
+// IMPORTAR MODELOS PRINCIPALES
+// ============================================
 import Material from './Material';
 import Equipo from './Equipo';
-import FlotaEquipo from './FlotaEquipo';
-import EquipoFlota from './EquipoFlota';
-import Componente from './Componente';
-import Servicio from './Servicio';
 import Estrategia from './Estrategia';
-import RegistroReparacion from './RegistroReparacion';
-import OrdenTrabajo from './OrdenTrabajo';
 import Tarea from './Tarea';
+import CodigoReparacion from './CodigoReparacion';
+import OrdenTrabajo from './OrdenTrabajo';
 
-// Definir relaciones entre modelos
-export const setupAssociations = () => {
-  // SubArea - Area
-  SubArea.belongsTo(Area, { foreignKey: 'area_codigo', targetKey: 'codigo' });
-  Area.hasMany(SubArea, { foreignKey: 'area_codigo', sourceKey: 'codigo' });
+// ============================================
+// IMPORTAR CATÁLOGOS COMPARTIDOS
+// ============================================
+import Planta from './catalogs/Planta';
+import Area from './catalogs/Area';
+import SubArea from './catalogs/SubArea';
+import UnidadMedida from './catalogs/UnidadMedida';
+import Moneda from './catalogs/Moneda';
+import Fabricante from './catalogs/Fabricante';
+import Categoria from './catalogs/Categoria';
+import Clasificacion from './catalogs/Clasificacion';
 
-  // TipoEquipo - Categoria
-  TipoEquipo.belongsTo(Categoria, { foreignKey: 'categoria_codigo', targetKey: 'codigo' });
-  Categoria.hasMany(TipoEquipo, { foreignKey: 'categoria_codigo', sourceKey: 'codigo' });
+// ============================================
+// IMPORTAR CATÁLOGOS DE EQUIPOS
+// ============================================
+import StatusEquipo from './catalogs/StatusEquipo';
+import TipoEquipo from './catalogs/TipoEquipo';
+import Criticidad from './catalogs/Criticidad';
 
-  // Material - Referencias
-  Material.belongsTo(Planta, { foreignKey: 'planta_codigo', targetKey: 'codigo' });
-  Material.belongsTo(Area, { foreignKey: 'area_codigo', targetKey: 'codigo' });
-  Material.belongsTo(Categoria, { foreignKey: 'categoria_codigo', targetKey: 'codigo' });
-  Material.belongsTo(Clasificacion, { foreignKey: 'clasificacion_codigo', targetKey: 'codigo' });
-  Material.belongsTo(UnidadMedida, { foreignKey: 'unidad_medida_codigo', targetKey: 'codigo' });
-  Material.belongsTo(Moneda, { foreignKey: 'moneda_codigo', targetKey: 'codigo' });
-  Material.belongsTo(Fabricante, { foreignKey: 'fabricante_codigo', targetKey: 'codigo' });
+// ============================================
+// IMPORTAR CATÁLOGOS DE ESTRATEGIAS
+// ============================================
+import StatusEstrategia from './catalogs/StatusEstrategia';
+import TipoEstrategia from './catalogs/TipoEstrategia';
 
-  // Equipo - Referencias
-  Equipo.belongsTo(StatusEquipo, { foreignKey: 'status_codigo', targetKey: 'codigo' });
-  Equipo.belongsTo(Area, { foreignKey: 'area_codigo', targetKey: 'codigo' });
-  Equipo.belongsTo(SubArea, { foreignKey: 'subarea_codigo', targetKey: 'codigo' });
-  Equipo.belongsTo(TipoEquipo, { foreignKey: 'tipo_codigo', targetKey: 'codigo' });
-  Equipo.belongsTo(Planta, { foreignKey: 'planta_codigo', targetKey: 'codigo' });
-  Equipo.belongsTo(Criticidad, { foreignKey: 'criticidad_codigo', targetKey: 'codigo' });
-  Equipo.belongsTo(UnidadMedida, { foreignKey: 'unidad_medida_codigo', targetKey: 'codigo' });
+// ============================================
+// IMPORTAR CATÁLOGOS DE TAREAS
+// ============================================
+import TipoTarea from './catalogs/TipoTarea';
 
-  // FlotaEquipo - Referencias
-  FlotaEquipo.belongsTo(Categoria, { foreignKey: 'categoria_codigo', targetKey: 'codigo' });
-  FlotaEquipo.belongsTo(Fabricante, { foreignKey: 'fabricante_codigo', targetKey: 'codigo' });
+// ============================================
+// IMPORTAR CATÁLOGOS DE CÓDIGOS DE REPARACIÓN
+// ============================================
+import TipoCodRep from './catalogs/TipoCodRep';
+import CategoriaCodRep from './catalogs/CategoriaCodRep';
+import FlotaEquipo from './catalogs/FlotaEquipo';
+import Posicion from './catalogs/Posicion';
 
-  // EquipoFlota - Relación muchos a muchos
-  EquipoFlota.belongsTo(Equipo, { foreignKey: 'equipo_id', targetKey: 'equipo_id' });
-  EquipoFlota.belongsTo(FlotaEquipo, { foreignKey: 'flota_codigo', targetKey: 'codigo' });
-  Equipo.belongsToMany(FlotaEquipo, { through: EquipoFlota, foreignKey: 'equipo_id' });
-  FlotaEquipo.belongsToMany(Equipo, { through: EquipoFlota, foreignKey: 'flota_codigo' });
+// ============================================
+// IMPORTAR CATÁLOGOS DE ÓRDENES DE TRABAJO
+// ============================================
+import Cliente from './catalogs/Cliente';
+import Garantia from './catalogs/Garantia';
+import AtencionReparacion from './catalogs/AtencionReparacion';
+import TipoReparacion from './catalogs/TipoReparacion';
+import TipoGarantia from './catalogs/TipoGarantia';
+import PrioridadAtencion from './catalogs/PrioridadAtencion';
+import BaseMetalica from './catalogs/BaseMetalica';
+import OtStatus from './catalogs/OtStatus';
+import RecursosStatus from './catalogs/RecursosStatus';
+import TallerStatus from './catalogs/TallerStatus';
 
-  // Componente - Referencias
-  Componente.belongsTo(Equipo, { foreignKey: 'equipo_id', targetKey: 'equipo_id' });
-  Componente.belongsTo(TipoComponente, { foreignKey: 'tipo_componente_codigo', targetKey: 'codigo' });
-  Componente.belongsTo(Criticidad, { foreignKey: 'criticidad_codigo', targetKey: 'codigo' });
-  Componente.belongsTo(UnidadMedida, { foreignKey: 'unidad_medida_codigo', targetKey: 'codigo' });
-  Equipo.hasMany(Componente, { foreignKey: 'equipo_id', sourceKey: 'equipo_id' });
+// ============================================
+// CONFIGURAR ASOCIACIONES
+// ============================================
+export function setupAssociations() {
+  console.log('⚙️ Configurando asociaciones de modelos...');
 
-  // Servicio - Referencias
-  Servicio.belongsTo(Moneda, { foreignKey: 'moneda_codigo', targetKey: 'codigo' });
+  // ========================================
+  // ASOCIACIONES DE MATERIAL (1_Log - Material)
+  // ========================================
+  Material.belongsTo(Planta, { foreignKey: 'planta_codigo', targetKey: 'codigo', as: 'planta' });
+  Material.belongsTo(Area, { foreignKey: 'area_codigo', targetKey: 'codigo', as: 'area' });
+  Material.belongsTo(Categoria, { foreignKey: 'categoria_codigo', targetKey: 'codigo', as: 'categoria' });
+  Material.belongsTo(Clasificacion, { foreignKey: 'clasificacion_codigo', targetKey: 'codigo', as: 'clasificacion' });
+  Material.belongsTo(UnidadMedida, { foreignKey: 'unidad_medida_codigo', targetKey: 'codigo', as: 'unidad_medida' });
+  Material.belongsTo(Moneda, { foreignKey: 'moneda_codigo', targetKey: 'codigo', as: 'moneda' });
+  Material.belongsTo(Fabricante, { foreignKey: 'fabricante_codigo', targetKey: 'codigo', as: 'fabricante' });
 
-  // Estrategia - Referencias
-  Estrategia.belongsTo(Area, { foreignKey: 'area_codigo', targetKey: 'codigo' });
-  Estrategia.belongsTo(Equipo, { foreignKey: 'equipo_codigo', targetKey: 'codigo' });
-  Estrategia.belongsTo(UnidadMedida, { foreignKey: 'unidad_medida_codigo', targetKey: 'codigo' });
-  Estrategia.belongsTo(TipoEstrategia, { foreignKey: 'tipo_estrategia_codigo', targetKey: 'codigo' });
-  Estrategia.belongsTo(StatusEstrategia, { foreignKey: 'status_codigo', targetKey: 'codigo' });
+  // ========================================
+  // ASOCIACIONES DE EQUIPO (2_Mant - Equipos)
+  // ========================================
+  Equipo.belongsTo(StatusEquipo, { foreignKey: 'status_codigo', targetKey: 'codigo', as: 'status' });
+  Equipo.belongsTo(Area, { foreignKey: 'area_codigo', targetKey: 'codigo', as: 'area' });
+  Equipo.belongsTo(SubArea, { foreignKey: 'sub_area_codigo', targetKey: 'codigo', as: 'sub_area' });
+  Equipo.belongsTo(TipoEquipo, { foreignKey: 'tipo_codigo', targetKey: 'codigo', as: 'tipo' });
+  Equipo.belongsTo(Fabricante, { foreignKey: 'fabricante_codigo', targetKey: 'codigo', as: 'fabricante' });
+  Equipo.belongsTo(UnidadMedida, { foreignKey: 'unidad_medida_codigo', targetKey: 'codigo', as: 'unidad_medida' });
+  Equipo.belongsTo(Planta, { foreignKey: 'planta_codigo', targetKey: 'codigo', as: 'planta' });
+  Equipo.belongsTo(Criticidad, { foreignKey: 'criticidad_codigo', targetKey: 'codigo', as: 'criticidad' });
 
-  // RegistroReparacion - Referencias
-  RegistroReparacion.belongsTo(TipoComponente, { foreignKey: 'tipo_componente_codigo', targetKey: 'codigo' });
-  RegistroReparacion.belongsTo(Categoria, { foreignKey: 'categoria_codigo', targetKey: 'codigo' });
-  RegistroReparacion.belongsTo(FlotaEquipo, { foreignKey: 'flota_equipo_codigo', targetKey: 'codigo' });
-  RegistroReparacion.belongsTo(Fabricante, { foreignKey: 'fabricante_codigo', targetKey: 'codigo' });
-  RegistroReparacion.belongsTo(Posicion, { foreignKey: 'posicion_codigo', targetKey: 'codigo' });
+  // ========================================
+  // ASOCIACIONES DE ESTRATEGIA (3_Todos - Estrategias)
+  // ========================================
+  Estrategia.belongsTo(Area, { foreignKey: 'area_codigo', targetKey: 'codigo', as: 'area' });
+  Estrategia.belongsTo(Equipo, { foreignKey: 'equipo_codigo', targetKey: 'codigo', as: 'equipo' });
+  Estrategia.belongsTo(UnidadMedida, { foreignKey: 'unidad_medida_codigo', targetKey: 'codigo', as: 'unidad_medida' });
+  Estrategia.belongsTo(TipoEstrategia, { foreignKey: 'tipo_estrategia_codigo', targetKey: 'codigo', as: 'tipo' });
+  Estrategia.belongsTo(StatusEstrategia, { foreignKey: 'status_codigo', targetKey: 'codigo', as: 'status' });
 
-  // OrdenTrabajo - Referencias
-  OrdenTrabajo.belongsTo(Cliente, { foreignKey: 'cliente_codigo', targetKey: 'codigo' });
-  OrdenTrabajo.belongsTo(EstrategiaOt, { foreignKey: 'estrategia_codigo', targetKey: 'codigo' });
-  OrdenTrabajo.belongsTo(RegistroReparacion, { foreignKey: 'registro_reparacion_id', targetKey: 'registro_id' });
-  OrdenTrabajo.belongsTo(Equipo, { foreignKey: 'equipo_id', targetKey: 'equipo_id' });
-  OrdenTrabajo.belongsTo(Componente, { foreignKey: 'componente_id', targetKey: 'componente_id' });
-  OrdenTrabajo.belongsTo(TipoReparacion, { foreignKey: 'tipo_reparacion_codigo', targetKey: 'codigo' });
-  OrdenTrabajo.belongsTo(BaseMetalica, { foreignKey: 'base_metalica_codigo', targetKey: 'codigo' });
-  OrdenTrabajo.belongsTo(Garantia, { foreignKey: 'garantia_codigo', targetKey: 'codigo' });
-  OrdenTrabajo.belongsTo(TipoGarantia, { foreignKey: 'tipo_garantia_codigo', targetKey: 'codigo' });
-  OrdenTrabajo.belongsTo(AtencionReparacion, { foreignKey: 'atencion_reparacion_codigo', targetKey: 'codigo' });
-  OrdenTrabajo.belongsTo(PrioridadAtencion, { foreignKey: 'prioridad_atencion_codigo', targetKey: 'codigo' });
-  OrdenTrabajo.belongsTo(OtStatus, { foreignKey: 'ot_status_codigo', targetKey: 'codigo' });
-  OrdenTrabajo.belongsTo(RecursosStatus, { foreignKey: 'recursos_status_codigo', targetKey: 'codigo' });
-  OrdenTrabajo.belongsTo(TallerStatus, { foreignKey: 'taller_status_codigo', targetKey: 'codigo' });
+  // ========================================
+  // ASOCIACIONES DE TAREA (4_Log_prod - Task List)
+  // ========================================
+  Tarea.belongsTo(CodigoReparacion, { foreignKey: 'cod_rep_codigo', targetKey: 'codigo', as: 'codigo_reparacion' });
+  Tarea.belongsTo(TipoTarea, { foreignKey: 'tipo_codigo', targetKey: 'codigo', as: 'tipo' });
+  Tarea.belongsTo(Material, { foreignKey: 'material_codigo', targetKey: 'codigo', as: 'material' });
 
-  // Tarea - Referencias
-  Tarea.belongsTo(OrdenTrabajo, { foreignKey: 'ot_id', targetKey: 'ot_id' });
-  Tarea.belongsTo(Material, { foreignKey: 'material_id', targetKey: 'material_id' });
-  Tarea.belongsTo(Servicio, { foreignKey: 'servicio_id', targetKey: 'servicio_id' });
-  Tarea.belongsTo(Equipo, { foreignKey: 'equipo_id', targetKey: 'equipo_id' });
-  Tarea.belongsTo(Componente, { foreignKey: 'componente_id', targetKey: 'componente_id' });
-  OrdenTrabajo.hasMany(Tarea, { foreignKey: 'ot_id', sourceKey: 'ot_id' });
-};
+  // ========================================
+  // ASOCIACIONES DE CODIGO_REPARACION (5_Cod_Rep)
+  // ========================================
+  CodigoReparacion.belongsTo(TipoCodRep, { foreignKey: 'tipo_codigo', targetKey: 'codigo', as: 'tipo' });
+  CodigoReparacion.belongsTo(CategoriaCodRep, { foreignKey: 'categoria_codigo', targetKey: 'codigo', as: 'categoria' });
+  CodigoReparacion.belongsTo(FlotaEquipo, { foreignKey: 'flota_codigo', targetKey: 'codigo', as: 'flota' });
+  CodigoReparacion.belongsTo(Fabricante, { foreignKey: 'fabricante_codigo', targetKey: 'codigo', as: 'fabricante' });
+  CodigoReparacion.belongsTo(Posicion, { foreignKey: 'posicion_codigo', targetKey: 'codigo', as: 'posicion' });
 
-// Exportar todos los modelos
+  // ========================================
+  // ASOCIACIONES DE ORDEN_TRABAJO (6_OTs)
+  // ========================================
+  OrdenTrabajo.belongsTo(Cliente, { foreignKey: 'cliente_id', as: 'cliente' });
+  OrdenTrabajo.belongsTo(Estrategia, { foreignKey: 'estrategia_codigo', targetKey: 'codigo', as: 'estrategia' });
+  OrdenTrabajo.belongsTo(CodigoReparacion, { foreignKey: 'cod_rep_codigo', targetKey: 'codigo', as: 'codigo_reparacion' });
+  OrdenTrabajo.belongsTo(Equipo, { foreignKey: 'equipo_codigo', targetKey: 'codigo', as: 'equipo' });
+  OrdenTrabajo.belongsTo(Garantia, { foreignKey: 'garantia_codigo', targetKey: 'codigo', as: 'garantia' });
+  OrdenTrabajo.belongsTo(AtencionReparacion, { foreignKey: 'atencion_reparacion_codigo', targetKey: 'codigo', as: 'atencion_reparacion' });
+  OrdenTrabajo.belongsTo(TipoReparacion, { foreignKey: 'tipo_reparacion_codigo', targetKey: 'codigo', as: 'tipo_reparacion' });
+  OrdenTrabajo.belongsTo(TipoGarantia, { foreignKey: 'tipo_garantia_codigo', targetKey: 'codigo', as: 'tipo_garantia' });
+  OrdenTrabajo.belongsTo(PrioridadAtencion, { foreignKey: 'prioridad_atencion_codigo', targetKey: 'codigo', as: 'prioridad_atencion' });
+  OrdenTrabajo.belongsTo(BaseMetalica, { foreignKey: 'base_metalica_codigo', targetKey: 'codigo', as: 'base_metalica' });
+  OrdenTrabajo.belongsTo(OtStatus, { foreignKey: 'ot_status_codigo', targetKey: 'codigo', as: 'ot_status' });
+  OrdenTrabajo.belongsTo(RecursosStatus, { foreignKey: 'recursos_status_codigo', targetKey: 'codigo', as: 'recursos_status' });
+  OrdenTrabajo.belongsTo(TallerStatus, { foreignKey: 'taller_status_codigo', targetKey: 'codigo', as: 'taller_status' });
+
+  // ========================================
+  // ASOCIACIONES INVERSAS (hasMany)
+  // ========================================
+  Area.belongsTo(Planta, { foreignKey: 'planta_codigo', targetKey: 'codigo', as: 'planta' });
+  SubArea.belongsTo(Area, { foreignKey: 'area_codigo', targetKey: 'codigo', as: 'area' });
+  
+  Planta.hasMany(Material, { foreignKey: 'planta_codigo', sourceKey: 'codigo', as: 'materiales' });
+  Planta.hasMany(Equipo, { foreignKey: 'planta_codigo', sourceKey: 'codigo', as: 'equipos' });
+  Planta.hasMany(Area, { foreignKey: 'planta_codigo', sourceKey: 'codigo', as: 'areas' });
+  
+  Area.hasMany(Material, { foreignKey: 'area_codigo', sourceKey: 'codigo', as: 'materiales' });
+  Area.hasMany(Equipo, { foreignKey: 'area_codigo', sourceKey: 'codigo', as: 'equipos' });
+  Area.hasMany(Estrategia, { foreignKey: 'area_codigo', sourceKey: 'codigo', as: 'estrategias' });
+  Area.hasMany(SubArea, { foreignKey: 'area_codigo', sourceKey: 'codigo', as: 'sub_areas' });
+  
+  Equipo.hasMany(Estrategia, { foreignKey: 'equipo_codigo', sourceKey: 'codigo', as: 'estrategias' });
+  Equipo.hasMany(OrdenTrabajo, { foreignKey: 'equipo_codigo', sourceKey: 'codigo', as: 'ordenes_trabajo' });
+  
+  Estrategia.hasMany(OrdenTrabajo, { foreignKey: 'estrategia_codigo', sourceKey: 'codigo', as: 'ordenes_trabajo' });
+  
+  CodigoReparacion.hasMany(Tarea, { foreignKey: 'cod_rep_codigo', sourceKey: 'codigo', as: 'tareas' });
+  CodigoReparacion.hasMany(OrdenTrabajo, { foreignKey: 'cod_rep_codigo', sourceKey: 'codigo', as: 'ordenes_trabajo' });
+  
+  Material.hasMany(Tarea, { foreignKey: 'material_codigo', sourceKey: 'codigo', as: 'tareas' });
+  
+  Cliente.hasMany(OrdenTrabajo, { foreignKey: 'cliente_id', as: 'ordenes_trabajo' });
+
+  console.log('✓ Asociaciones de modelos configuradas');
+}
+
+// ============================================
+// EXPORTAR TODOS LOS MODELOS
+// ============================================
 export {
+  sequelize,
+  // Modelos Principales
+  Material,
+  Equipo,
+  Estrategia,
+  Tarea,
+  CodigoReparacion,
+  OrdenTrabajo,
+  // Catálogos Compartidos
   Planta,
   Area,
   SubArea,
-  Categoria,
-  Clasificacion,
   UnidadMedida,
   Moneda,
   Fabricante,
-  Criticidad,
-  TipoComponente,
-  Posicion,
+  Categoria,
+  Clasificacion,
+  // Catálogos de Equipos
   StatusEquipo,
+  TipoEquipo,
+  Criticidad,
+  // Catálogos de Estrategias
   StatusEstrategia,
   TipoEstrategia,
+  // Catálogos de Tareas
+  TipoTarea,
+  // Catálogos de Códigos de Reparación
+  TipoCodRep,
+  CategoriaCodRep,
+  FlotaEquipo,
+  Posicion,
+  // Catálogos de Órdenes de Trabajo
+  Cliente,
+  Garantia,
+  AtencionReparacion,
+  TipoReparacion,
+  TipoGarantia,
+  PrioridadAtencion,
+  BaseMetalica,
   OtStatus,
   RecursosStatus,
   TallerStatus,
-  PrioridadAtencion,
-  AtencionReparacion,
-  TipoReparacion,
-  Garantia,
-  TipoGarantia,
-  BaseMetalica,
-  Cliente,
-  EstrategiaOt,
-  TipoEquipo,
+};
+
+export default {
+  sequelize,
+  setupAssociations,
+  // Modelos Principales
   Material,
   Equipo,
-  FlotaEquipo,
-  EquipoFlota,
-  Componente,
-  Servicio,
   Estrategia,
-  RegistroReparacion,
-  OrdenTrabajo,
   Tarea,
+  CodigoReparacion,
+  OrdenTrabajo,
+  // Catálogos
+  Planta,
+  Area,
+  SubArea,
+  UnidadMedida,
+  Moneda,
+  Fabricante,
+  Categoria,
+  Clasificacion,
+  StatusEquipo,
+  TipoEquipo,
+  Criticidad,
+  StatusEstrategia,
+  TipoEstrategia,
+  TipoTarea,
+  TipoCodRep,
+  CategoriaCodRep,
+  FlotaEquipo,
+  Posicion,
+  Cliente,
+  Garantia,
+  AtencionReparacion,
+  TipoReparacion,
+  TipoGarantia,
+  PrioridadAtencion,
+  BaseMetalica,
+  OtStatus,
+  RecursosStatus,
+  TallerStatus,
 };

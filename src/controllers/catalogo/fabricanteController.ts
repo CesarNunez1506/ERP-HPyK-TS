@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import Fabricante from '../../models/Fabricante';
+import Fabricante from '../../models/catalogs/Fabricante';
 
 export const getAllFabricantes = async (req: Request, res: Response) => {
   try {

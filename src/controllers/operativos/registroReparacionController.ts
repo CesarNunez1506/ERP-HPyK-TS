@@ -1,21 +1,22 @@
 import { Request, Response } from 'express';
 import RegistroReparacion from '../../models/RegistroReparacion';
 import TipoComponente from '../../models/TipoComponente';
-import Categoria from '../../models/Categoria';
-import FlotaEquipo from '../../models/FlotaEquipo';
-import Fabricante from '../../models/Fabricante';
-import Posicion from '../../models/Posicion';
+import Categoria from '../../models/catalogs/Categoria';
+import FlotaEquipo from '../../models/catalogs/FlotaEquipo';
+import Fabricante from '../../models/catalogs/Fabricante';
+import Posicion from '../../models/catalogs/Posicion';
 
 export const getAllRegistrosReparacion = async (req: Request, res: Response) => {
   try {
     const registros = await RegistroReparacion.findAll({
       include: [
-        { model: TipoComponente },
-        { model: Categoria },
-        { model: FlotaEquipo },
-        { model: Fabricante },
-        { model: Posicion }
-      ]
+        { model: TipoComponente, as: 'tipo_componente' },
+        { model: Categoria, as: 'categoria' },
+        { model: FlotaEquipo, as: 'flota' },
+        { model: Fabricante, as: 'fabricante' },
+        { model: Posicion, as: 'posicion' }
+      ],
+      order: [['id', 'DESC']]
     });
     res.json(registros);
   } catch (error) {
@@ -28,11 +29,11 @@ export const getRegistroReparacionById = async (req: Request, res: Response) => 
     const { id } = req.params;
     const registro = await RegistroReparacion.findByPk(parseInt(id as string), {
       include: [
-        { model: TipoComponente },
-        { model: Categoria },
-        { model: FlotaEquipo },
-        { model: Fabricante },
-        { model: Posicion }
+        { model: TipoComponente, as: 'tipo_componente' },
+        { model: Categoria, as: 'categoria' },
+        { model: FlotaEquipo, as: 'flota' },
+        { model: Fabricante, as: 'fabricante' },
+        { model: Posicion, as: 'posicion' }
       ]
     });
     

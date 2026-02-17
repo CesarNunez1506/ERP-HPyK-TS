@@ -1,11 +1,12 @@
 import { Request, Response } from 'express';
 import Servicio from '../../models/Servicio';
-import Moneda from '../../models/Moneda';
+import Moneda from '../../models/catalogs/Moneda';
 
 export const getAllServicios = async (req: Request, res: Response) => {
   try {
     const servicios = await Servicio.findAll({
-      include: [{ model: Moneda }]
+      include: [{ model: Moneda, as: 'moneda' }],
+      order: [['servicio_id', 'ASC']]
     });
     res.json(servicios);
   } catch (error) {
@@ -17,7 +18,7 @@ export const getServicioById = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
     const servicio = await Servicio.findByPk(parseInt(id as string), {
-      include: [{ model: Moneda }]
+      include: [{ model: Moneda, as: 'moneda' }]
     });
     
     if (!servicio) {

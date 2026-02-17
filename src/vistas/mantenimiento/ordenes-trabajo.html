@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Órdenes de Trabajo - ERP Monasterio</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="/vistas/shared/navigation.js"></script>
+    <style>
+        .dropdown-menu { display: none; }
+        .dropdown.active .dropdown-menu { display: block; }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <!-- Navigation Menu will be loaded here -->
+    <div id="navigation-container"></div>
+
+    <!-- Header -->
+    <div class="bg-gradient-to-r from-green-600 to-green-800 text-white shadow-lg">
+        <div class="container mx-auto px-6 py-4">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center space-x-4">
+                    <i class="fas fa-clipboard-list text-3xl"></i>
+                    <div>
+                        <h1 class="text-2xl font-bold">Órdenes de Trabajo</h1>
+                        <p class="text-green-200 text-sm">Gestión y Seguimiento de Tareas</p>
+                    </div>
+                </div>
+                <div class="flex items-center space-x-3">
+                    <a href="/index.html" class="bg-green-700 hover:bg-green-800 px-4 py-2 rounded-lg transition">
+                        <i class="fas fa-home"></i> Inicio
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Header -->
+    <div class="bg-gradient-to-r from-green-500 to-green-700 text-white py-8">
+        <div class="container mx-auto px-4">
+            <h1 class="text-3xl font-bold mb-2">
+                <i class="fas fa-clipboard-list mr-2"></i> Órdenes de Trabajo
+            </h1>
+            <p class="text-green-100">Módulo de Mantenimiento - Gestión de órdenes de mantenimiento y reparación</p>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="container mx-auto px-4 py-8">
+        <!-- Stats Cards -->
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+            <div class="bg-white rounded-lg shadow-lg p-6">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-gray-500 text-sm">Abiertas</p>
+                        <p class="text-3xl font-bold text-yellow-600">15</p>
+                    </div>
+                    <div class="bg-yellow-100 p-3 rounded-full">
+                        <i class="fas fa-folder-open text-yellow-600 text-2xl"></i>
+                    </div>
+                </div>
+            </div>
+            <div class="bg-white rounded-lg shadow-lg p-6">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-gray-500 text-sm">En Proceso</p>
+                        <p class="text-3xl font-bold text-blue-600">8</p>
+                    </div>
+                    <div class="bg-blue-100 p-3 rounded-full">
+                        <i class="fas fa-cog text-blue-600 text-2xl"></i>
+                    </div>
+                </div>
+            </div>
+            <div class="bg-white rounded-lg shadow-lg p-6">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-gray-500 text-sm">Completadas</p>
+                        <p class="text-3xl font-bold text-green-600">124</p>
+                    </div>
+                    <div class="bg-green-100 p-3 rounded-full">
+                        <i class="fas fa-check-circle text-green-600 text-2xl"></i>
+                    </div>
+                </div>
+            </div>
+            <div class="bg-white rounded-lg shadow-lg p-6">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-gray-500 text-sm">Urgentes</p>
+                        <p class="text-3xl font-bold text-red-600">3</p>
+                    </div>
+                    <div class="bg-red-100 p-3 rounded-full">
+                        <i class="fas fa-exclamation-circle text-red-600 text-2xl"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Work Orders Table -->
+        <div class="bg-white rounded-lg shadow overflow-hidden">
+            <table class="w-full">
+                <thead class="bg-green-600 text-white">
+                    <tr>
+                        <th class="px-6 py-3 text-left">OT #</th>
+                        <th class="px-6 py-3 text-left">Equipo</th>
+                        <th class="px-6 py-3 text-left">Tipo</th>
+                        <th class="px-6 py-3 text-left">Prioridad</th>
+                        <th class="px-6 py-3 text-left">Técnico</th>
+                        <th class="px-6 py-3 text-left">Estado</th>
+                        <th class="px-6 py-3 text-left">Fecha</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-200">
+                    <tr class="hover:bg-gray-50">
+                        <td class="px-6 py-4 font-mono font-semibold">OT-2026-045</td>
+                        <td class="px-6 py-4">Horno Industrial A1</td>
+                        <td class="px-6 py-4">
+                            <span class="bg-red-100 text-red-800 px-2 py-1 rounded text-sm">Correctivo</span>
+                        </td>
+                        <td class="px-6 py-4">
+                            <span class="bg-red-100 text-red-800 px-2 py-1 rounded text-sm font-semibold">Urgente</span>
+                        </td>
+                        <td class="px-6 py-4">Carlos Mendoza</td>
+                        <td class="px-6 py-4">
+                            <span class="bg-blue-100 text-blue-800 px-2 py-1 rounded text-sm font-semibold">En Proceso</span>
+                        </td>
+                        <td class="px-6 py-4">2026-02-10</td>
+                    </tr>
+                    <tr class="hover:bg-gray-50">
+                        <td class="px-6 py-4 font-mono font-semibold">OT-2026-044</td>
+                        <td class="px-6 py-4">Mezcladora B3</td>
+                        <td class="px-6 py-4">
+                            <span class="bg-green-100 text-green-800 px-2 py-1 rounded text-sm">Preventivo</span>
+                        </td>
+                        <td class="px-6 py-4">
+                            <span class="bg-green-100 text-green-800 px-2 py-1 rounded text-sm font-semibold">Normal</span>
+                        </td>
+                        <td class="px-6 py-4">Ana Torres</td>
+                        <td class="px-6 py-4">
+                            <span class="bg-yellow-100 text-yellow-800 px-2 py-1 rounded text-sm font-semibold">Abierta</span>
+                        </td>
+                        <td class="px-6 py-4">2026-02-09</td>
+                    </tr>
+                    <tr class="hover:bg-gray-50">
+                        <td class="px-6 py-4 font-mono font-semibold">OT-2026-043</td>
+                        <td class="px-6 py-4">Compresor C2</td>
+                        <td class="px-6 py-4">
+                            <span class="bg-green-100 text-green-800 px-2 py-1 rounded text-sm">Preventivo</span>
+                        </td>
+                        <td class="px-6 py-4">
+                            <span class="bg-green-100 text-green-800 px-2 py-1 rounded text-sm font-semibold">Normal</span>
+                        </td>
+                        <td class="px-6 py-4">Luis Ramírez</td>
+                        <td class="px-6 py-4">
+                            <span class="bg-green-100 text-green-800 px-2 py-1 rounded text-sm font-semibold">Completada</span>
+                        </td>
+                        <td class="px-6 py-4">2026-02-08</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        function toggleDropdown(event, button) {
+            event.stopPropagation();
+            const dropdown = button.closest('.dropdown');
+            const isActive = dropdown.classList.contains('active');
+            document.querySelectorAll('.dropdown').forEach(d => d.classList.remove('active'));
+            if (!isActive) dropdown.classList.add('active');
+        }
+
+        function closeAllDropdowns(event) {
+            if (!event.target.closest('.dropdown')) {
+                document.querySelectorAll('.dropdown').forEach(d => d.classList.remove('active'));
+            }
+        }
+    </script>
+</body>
+</html>

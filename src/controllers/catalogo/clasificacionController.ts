@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import Clasificacion from '../../models/Clasificacion';
+import Clasificacion from '../../models/catalogs/Clasificacion';
 
 export const getAllClasificaciones = async (req: Request, res: Response) => {
   try {

@@ -1,11 +1,12 @@
 import { Request, Response } from 'express';
-import TipoEquipo from '../../models/TipoEquipo';
-import Categoria from '../../models/Categoria';
+import TipoEquipo from '../../models/catalogs/TipoEquipo';
+import Categoria from '../../models/catalogs/Categoria';
 
 export const getAllTiposEquipo = async (req: Request, res: Response) => {
   try {
     const tipos = await TipoEquipo.findAll({
-      include: [{ model: Categoria }]
+      include: [{ model: Categoria, as: 'categoria' }],
+      order: [['codigo', 'ASC']]
     });
     res.json(tipos);
   } catch (error) {
@@ -17,7 +18,7 @@ export const getTipoEquipoById = async (req: Request, res: Response) => {
   try {
     const { codigo } = req.params;
     const tipo = await TipoEquipo.findByPk(codigo as string, {
-      include: [{ model: Categoria }]
+      include: [{ model: Categoria, as: 'categoria' }]
     });
     
     if (!tipo) {

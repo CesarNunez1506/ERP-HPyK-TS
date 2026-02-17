@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import Criticidad from '../../models/Criticidad';
+import Criticidad from '../../models/catalogs/Criticidad';
 
 export const getAllCriticidades = async (req: Request, res: Response) => {
   try {
